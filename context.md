@@ -295,3 +295,8 @@ El dragData incluye:
 - `.fab`: Botón flotante con safe-area-inset
 - `.bottom-sheet`: Panel deslizante desde abajo
 - Slots en mobile tienen padding lateral 12px via CSS específico
+
+### Tipografía Responsive
+- Todos los `font-size` usan `rem` (no `px`) para escalar con el tamaño base
+- Desktop: `html { font-size: 130%; }`
+- Mobile (≤600px): `html { font-size: 150%; }` para mejor legibilidad en pantallas pequeñas
