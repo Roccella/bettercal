@@ -373,7 +373,7 @@
 
     // Day width is base unit (50% more than before: 175 * 1.5 = 262), sidebar is 1.2x
     const DAY_WIDTH = 200;
-    const SIDEBAR_WIDTH = 240;
+    const SIDEBAR_WIDTH = 300;
 
     const initialCategories = [
       { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
@@ -389,82 +389,82 @@
 
     const initialItems = [
       // AI agents
-      { id: 1, title: 'Armar prototipo nuevo', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
-      { id: 2, title: 'Mejorar prompts de código', category: 'ai', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 1, title: 'Armar prototipo nuevo', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 2, title: 'Mejorar prompts de código', category: 'ai', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 3, title: 'Probar Kimi K2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: true, repeat: null, description: '' },
-      { id: 9, title: 'Revisar código OpenClaw', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
-      { id: 110, title: 'Leer artículo RL', category: 'ai', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
-      { id: 111, title: 'Testear Claude 4', category: 'ai', effort: 2, scheduledDate: '2026-02-05', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 9, title: 'Revisar código OpenClaw', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 110, title: 'Leer artículo RL', category: 'ai', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 111, title: 'Testear Claude 4', category: 'ai', effort: 2, scheduledDate: '2026-02-05', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 112, title: 'Documentar agentes', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 200, title: 'Investigar MCP', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
       { id: 201, title: 'Probar Gemini 2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-17', isArchived: false, repeat: null, description: '' },
 
       // Trabajo
-      { id: 10, title: 'Comprar verduras', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
-      { id: 11, title: 'Responder emails', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: true, completedDate: '2026-02-03', createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
-      { id: 12, title: 'Preparar presentación', category: 'work', effort: 3, scheduledDate: '2026-02-04', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-29', isArchived: false, repeat: null, description: '' },
-      { id: 13, title: 'Revisar inversiones', category: 'work', effort: 2, scheduledDate: '2026-02-07', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
-      { id: 108, title: 'Review código equipo', category: 'work', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 109, title: 'Planificar semana', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
-      { id: 113, title: 'Llamar cliente', category: 'work', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
-      { id: 114, title: 'Enviar propuesta', category: 'work', effort: 2, scheduledDate: '2026-02-08', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 10, title: 'Comprar verduras', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
+      { id: 11, title: 'Responder emails', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: true, completedDate: '2026-02-03', createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
+      { id: 12, title: 'Preparar presentación', category: 'work', effort: 3, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-29', isArchived: false, repeat: null, description: '' },
+      { id: 13, title: 'Revisar inversiones', category: 'work', effort: 2, scheduledDate: '2026-02-07', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+      { id: 108, title: 'Review código equipo', category: 'work', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 109, title: 'Planificar semana', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 113, title: 'Llamar cliente', category: 'work', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 114, title: 'Enviar propuesta', category: 'work', effort: 2, scheduledDate: '2026-02-08', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 115, title: 'Actualizar CV', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 202, title: 'Revisar contratos', category: 'work', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
       { id: 203, title: 'Organizar archivos', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-14', isArchived: false, repeat: null, description: '' },
 
       // Salud
-      { id: 107, title: 'Vitaminas', category: 'health', effort: 0, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'vitaminas', description: '' },
-      { id: 116, title: 'Turno dentista', category: 'health', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 117, title: 'Comprar medicamentos', category: 'health', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 107, title: 'Vitaminas', category: 'health', effort: 0, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'vitaminas', description: '' },
+      { id: 116, title: 'Turno dentista', category: 'health', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 117, title: 'Comprar medicamentos', category: 'health', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
       { id: 204, title: 'Chequeo anual', category: 'health', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
 
       // Social
-      { id: 7, title: 'Llamar a mamá', category: 'social', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 8, title: 'Organizar juntada', category: 'social', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
-      { id: 118, title: 'Cumpleaños Pablo', category: 'social', effort: 1, scheduledDate: '2026-02-07', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
-      { id: 119, title: 'Cena con amigos', category: 'social', effort: 1, scheduledDate: '2026-02-10', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 7, title: 'Llamar a mamá', category: 'social', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 8, title: 'Organizar juntada', category: 'social', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 118, title: 'Cumpleaños Pablo', category: 'social', effort: 1, scheduledDate: '2026-02-07', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 119, title: 'Cena con amigos', category: 'social', effort: 1, scheduledDate: '2026-02-10', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 205, title: 'Visitar abuelos', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
 
       // Música
-      { id: 132, title: 'Practicar teclado', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-02-02', isArchived: false, repeat: { type: 'days', every: 3, startDate: '2026-02-02' }, description: '' },
-      { id: 130, title: 'Practicar guitarra', category: 'music', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
-      { id: 131, title: 'Escuchar álbum nuevo', category: 'music', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 132, title: 'Practicar teclado', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-02-02', isArchived: false, repeat: { type: 'days', every: 3, startDate: '2026-02-02' }, description: '' },
+      { id: 130, title: 'Practicar guitarra', category: 'music', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 131, title: 'Escuchar álbum nuevo', category: 'music', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 206, title: 'Comprar cuerdas', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
       { id: 207, title: 'Aprender canción nueva', category: 'music', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
 
       // Entretenimiento
-      { id: 4, title: 'Ver Severance S2', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
-      { id: 5, title: 'Jugar Balatro', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 4, title: 'Ver Severance S2', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 5, title: 'Jugar Balatro', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
       { id: 6, title: 'Terminar Elden Ring DLC', category: 'entertainment', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-05', isArchived: true, repeat: null, description: '' },
-      { id: 120, title: 'Leer libro nuevo', category: 'entertainment', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
-      { id: 121, title: 'Ver película', category: 'entertainment', effort: 1, scheduledDate: '2026-02-08', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 120, title: 'Leer libro nuevo', category: 'entertainment', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 121, title: 'Ver película', category: 'entertainment', effort: 1, scheduledDate: '2026-02-08', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 208, title: 'Terminar serie', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
       { id: 209, title: 'Probar juego nuevo', category: 'entertainment', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
 
       // Hogar
-      { id: 106, title: 'Regar plantas', category: 'home', effort: 0, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [0, 3] }, repeatBaseId: 'plantas', description: '' },
-      { id: 122, title: 'Limpiar casa', category: 'home', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 123, title: 'Comprar supermercado', category: 'home', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
-      { id: 124, title: 'Pagar facturas', category: 'home', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 106, title: 'Regar plantas', category: 'home', effort: 0, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [0, 3] }, repeatBaseId: 'plantas', description: '' },
+      { id: 122, title: 'Limpiar casa', category: 'home', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 123, title: 'Comprar supermercado', category: 'home', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 124, title: 'Pagar facturas', category: 'home', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 125, title: 'Ordenar armario', category: 'home', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 210, title: 'Arreglar grifo', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
       { id: 211, title: 'Cambiar focos', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
 
       // Fitness
-      { id: 101, title: 'Gym abajo', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'gym-abajo', description: '' },
-      { id: 102, title: 'Gym arriba', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [2, 5] }, repeatBaseId: 'gym-arriba', description: '' },
-      { id: 126, title: 'Boxeo switch', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [3] }, repeatBaseId: 'boxeo', description: '' },
-      { id: 127, title: 'Correr 5km', category: 'fitness', effort: 2, scheduledDate: '2026-02-10', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 101, title: 'Gym abajo', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'gym-abajo', description: '' },
+      { id: 102, title: 'Gym arriba', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [2, 5] }, repeatBaseId: 'gym-arriba', description: '' },
+      { id: 126, title: 'Boxeo switch', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [3] }, repeatBaseId: 'boxeo', description: '' },
+      { id: 127, title: 'Correr 5km', category: 'fitness', effort: 2, scheduledDate: '2026-02-10', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 212, title: 'Yoga', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 213, title: 'Nadar', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
 
       // Previous week items (Jan 27 - Feb 1)
-      { id: 300, title: 'Reunión equipo', category: 'work', effort: 1, scheduledDate: '2026-01-28', scheduledSlot: 'morning', completed: true, completedDate: '2026-01-28', createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
-      { id: 301, title: 'Deploy producción', category: 'ai', effort: 2, scheduledDate: '2026-01-29', scheduledSlot: 'afternoon', completed: true, completedDate: '2026-01-29', createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
-      { id: 302, title: 'Pagar alquiler', category: 'home', effort: 1, scheduledDate: '2026-01-30', scheduledSlot: 'morning', completed: true, completedDate: '2026-01-30', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 303, title: 'Cena con Ana', category: 'social', effort: 1, scheduledDate: '2026-01-31', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
-      { id: 304, title: 'Comprar regalo', category: 'social', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'afternoon', completed: true, completedDate: '2026-02-01', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
-      { id: 305, title: 'Backup laptop', category: 'work', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 300, title: 'Reunión equipo', category: 'work', effort: 1, scheduledDate: '2026-01-28', scheduledSlot: 'todo', completed: true, completedDate: '2026-01-28', createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 301, title: 'Deploy producción', category: 'ai', effort: 2, scheduledDate: '2026-01-29', scheduledSlot: 'todo', completed: true, completedDate: '2026-01-29', createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 302, title: 'Pagar alquiler', category: 'home', effort: 1, scheduledDate: '2026-01-30', scheduledSlot: 'todo', completed: true, completedDate: '2026-01-30', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 303, title: 'Cena con Ana', category: 'social', effort: 1, scheduledDate: '2026-01-31', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 304, title: 'Comprar regalo', category: 'social', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'todo', completed: true, completedDate: '2026-02-01', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 305, title: 'Backup laptop', category: 'work', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
 
       // Additional backlog items
       { id: 310, title: 'asdsad', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
@@ -764,16 +764,13 @@
     const EnergySelector = ({ energy, onChange }) => (
       <div style={{ display: 'flex', gap: '2px' }}>
         {[1,2,3].map(l => (
-          <button key={l} onClick={(e) => { e.stopPropagation(); onChange(l); }} style={{
-            padding: '2px 6px',
-            border: 'none',
-            borderRadius: '4px',
+          <button key={l} onClick={(e) => { e.stopPropagation(); onChange(l); }} className="btn" style={{
+            width: '18px',
+            padding: '1px 0',
             background: energy === l ? 'var(--bg-input)' : 'transparent',
-            fontSize: '0.625rem',
-            cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
-          }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</button>
+          }}><span style={{ position: 'relative', top: '-1px', left: '2px' }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</span></button>
         ))}
       </div>
     );
@@ -1013,7 +1010,7 @@
       );
     };
 
-    const AddEditItemPopover = ({ categories, onSave, onDelete, onClose, targetRect, editItem, defaultCategory, defaultSlot, defaultDate, addCompleted, visualDate }) => {
+    const AddEditItemPopover = ({ categories, onSave, onDelete, onComplete, onClose, targetRect, editItem, defaultCategory, defaultSlot, defaultDate, addCompleted, visualDate }) => {
       const [title, setTitle] = useState(editItem?.title || '');
       const [description, setDescription] = useState(editItem?.description || '');
       const [category, setCategory] = useState(editItem?.category || defaultCategory || 'temp');
@@ -1021,7 +1018,7 @@
       // For recurring items, use visualDate as initial scheduled date
       const initialDate = editItem?.scheduledDate || visualDate || defaultDate || null;
       const [scheduledDate, setScheduledDate] = useState(initialDate);
-      const [scheduledSlot, setScheduledSlot] = useState(editItem?.scheduledSlot || defaultSlot || 'morning');
+      const [scheduledSlot, setScheduledSlot] = useState(editItem?.scheduledSlot || defaultSlot || 'todo');
       const [userClearedDate, setUserClearedDate] = useState(false); // Track if user explicitly chose "Sin fecha"
       const [repeatType, setRepeatType] = useState(editItem?.repeat?.type || 'none');
       const [repeatEvery, setRepeatEvery] = useState(editItem?.repeat?.every || 1);
@@ -1039,7 +1036,7 @@
       const originalEffort = editItem?.effort ?? 1;
       // For recurring items, use the same initialDate logic to compare against
       const originalScheduledDate = editItem?.scheduledDate || visualDate || defaultDate || null;
-      const originalScheduledSlot = editItem?.scheduledSlot || defaultSlot || 'morning';
+      const originalScheduledSlot = editItem?.scheduledSlot || defaultSlot || 'todo';
       const originalRepeatType = editItem?.repeat?.type || 'none';
       const originalRepeatEvery = editItem?.repeat?.every || 1;
       const originalRepeatDays = editItem?.repeat?.days || [];
@@ -1189,11 +1186,10 @@
 
               {(scheduledDate || repeatType !== 'none') && (
                 <div style={{ marginBottom: '8px' }}>
-                  <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Prioridad</div>
                   <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
-                    <option value="morning">Mañana</option>
-                    <option value="afternoon">Tarde</option>
-                    <option value="evening">Noche</option>
+                    <option value="important">Importante</option>
+                    <option value="todo">Pendiente</option>
                   </select>
                 </div>
               )}
@@ -1238,8 +1234,18 @@
                 </div>
               </div>
 
+              {/* Mark as done button - only for editing non-completed items */}
+              {isEditing && !editItem.completed && onComplete && (
+                <button type="button" onClick={() => { onComplete(editItem.id); onClose(); }} style={{
+                  width: '100%', padding: '8px', marginBottom: '10px', border: 'none', borderRadius: '6px',
+                  background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.6875rem', cursor: 'pointer'
+                }}>
+                  Marcar como hecho
+                </button>
+              )}
+
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger">🗑</button>}
+                {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
                 <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '6px 10px', fontSize: '0.75rem' }}>✕</button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
@@ -1303,7 +1309,7 @@
               </div>
             </div>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}>🗑</button>}
+              {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
               <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>{isNew ? 'Crear' : 'Guardar'}</button>
             </div>
             {!isNew && !canDelete && <div style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
@@ -1404,9 +1410,8 @@
       const hasChanges = typeChanged || everyChanged || daysChanged;
 
       const getSlotName = (slot) => {
-        if (slot === 'morning') return 'Mañana';
-        if (slot === 'afternoon') return 'Tarde';
-        if (slot === 'evening') return 'Noche';
+        if (slot === 'important') return 'Importante';
+        if (slot === 'todo') return 'Pendiente';
         if (slot === 'done') return 'Hecho';
         return slot;
       };
@@ -1749,12 +1754,9 @@
         return 'var(--text-primary)';
       };
 
-      // Checkbox visibility logic
+      // Recurring item logic (for sidebar label)
       const isRecurring = !!item.repeat;
       const isScheduled = !!item.scheduledDate;
-      const hideCheckbox = inSidebar && isRecurring && !isScheduled;
-      const disableCheckbox = inSidebar && isRecurring && isScheduled;
-      const showCheckbox = !hideCheckbox;
 
       // Check if this item was just dropped (for feedback animation)
       const itemBaseId = typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id;
@@ -1780,31 +1782,7 @@
           onTouchEnd={handleTouchEnd}
           style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', padding: '5px 6px', background: getCardBackground(), borderRadius: '5px', opacity: item.completed ? 0.6 : (item._isPending ? 0.7 : 1), touchAction: isMobileDevice ? 'pan-x' : 'auto' }}
         >
-          {/* Left: Checkbox */}
-          {showCheckbox && (
-            <div
-              data-checkbox="true"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!disableCheckbox) onComplete(completeId);
-              }}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: '20px', height: '20px', marginLeft: '-3px', marginTop: '-2px',
-                cursor: disableCheckbox ? 'default' : 'pointer', flexShrink: 0,
-                opacity: disableCheckbox ? 0.4 : 1,
-              }}
-            >
-              <div style={{
-                width: '14px', height: '14px', borderRadius: '4px',
-                background: item.completed ? 'var(--accent-green)' : 'var(--checkbox-bg)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {item.completed && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
-              </div>
-            </div>
-          )}
-          {/* Center: Title + metadata */}
+          {/* Left: Title + metadata */}
           <div style={{ flex: 1, minWidth: 0, marginTop: '1px' }}>
             <div style={{
               fontSize: '0.625rem', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -1825,7 +1803,7 @@
       );
     };
 
-    const SlotSection = ({ slot, label, items, energy, categories, onComplete, onEdit, onDelete, onDrop, onAdd, dateStr, isDone, isToday, isPast, justDroppedItemId }) => {
+    const SlotSection = ({ slot, label, items, energy, categories, onComplete, onEdit, onDelete, onDrop, onAdd, dateStr, isDone, isToday, isPast, justDroppedItemId, allowClickToAdd }) => {
       const [newItemId, setNewItemId] = useState(null);
       const [editRect, setEditRect] = useState(null);
       const [dropIndex, setDropIndex] = useState(-1);
@@ -1965,8 +1943,7 @@
             <div onClick={(e) => handleAddItem(e, true)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '0.5625rem', color: isDone ? 'var(--accent-green)' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
-                  {!isDone && <EffortBarSlot effort={slotEffort} energy={energy} />}
+                  <span style={{ fontSize: '0.5625rem', color: isDone ? 'var(--accent-green)' : slot === 'important' ? '#EF4444' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
                 </div>
                 {!isDone && <button onClick={(e) => handleAddItem(e, false)} className="btn" style={{ fontWeight: '700', padding: '1px 5px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>}
               </div>
@@ -2011,8 +1988,8 @@
                 )}
                 {/* Bottom padding for Done slot */}
                 {isDone && <div style={{ height: '6px', flexShrink: 0 }} />}
-                {/* Bottom drop area - only for Noche slot (allows clicking empty area to add) */}
-                {slot === 'evening' && (
+                {/* Bottom drop area - allows clicking empty area to add */}
+                {allowClickToAdd && (
                   <div
                     style={{ flex: 1, minHeight: '10px' }}
                     onDragOver={(e) => {
@@ -2032,6 +2009,7 @@
               categories={categories}
               onSave={onAdd}
               onDelete={onDelete}
+              onComplete={onComplete}
               onClose={handleClosePopover}
               targetRect={editRect.rect}
               editItem={editingItem}
@@ -2047,7 +2025,7 @@
       const energy = dayEnergy[dateStr] || 2;
       const getSlotItems = (slot) => items.filter(i => i.scheduledDate === dateStr && i.scheduledSlot === slot && !i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       const completedItems = items.filter(i => i.completedDate === dateStr && i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      const dayEffort = ['morning','afternoon','evening'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
+      const dayEffort = ['important','todo'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isSunday = day.date.getDay() === 0;
 
@@ -2069,14 +2047,15 @@
               <span style={{ fontSize: '0.8125rem', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
               <span style={{ fontSize: '0.8125rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
             </div>
-            <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
-            <EffortBarSlot effort={dayEffort} energy={energy} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
+              <div style={{ marginTop: '2px' }}><EffortBarSlot effort={dayEffort} energy={energy} /></div>
+            </div>
           </div>
           <div className="slot-container">
             <div className="slots-scrollable">
-              <SlotSection slot="morning" label="Mañana" items={getSlotItems('morning')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
-              <SlotSection slot="afternoon" label="Tarde" items={getSlotItems('afternoon')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
-              <SlotSection slot="evening" label="Noche" items={getSlotItems('evening')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+              <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+              <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} allowClickToAdd={true} />
             </div>
             <SlotSection slot="done" label="Hecho" items={completedItems} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isDone={true} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
           </div>
@@ -2503,6 +2482,7 @@
               categories={categories}
               onSave={onAdd}
               onDelete={onDelete}
+              onComplete={onComplete}
               onClose={handleBacklogClosePopover}
               targetRect={backlogEditRect.rect}
               editItem={backlogEditingItem}
@@ -2524,17 +2504,132 @@
       );
     };
 
+    // ============ EXPANDED CATEGORIES COLUMN ============
+
+    const ExpandedCategoryColumn = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onSidebarGroupDrop, justDroppedItemId, groupsExp, onGroupToggle }) => {
+      const categoryItems = items.filter(i => i.category === category.id);
+
+      const seenRepeatBaseIds = new Set();
+      const seenIds = new Set();
+      const uniqueItems = categoryItems.filter(item => {
+        if (item.repeatBaseId) {
+          if (seenRepeatBaseIds.has(item.repeatBaseId)) return false;
+          seenRepeatBaseIds.add(item.repeatBaseId);
+          return true;
+        }
+        const baseId = item.originalId || item.id;
+        if (seenIds.has(baseId)) return false;
+        seenIds.add(baseId);
+        return true;
+      });
+
+      const ongoing = uniqueItems.filter(i => !i.completed && !i.isArchived);
+      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.completed && !i.repeat)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      const scheduled = ongoing.filter(i => i.scheduledDate || i.repeat);
+      const recurringItems = scheduled.filter(i => i.repeat && !i.scheduledDate);
+      const dateScheduled = scheduled.filter(i => i.scheduledDate);
+
+      const byDate = {};
+      dateScheduled.forEach(item => {
+        if (!byDate[item.scheduledDate]) byDate[item.scheduledDate] = [];
+        byDate[item.scheduledDate].push(item);
+      });
+      const sortedDates = Object.keys(byDate).sort();
+
+      const scheduledExp = groupsExp?.scheduled ?? true;
+      const backlogExp = groupsExp?.backlog ?? true;
+      const doneExp = groupsExp?.done ?? true;
+
+      const [isDraggingItem, setIsDraggingItem] = useState(false);
+      const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const dragCountRef = useRef(0);
+
+      const handleGroupDrop = (data, targetGroup, e, dropIdx) => {
+        const { id } = data;
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : parseInt(id);
+        const item = allItems.find(i => i.id === numId);
+        if (!item) return;
+
+        if ((item.scheduledDate || item.repeat) && targetGroup === 'backlog') {
+          const rect = {
+            top: e?.clientY || window.innerHeight / 2,
+            bottom: (e?.clientY || window.innerHeight / 2) + 10,
+            left: (e?.clientX || window.innerWidth / 2) - 140,
+            right: (e?.clientX || window.innerWidth / 2) + 140,
+          };
+          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: !!item.repeat });
+          return;
+        }
+        onSidebarGroupDrop?.(numId, targetGroup, category.id, dropIdx);
+      };
+
+      const handleColumnDragEnter = (e) => {
+        if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+          dragCountRef.current++;
+          setIsDraggingItem(true);
+        }
+      };
+
+      const handleColumnDragLeave = (e) => {
+        if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+          dragCountRef.current--;
+          if (dragCountRef.current === 0) setIsDraggingItem(false);
+        }
+      };
+
+      const handleColumnDrop = (e) => {
+        e.preventDefault();
+        dragCountRef.current = 0;
+        setIsDraggingItem(false);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) handleGroupDrop(JSON.parse(data), 'anyday', e);
+      };
+
+      return (
+        <div
+          onDragEnter={handleColumnDragEnter}
+          onDragLeave={handleColumnDragLeave}
+          onDragOver={(e) => { if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) e.preventDefault(); }}
+          onDrop={handleColumnDrop}
+          style={{ flex: '0 0 300px', width: '300px', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)', height: '100%' }}>
+          <div style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12` }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
+            <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px 8px' }}>
+            <SidebarGroup label="Backlog" count={backlogItems.length} items={backlogItems} expanded={backlogExp} onToggle={() => onGroupToggle?.('backlog')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)} showDropIndicator={isDraggingItem} isBacklog={true} justDroppedItemId={justDroppedItemId} />
+            <div style={{ marginBottom: '4px' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
+              <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
+                <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: 'var(--text-muted)' }}>▶</span>
+                <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Hacer ({scheduled.length})</span>
+              </div>
+              <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
+                {recurringItems.map(item => <div key={item.id} style={{ marginBottom: '6px' }}><ItemCard item={item} categories={categories} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} /></div>)}
+                {sortedDates.flatMap(date => byDate[date]).map(item => <div key={item.id} style={{ marginBottom: '6px' }}><ItemCard item={item} categories={categories} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} /></div>)}
+              </div>
+            </div>
+            <SidebarGroup label="Hecho" count={doneItems.length} items={doneItems} expanded={doneExp} onToggle={() => onGroupToggle?.('done')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'done', e, dropIdx)} labelColor="var(--accent-green)" justDroppedItemId={justDroppedItemId} />
+          </div>
+          {removeDatePopover && <RemoveDatePopover itemTitle={removeDatePopover.item.title} isRecurring={removeDatePopover.isRecurring} onConfirm={() => { onSidebarGroupDrop?.(removeDatePopover.item.id, 'backlog', category.id, removeDatePopover.dropIdx); setRemoveDatePopover(null); }} onCancel={() => setRemoveDatePopover(null)} targetRect={removeDatePopover.rect} />}
+        </div>
+      );
+    };
+
     // ============ MOBILE COMPONENTS ============
 
     // BottomSheet for mobile item editing
-    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onClose, closing }) => {
+    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onComplete, onClose, closing }) => {
       const [title, setTitle] = useState(item?.title || '');
       const [description, setDescription] = useState(item?.description || '');
       const [category, setCategory] = useState(item?.category || 'temp');
       const [effort, setEffort] = useState(item?.effort ?? 1);
       const initialDate = item?.scheduledDate || visualDate || null;
       const [scheduledDate, setScheduledDate] = useState(initialDate);
-      const [scheduledSlot, setScheduledSlot] = useState(item?.scheduledSlot || 'morning');
+      const [scheduledSlot, setScheduledSlot] = useState(item?.scheduledSlot || 'todo');
       const [repeatType, setRepeatType] = useState(item?.repeat?.type || 'none');
       const [repeatEvery, setRepeatEvery] = useState(item?.repeat?.every || 1);
       const [repeatDays, setRepeatDays] = useState(item?.repeat?.days || []);
@@ -2557,7 +2652,7 @@
 
       const hasChanges = title !== originalTitle || description !== originalDescription ||
         category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
-        scheduledDate !== initialDate || scheduledSlot !== (item?.scheduledSlot || 'morning') ||
+        scheduledDate !== initialDate || scheduledSlot !== (item?.scheduledSlot || 'todo') ||
         repeatType !== (item?.repeat?.type || 'none');
 
       const hasUserChanges = isNewUntitledItem ? (
@@ -2676,14 +2771,13 @@
 
             {(scheduledDate || repeatType !== 'none') && (
               <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Prioridad</div>
                 <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{
                   width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
                   fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
                 }}>
-                  <option value="morning">Mañana</option>
-                  <option value="afternoon">Tarde</option>
-                  <option value="evening">Noche</option>
+                  <option value="important">Importante</option>
+                  <option value="todo">Pendiente</option>
                 </select>
               </div>
             )}
@@ -2732,8 +2826,18 @@
               </div>
             </div>
 
+            {/* Mark as done button - only for editing non-completed items */}
+            {isEditing && !item.completed && onComplete && (
+              <button type="button" onClick={() => { onComplete(item.id); onClose(); }} style={{
+                width: '100%', padding: '12px', marginBottom: '12px', border: 'none', borderRadius: '8px',
+                background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.8125rem', cursor: 'pointer'
+              }}>
+                Marcar como hecho
+              </button>
+            )}
+
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
-              {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}>🗑</button>}
+              {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
               <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '10px 12px', fontSize: '0.875rem' }}>✕</button>
               <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '0.8125rem' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
             </div>
@@ -2755,7 +2859,7 @@
       const getDoneItems = () => items.filter(i => i.completedDate === dateStr && i.completed)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-      const dayEffort = ['morning','afternoon','evening'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
+      const dayEffort = ['important','todo'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
       const maxEffort = energy * 3;
 
       return (
@@ -2782,9 +2886,8 @@
 
           {/* Slots */}
           <div style={{ flex: 1, overflow: 'auto' }} className="hide-scrollbar">
-            <SlotSection slot="morning" label="Mañana" items={getSlotItems('morning')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="afternoon" label="Tarde" items={getSlotItems('afternoon')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="evening" label="Noche" items={getSlotItems('evening')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+            <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+            <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
 
             {getDoneItems().length > 0 && (
               <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-light)' }}>
@@ -2849,6 +2952,9 @@
       // Mobile scroll ref
       const mobileScrollRef = useRef(null);
       const isScrollingRef = useRef(false);
+
+      // Expanded categories mode (desktop only)
+      const [expandedCategoriesMode, setExpandedCategoriesMode] = useState(false);
 
       const scrollRef = useRef(null);
       const [sticky, setSticky] = useState(false);
@@ -3196,6 +3302,8 @@
       const handleUndoDelete = () => {
         if (toast?.item) {
           setItems(p => [...p, toast.item]);
+        } else if (toast?.hiddenIds) {
+          setItems(p => p.map(i => toast.hiddenIds.includes(i.id) ? { ...i, hiddenFromSidebar: false } : i));
         }
         setToast(null);
       };
@@ -3338,7 +3446,7 @@
               } else {
                 // Non-recurring item: update directly
                 if (slot === 'done') {
-                  return { ...i, completed: true, completedDate: date, scheduledDate: date, scheduledSlot: i.scheduledSlot || 'morning', sortOrder: sortInfo?.sortOrder ?? 0 };
+                  return { ...i, completed: true, completedDate: date, scheduledDate: date, scheduledSlot: i.scheduledSlot || 'todo', sortOrder: sortInfo?.sortOrder ?? 0 };
                 }
                 return { ...i, scheduledDate: date, scheduledSlot: slot, isArchived: false, completed: false, completedDate: null, sortOrder: sortInfo?.sortOrder ?? 0 };
               }
@@ -3777,7 +3885,7 @@
 
       const handleMobileAddClick = () => {
         if (mobileViewMode === 'calendar') {
-          // In calendar view: create item without title as first item of morning slot
+          // In calendar view: create item without title as first item of todo slot
           const newItem = {
             id: Date.now(),
             title: '',
@@ -3785,7 +3893,7 @@
             category: 'temp',
             effort: 1,
             scheduledDate: formatDate(currentMobileDay),
-            scheduledSlot: 'morning',
+            scheduledSlot: 'todo',
             completed: false,
             completedDate: null,
             createdAt: formatDate(REAL_TODAY),
@@ -3862,7 +3970,16 @@
 
       const clearDone = () => {
         // Hide completed items from sidebar only (calendar Hecho sections are not affected)
+        const itemsToHide = items.filter(i => i.completed && !i.hiddenFromSidebar);
+        if (itemsToHide.length === 0) return;
+
+        const hiddenIds = itemsToHide.map(i => i.id);
         setItems(p => p.map(i => i.completed ? { ...i, hiddenFromSidebar: true } : i));
+
+        setToast({
+          message: `${itemsToHide.length} item${itemsToHide.length > 1 ? 's' : ''} oculto${itemsToHide.length > 1 ? 's' : ''}`,
+          hiddenIds,
+        });
       };
 
       // Mobile helper: get items for current mobile day
@@ -3875,11 +3992,13 @@
           <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
             {/* Mobile Header - only shows in Categories view */}
             {mobileViewMode === 'categories' && (
-              <div style={{ padding: '14px 12px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button onClick={clearDone} className="btn" style={{ fontSize: '0.5625rem' }}>Limpiar hechos</button>
-                  <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700' }}>+</button>
+              <div style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ padding: '14px 12px 8px', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                </div>
+                <div style={{ padding: '0 12px 10px', display: 'flex', gap: '6px' }}>
+                  <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ flex: 1, fontSize: '0.5625rem', opacity: bottomSheetItem ? 0.5 : 1, cursor: bottomSheetItem ? 'default' : 'pointer' }}>Agregar categoría</button>
+                  <button onClick={clearDone} className="btn" style={{ flex: 1, fontSize: '0.5625rem' }}>Limpiar hechos</button>
                 </div>
               </div>
             )}
@@ -3982,6 +4101,7 @@
                 categories={categories}
                 onSave={handleBottomSheetSave}
                 onDelete={handleDelete}
+                onComplete={handleComplete}
                 onClose={handleBottomSheetClose}
                 closing={bottomSheetClosing}
               />
@@ -4003,66 +4123,91 @@
       return (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              {/* Calendar header */}
-              <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
-                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <button onClick={() => navigateDays(-12)} className="btn">««</button>
-                  <button onClick={() => navigateDays(-1)} className="btn">«</button>
-                </div>
-                <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <button onClick={() => navigateDays(1)} className="btn">»</button>
-                  <button onClick={() => navigateDays(12)} className="btn">»»</button>
-                </div>
-                <button onClick={goToToday} className="btn">Hoy</button>
-                <div style={{ flex: 1 }} />
-                <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} className="btn">{theme === 'light' ? '🌙' : '☀️'}</button>
-              </div>
-              <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
-                {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
-              </div>
-              <div className="backlog-row" style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
-                <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
-                  <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
-                    <span style={{ fontSize: '0.875rem' }}>🎲</span>
-                    <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '0.6875rem' }}>Backlogs</span>
-                  </button>
-                </div>
-                <div className="hide-scrollbar" style={{ flex: 1, display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 12px', alignItems: 'center' }}>
-                  {shuffledBacklog.slice(0, 12).map(item => <div key={item.id} style={{ flex: `0 0 ${DAY_WIDTH}px` }}><ItemCard item={item} categories={categories} onComplete={handleComplete} onEdit={handleEdit} justDroppedItemId={justDroppedItemId} /></div>)}
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '44px' }}>
-                <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <button onClick={clearDone} className="btn" style={{ fontSize: '0.5rem' }}>Limpiar hechos</button>
-                  <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700', opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
-                </div>
-              </div>
-              <div style={{ flex: 1, overflowY: 'auto' }}>
-                {categories.map(cat => (
-                  <div key={cat.id}
-                    onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
-                    onDragLeave={() => setDragOverCat(null)}
-                    onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}>
-                    <CategorySection category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} expanded={expanded[cat.id] || false} dragOverCat={dragOverCat}
-                      onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} groupsExpandedState={groupsExpandedState} justDroppedItemId={justDroppedItemId}
-                      groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
-                      onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+            {/* Calendar section - hidden in expanded categories mode */}
+            {!expandedCategoriesMode && (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                {/* Calendar header */}
+                <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
+                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <button onClick={() => navigateDays(-12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
+                    <button onClick={() => navigateDays(-1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
                   </div>
-                ))}
+                  <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <button onClick={() => navigateDays(1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
+                    <button onClick={() => navigateDays(12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
+                  </div>
+                  <button onClick={goToToday} className="btn">Hoy</button>
+                  <div style={{ flex: 1 }} />
+                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} className="btn" style={{ width: '18px', padding: '1px 0' }}><span style={{ position: 'relative', top: '-1px' }}>{theme === 'light' ? '🌙' : '☀️'}</span></button>
+                </div>
+                <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
+                  {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
+                </div>
+                <div className="backlog-row" style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
+                  <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
+                    <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
+                      <span style={{ fontSize: '0.875rem' }}>🎲</span>
+                      <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '0.6875rem' }}>Backlogs</span>
+                    </button>
+                  </div>
+                  <div className="hide-scrollbar" style={{ flex: 1, display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 12px', alignItems: 'center' }}>
+                    {shuffledBacklog.slice(0, 12).map(item => <div key={item.id} style={{ flex: `0 0 ${DAY_WIDTH}px` }}><ItemCard item={item} categories={categories} onComplete={handleComplete} onEdit={handleEdit} justDroppedItemId={justDroppedItemId} /></div>)}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Expanded Categories Mode - full width with horizontal scroll */}
+            {expandedCategoriesMode ? (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
+                <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                  <div style={{ flex: 1 }} />
+                  <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}>Agregar categoría</button>
+                  <button onClick={clearDone} className="btn">Limpiar hechos</button>
+                  <button onClick={() => setExpandedCategoriesMode(false)} className="btn btn-primary">Calendario</button>
+                </div>
+                <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
+                  {categories.map(cat => (
+                    <ExpandedCategoryColumn key={cat.id} category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }} onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Sidebar - normal mode */
+              <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '8px 10px', display: 'flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                    <div style={{ flex: 1 }} />
+                    <button onClick={() => setExpandedCategoriesMode(true)} className="btn">Ampliar</button>
+                  </div>
+                  <div style={{ padding: '0 10px 8px', display: 'flex', gap: '4px' }}>
+                    <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ flex: 1, fontSize: '0.5rem', opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}>Agregar categoría</button>
+                    <button onClick={clearDone} className="btn" style={{ flex: 1, fontSize: '0.5rem' }}>Limpiar hechos</button>
+                  </div>
+                </div>
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  {categories.map(cat => (
+                    <div key={cat.id}
+                      onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
+                      onDragLeave={() => setDragOverCat(null)}
+                      onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}>
+                      <CategorySection category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} expanded={expanded[cat.id] || false} dragOverCat={dragOverCat}
+                        onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} groupsExpandedState={groupsExpandedState} justDroppedItemId={justDroppedItemId}
+                        groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
+                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
-          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onClose={() => setEditPopover(null)} targetRect={editPopover.rect} />}
+          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onClose={() => setEditPopover(null)} targetRect={editPopover.rect} />}
           {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
           {recurringEditPopover && <RecurringActionPopover
             item={recurringEditPopover.item}
