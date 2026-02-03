@@ -1,13 +1,30 @@
 # Better Cal - Contexto del Proyecto
 
+## Repositorio
+- **GitHub**: https://github.com/Roccella/bettercal (privado)
+- **Branch principal**: main
+
 ## Descripción General
 Better Cal es una aplicación de gestión de tareas y atención, implementada como un prototipo en un único archivo HTML usando React 18 con Babel standalone (transformación JSX en el navegador).
 
 ## Arquitectura Técnica
 - **Stack**: HTML + React 18 + Babel standalone (sin build process)
-- **Archivo principal**: `prototype.html`
+- **Archivo principal**: `prototype.html` (responsive: desktop + mobile)
+- **Backup**: `prototype-bkp1.html` (versión solo desktop)
 - **Estado**: Manejado con React hooks (useState, useMemo, useEffect, useCallback)
 - **Fecha simulada**: `REAL_TODAY = new Date('2026-02-03')` (Martes 3 de febrero de 2026)
+
+### Dependencias Externas (CDN)
+Actualmente el prototipo usa CDN para:
+- React 18 (unpkg.com)
+- ReactDOM 18 (unpkg.com)
+- Babel standalone (unpkg.com) - solo para desarrollo
+- IBM Plex Sans (Google Fonts)
+
+> **⚠️ RECORDATORIO PARA PRODUCCIÓN**: Cuando se implemente la versión de producción, pasar todas las dependencias de CDN a local:
+> - Bundlear React/ReactDOM con Vite o similar (elimina Babel standalone)
+> - Hostear IBM Plex Sans localmente (solo weights 400, 500, 600, 700)
+> - Esto mejora: disponibilidad, velocidad, privacidad, seguridad, y funcionamiento offline
 
 ## Estructura de la UI
 
@@ -231,3 +248,50 @@ El dragData incluye:
 - Clase CSS `.just-dropped` con pseudo-elemento `::after` animado
 - Estado `justDroppedItemId` en App, se limpia después de 600ms
 - Funciona en calendario y sidebar, para items normales y recurrentes
+
+## Versión Mobile (PWA)
+
+### Layout Responsive
+- Breakpoint: 600px
+- Desktop (>600px): Layout original con 12 días + sidebar
+- Mobile (≤600px): Vista de 1 día con swipe + FAB
+
+### Características Mobile
+- **Swipe navegación**: Scroll horizontal nativo con CSS `scroll-snap-type: x mandatory`. Permite ver parcialmente el día siguiente/anterior mientras se arrastra, con snap al soltar.
+- **FAB (Floating Action Button)**: Crea items en Temp backlog, abre BottomSheet
+- **BottomSheet**: Editor de items a pantalla completa desde abajo (reemplaza popovers)
+- **Toggle vistas**: Botón con ícono para cambiar entre 📅 Calendario y 📁 Categorías
+- **Header simplificado**: Selector de mes (sin ícono) y botón "Hoy"
+
+### Interacción Touch en Items (Mobile)
+- **Long-press para drag**: Los items requieren mantener presionado ~200ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
+- **Vibración feedback**: Al activarse el drag después del long-press, el dispositivo vibra brevemente (si soporta `navigator.vibrate`).
+- **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
+- **touch-action: pan-x**: Los items permiten scroll horizontal nativo mientras se tocan.
+
+### Alineamiento Visual Mobile
+- Todos los elementos están alineados a 12px del borde izquierdo:
+  - Header principal (botón mes)
+  - Header del día (Lun 2)
+  - Labels de slots (Mañana, Tarde, Noche)
+  - Items dentro de slots
+  - Sección Hecho
+
+### Componentes Mobile
+- `MobileDayColumn`: Renderiza un día completo (header + slots + done)
+- `BottomSheet`: Editor de items con todos los campos
+- `FAB`: Botón flotante "+" en esquina inferior derecha
+
+### Estados Mobile
+- `isMobile`: Detecta viewport ≤600px
+- `mobileViewMode`: 'calendar' | 'categories'
+- `currentMobileDay`: Día actualmente visible
+- `bottomSheetItem`: Item siendo editado en BottomSheet
+- `mobileScrollRef`: Ref para scroll programático
+
+### CSS Mobile
+- `.mobile-day-scroll`: Container horizontal con `scroll-snap-type: x mandatory` y `scroll-snap-stop: always`
+- `.mobile-day-column`: Cada día ocupa 100% del ancho con `scroll-snap-align: start`
+- `.fab`: Botón flotante con safe-area-inset
+- `.bottom-sheet`: Panel deslizante desde abajo
+- Slots en mobile tienen padding lateral 12px via CSS específico

@@ -249,90 +249,6 @@
     }
     @keyframes dialogPopIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
     [data-theme="dark"] .discard-dialog { background: var(--bg-card); }
-
-    /* ===== MOBILE STYLES ===== */
-    .mobile-only { display: none; }
-    .desktop-only { display: flex; }
-
-    /* Bottom Sheet */
-    .bottom-sheet-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5); z-index: 10000;
-      animation: fadeIn 0.2s ease-out;
-    }
-    .bottom-sheet-overlay.closing { animation: fadeOut 0.2s ease-out forwards; }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-
-    .bottom-sheet {
-      position: fixed; left: 0; right: 0; bottom: 0;
-      background: var(--bg-primary); border-radius: 16px 16px 0 0;
-      padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-      max-height: 85vh; overflow-y: auto; z-index: 10001;
-      animation: slideUp 0.3s ease-out;
-    }
-    .bottom-sheet.closing { animation: slideDown 0.2s ease-out forwards; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    @keyframes slideDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
-    [data-theme="dark"] .bottom-sheet { background: var(--bg-card); }
-
-    .bottom-sheet-handle {
-      width: 36px; height: 4px; background: var(--border-color);
-      border-radius: 2px; margin: 0 auto 12px;
-    }
-
-    /* FAB */
-    .fab {
-      position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--accent-blue); color: white;
-      border: none; font-size: 28px; font-weight: 300;
-      display: none; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 100; cursor: pointer; touch-action: manipulation;
-    }
-    .fab:active { transform: scale(0.95); background: #2d6bc4; }
-
-    /* Mobile media query */
-    @media (max-width: 600px) {
-      html { font-size: 100%; }
-      body { overscroll-behavior-y: contain; -webkit-tap-highlight-color: transparent; }
-
-      .mobile-only { display: flex; }
-      .desktop-only { display: none !important; }
-
-      .fab { display: flex; }
-
-      /* Sidebar mobile fullwidth */
-      .sidebar-mobile { width: 100% !important; border-left: none !important; }
-
-      /* Mobile day scroll with snap */
-      .mobile-day-scroll {
-        display: flex;
-        overflow-x: scroll;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-      .mobile-day-scroll::-webkit-scrollbar { display: none; }
-      .mobile-day-column {
-        flex: 0 0 100%;
-        min-width: 100%;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-      }
-
-      /* Larger touch targets */
-      .btn { padding: 8px 12px; font-size: 11px; }
-      .item-card { padding: 8px 10px; }
-
-      /* Mobile calendar alignment - slots get padding */
-      .mobile-day-column .slot-row,
-      .mobile-day-column .slot-row-done { padding-left: 12px; padding-right: 12px; }
-
-      /* Hide backlog row */
-      .backlog-row { display: none !important; }
-    }
   </style>
 </head>
 <body>
@@ -746,8 +662,6 @@
             background: energy === l ? 'var(--bg-input)' : 'transparent',
             fontSize: '10px',
             cursor: 'pointer',
-            opacity: energy === l ? 1 : 0.3,
-            filter: energy === l ? 'none' : 'grayscale(100%)',
           }}>{l === 1 ? '😴' : l === 2 ? '😊' : '🔥'}</button>
         ))}
       </div>
@@ -1576,15 +1490,9 @@
 
     const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId }) => {
       const [dragging, setDragging] = useState(false);
-      const [canDrag, setCanDrag] = useState(true); // For mobile long-press
       const mouseDownPos = useRef(null);
-      const touchStartPos = useRef(null);
-      const longPressTimer = useRef(null);
       const cardRef = useRef(null);
       const cat = categories.find(c => c.id === item.category);
-
-      // Detect mobile
-      const isMobileDevice = typeof window !== 'undefined' && window.innerWidth <= 600;
       // For completion, use full ID (keeps date for recurring items)
       const completeId = item.id;
       // For drag/edit, use base ID
@@ -1618,68 +1526,6 @@
           }
         }
         mouseDownPos.current = null;
-      };
-
-      // Touch handlers for mobile - long press to enable drag
-      const handleTouchStart = (e) => {
-        if (e.target.closest('[data-checkbox]')) return;
-        const touch = e.touches[0];
-        touchStartPos.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
-
-        // On mobile, disable drag initially - require long press
-        if (isMobileDevice) {
-          setCanDrag(false);
-          longPressTimer.current = setTimeout(() => {
-            setCanDrag(true);
-            // Vibrate if supported to indicate drag is enabled
-            if (navigator.vibrate) navigator.vibrate(50);
-          }, 200); // 200ms long press
-        }
-      };
-
-      const handleTouchMove = (e) => {
-        if (!touchStartPos.current) return;
-        const touch = e.touches[0];
-        const dx = Math.abs(touch.clientX - touchStartPos.current.x);
-        const dy = Math.abs(touch.clientY - touchStartPos.current.y);
-
-        // If moved more than 10px, cancel long press (user is scrolling)
-        if (dx > 10 || dy > 10) {
-          if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-          }
-        }
-      };
-
-      const handleTouchEnd = (e) => {
-        if (longPressTimer.current) {
-          clearTimeout(longPressTimer.current);
-          longPressTimer.current = null;
-        }
-
-        if (!touchStartPos.current) return;
-
-        const timeDelta = Date.now() - touchStartPos.current.time;
-        const touch = e.changedTouches[0];
-        const dx = Math.abs(touch.clientX - touchStartPos.current.x);
-        const dy = Math.abs(touch.clientY - touchStartPos.current.y);
-
-        // If short tap (< 200ms) and didn't move much, treat as click
-        if (timeDelta < 200 && dx < 10 && dy < 10 && !dragging) {
-          e.preventDefault();
-          if (Date.now() - lastPopoverCloseTime < 200) {
-            touchStartPos.current = null;
-            setCanDrag(true);
-            return;
-          }
-          if (cardRef.current) {
-            onEdit(item, cardRef.current.getBoundingClientRect());
-          }
-        }
-
-        touchStartPos.current = null;
-        setCanDrag(true);
       };
 
       // For recurring items, we need both:
@@ -1738,21 +1584,13 @@
         <div
           ref={cardRef}
           data-item-id={item.id}
-          draggable={!isMobileDevice || canDrag}
-          onDragStart={(e) => {
-            if (isMobileDevice && !canDrag) { e.preventDefault(); return; }
-            e.dataTransfer.setData('itemData', dragData);
-            setDragging(true);
-            mouseDownPos.current = null;
-          }}
+          draggable
+          onDragStart={(e) => { e.dataTransfer.setData('itemData', dragData); setDragging(true); mouseDownPos.current = null; }}
           onDragEnd={() => setDragging(false)}
           className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''}`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', padding: '5px 6px', background: getCardBackground(), borderRadius: '5px', opacity: item.completed ? 0.6 : (item._isPending ? 0.7 : 1), touchAction: isMobileDevice ? 'pan-x' : 'auto' }}
+          style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', padding: '5px 6px', background: getCardBackground(), borderRadius: '5px', opacity: item.completed ? 0.6 : (item._isPending ? 0.7 : 1) }}
         >
           {/* Left: Checkbox */}
           {showCheckbox && (
@@ -2498,279 +2336,6 @@
       );
     };
 
-    // ============ MOBILE COMPONENTS ============
-
-    // BottomSheet for mobile item editing
-    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onClose, closing }) => {
-      const [title, setTitle] = useState(item?.title || '');
-      const [description, setDescription] = useState(item?.description || '');
-      const [category, setCategory] = useState(item?.category || 'temp');
-      const [effort, setEffort] = useState(item?.effort ?? 1);
-      const initialDate = item?.scheduledDate || visualDate || null;
-      const [scheduledDate, setScheduledDate] = useState(initialDate);
-      const [scheduledSlot, setScheduledSlot] = useState(item?.scheduledSlot || 'morning');
-      const [repeatType, setRepeatType] = useState(item?.repeat?.type || 'none');
-      const [repeatEvery, setRepeatEvery] = useState(item?.repeat?.every || 1);
-      const [repeatDays, setRepeatDays] = useState(item?.repeat?.days || []);
-      const [showDatePicker, setShowDatePicker] = useState(false);
-      const [showDiscardDialog, setShowDiscardDialog] = useState(false);
-      const [userClearedDate, setUserClearedDate] = useState(false);
-      const inputRef = useRef(null);
-
-      const isEditing = !!item?.id && !item._isNewItem;
-      const hadRepeat = !!item?.repeat;
-      const originalTitle = item?.title || '';
-      const originalDescription = item?.description || '';
-
-      useEffect(() => {
-        setTimeout(() => inputRef.current?.focus(), 100);
-      }, []);
-
-      const hasChanges = title !== originalTitle || description !== originalDescription ||
-        category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
-        scheduledDate !== initialDate || scheduledSlot !== (item?.scheduledSlot || 'morning') ||
-        repeatType !== (item?.repeat?.type || 'none');
-
-      const isNewUntitledItem = isEditing && (item?._isNewItem || originalTitle === '');
-
-      const hasUserChanges = isNewUntitledItem ? (
-        title.trim() !== '' || description !== '' || category !== (item?.category || 'temp') ||
-        effort !== 1 || repeatType !== 'none'
-      ) : hasChanges;
-
-      const handleRequestClose = () => {
-        if (hasUserChanges && (title.trim() || isEditing)) {
-          setShowDiscardDialog(true);
-        } else {
-          if (isNewUntitledItem) onDelete(item.id);
-          onClose();
-        }
-      };
-
-      const handleSave = () => {
-        if (!title.trim()) {
-          if (isNewUntitledItem) onDelete(item.id);
-          onClose();
-          return;
-        }
-        let repeat = null;
-        if (repeatType === 'weekdays') repeat = { type: 'weekdays', days: repeatDays };
-        else if (repeatType !== 'none') repeat = { type: repeatType, every: repeatEvery };
-
-        let finalScheduledDate = scheduledDate;
-        if (hadRepeat && !repeat && !scheduledDate && visualDate && !userClearedDate) {
-          finalScheduledDate = visualDate;
-        }
-
-        onSave({
-          id: item?.id,
-          title: title.trim(),
-          description,
-          category,
-          effort,
-          repeat,
-          scheduledDate: finalScheduledDate,
-          scheduledSlot: (finalScheduledDate || repeat) ? scheduledSlot : null,
-          completed: item?.completed || false,
-          completedDate: item?.completedDate || null,
-          isArchived: !finalScheduledDate && !repeat,
-          sortOrder: item?.sortOrder ?? 0,
-        });
-      };
-
-      const toggleDay = (d) => setRepeatDays(p => p.includes(d) ? p.filter(x => x !== d) : [...p, d]);
-
-      const getDateLabel = () => {
-        if (!scheduledDate) return 'Sin fecha (Backlog)';
-        return formatDateLabel(scheduledDate);
-      };
-
-      return (
-        <>
-          <div className={`bottom-sheet-overlay ${closing ? 'closing' : ''}`} onClick={handleRequestClose} />
-          <div className={`bottom-sheet ${closing ? 'closing' : ''}`}>
-            <div className="bottom-sheet-handle" />
-
-            <input
-              ref={inputRef}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Item..."
-              style={{
-                width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '14px', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none'
-              }}
-            />
-
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descripción..."
-              rows={2}
-              style={{
-                width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none', resize: 'none', fontFamily: 'inherit'
-              }}
-            />
-
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{
-                width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none'
-              }}
-            >
-              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
-              <button
-                onClick={() => setShowDatePicker(!showDatePicker)}
-                style={{
-                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
-                  fontSize: '12px', textAlign: 'left', cursor: 'pointer'
-                }}
-              >
-                {getDateLabel()}
-              </button>
-              {showDatePicker && (
-                <div style={{ marginTop: '8px' }}>
-                  <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} />
-                </div>
-              )}
-            </div>
-
-            {(scheduledDate || repeatType !== 'none') && (
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
-                <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{
-                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
-                }}>
-                  <option value="morning">Mañana</option>
-                  <option value="afternoon">Tarde</option>
-                  <option value="evening">Noche</option>
-                </select>
-              </div>
-            )}
-
-            {hadRepeat && userClearedDate && (
-              <div style={{ marginBottom: '10px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '10px', color: '#EF4444' }}>
-                Al guardar se eliminará la recurrencia
-              </div>
-            )}
-
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
-              <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{
-                width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
-              }}>
-                <option value="none">No repetir</option>
-                <option value="days">Cada X días</option>
-                <option value="weeks">Cada X semanas</option>
-                <option value="weekdays">Días de semana</option>
-              </select>
-              {repeatType !== 'none' && repeatType !== 'weekdays' && (
-                <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                  style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '12px', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
-                />
-              )}
-              {repeatType === 'weekdays' && (
-                <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
-                  {DAYS.map((d, i) => (
-                    <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '8px 4px', fontSize: '10px' }}>{d.charAt(0)}</button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {[0,1,2,3].map(e => (
-                  <button key={e} type="button" onClick={() => setEffort(e)} style={{
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
-                    color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '12px',
-                  }}>{e}</button>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}>🗑</button>}
-              <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '13px' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
-            </div>
-          </div>
-          {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
-        </>
-      );
-    };
-
-    // Mobile Day Column Component for scroll-snap
-    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, justDroppedItemId }) => {
-      const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
-      const isPast = day.date < REAL_TODAY;
-      const dateStr = formatDate(day.date);
-      const energy = dayEnergy[dateStr] || 2;
-
-      const getSlotItems = (slot) => items.filter(i => i.scheduledDate === dateStr && i.scheduledSlot === slot && !i.completed)
-        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      const getDoneItems = () => items.filter(i => i.completedDate === dateStr && i.completed)
-        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-
-      const dayEffort = ['morning','afternoon','evening'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
-      const maxEffort = energy * 3;
-
-      return (
-        <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
-          {/* Day header */}
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
-                {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {['😴', '😊', '🔥'].map((emoji, i) => (
-                <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
-                  style={{ background: 'none', border: 'none', fontSize: '16px', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer' }}>
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            <div style={{ width: '50px', height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ width: `${Math.min(100, (dayEffort / maxEffort) * 100)}%`, height: '100%', background: dayEffort > maxEffort ? '#EF4444' : dayEffort >= maxEffort * 0.8 ? '#F59E0B' : '#22C55E', borderRadius: '4px' }} />
-            </div>
-          </div>
-
-          {/* Slots */}
-          <div style={{ flex: 1, overflow: 'auto' }} className="hide-scrollbar">
-            <SlotSection slot="morning" label="Mañana" items={getSlotItems('morning')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="afternoon" label="Tarde" items={getSlotItems('afternoon')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="evening" label="Noche" items={getSlotItems('evening')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-
-            {getDoneItems().length > 0 && (
-              <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-light)' }}>
-                <div style={{ fontSize: '9px', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '6px', textTransform: 'uppercase' }}>Hecho ({getDoneItems().length})</div>
-                {getDoneItems().slice(0, 3).map(item => (
-                  <ItemCard key={item.id} item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-                ))}
-                {getDoneItems().length > 3 && <div style={{ fontSize: '10px', color: 'var(--text-muted)', padding: '4px' }}>+{getDoneItems().length - 3} más</div>}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    };
-
     // ============ MAIN APP ============
     // Helper to load state from localStorage
     const loadFromStorage = (key, defaultValue) => {
@@ -2809,17 +2374,6 @@
       const [shuffledBacklog, setShuffledBacklog] = useState([]);
       const [toast, setToast] = useState(null);
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
-
-      // Mobile states
-      const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 600);
-      const [mobileViewMode, setMobileViewMode] = useState('calendar'); // 'calendar' | 'categories'
-      const [currentMobileDay, setCurrentMobileDay] = useState(REAL_TODAY);
-      const [bottomSheetItem, setBottomSheetItem] = useState(null);
-      const [bottomSheetClosing, setBottomSheetClosing] = useState(false);
-
-      // Mobile scroll ref
-      const mobileScrollRef = useRef(null);
-      const isScrollingRef = useRef(false);
 
       const scrollRef = useRef(null);
       const [sticky, setSticky] = useState(false);
@@ -2940,14 +2494,6 @@
       const rangeText = `${formatDayNumber(firstVisible)}-${formatDayNumber(lastVisible)} ${getShortMonthName(lastVisible)}`;
 
       useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
-
-      // Detect mobile/desktop on resize
-      useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth <= 600);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-      }, []);
-
       useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
@@ -3711,83 +3257,7 @@
         }
       };
 
-      const goToToday = () => {
-        setViewBase(REAL_TODAY);
-        setCurrentMobileDay(REAL_TODAY);
-      };
-
-      // ===== Mobile Functions =====
-      const handleMobileScroll = useCallback(() => {
-        if (!mobileScrollRef.current || isScrollingRef.current) return;
-        const container = mobileScrollRef.current;
-        const scrollLeft = container.scrollLeft;
-        const width = container.clientWidth;
-        const index = Math.round(scrollLeft / width);
-        if (index >= 0 && index < days.length) {
-          const newDay = days[index].date;
-          if (formatDate(newDay) !== formatDate(currentMobileDay)) {
-            setCurrentMobileDay(newDay);
-          }
-        }
-      }, [days, currentMobileDay]);
-
-      // Scroll to day when currentMobileDay changes (e.g., from picker)
-      useEffect(() => {
-        if (!isMobile || !mobileScrollRef.current) return;
-        const index = days.findIndex(d => formatDate(d.date) === formatDate(currentMobileDay));
-        if (index >= 0) {
-          const container = mobileScrollRef.current;
-          const targetScroll = index * container.clientWidth;
-          if (Math.abs(container.scrollLeft - targetScroll) > 10) {
-            isScrollingRef.current = true;
-            container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-            setTimeout(() => { isScrollingRef.current = false; }, 300);
-          }
-        }
-      }, [currentMobileDay, isMobile, days]);
-
-      const handleFabClick = () => {
-        const newItem = {
-          id: Date.now(),
-          title: '',
-          description: '',
-          category: 'temp',
-          effort: 1,
-          scheduledDate: null,
-          scheduledSlot: null,
-          completed: false,
-          completedDate: null,
-          createdAt: formatDate(REAL_TODAY),
-          isArchived: false,
-          repeat: null,
-          sortOrder: -1000,
-          _isNewItem: true,
-        };
-        setItems(p => [newItem, ...p]);
-        setMobileViewMode('categories');
-        setBottomSheetItem({ item: newItem, visualDate: null });
-      };
-
-      const handleBottomSheetClose = () => {
-        setBottomSheetClosing(true);
-        setTimeout(() => {
-          setBottomSheetItem(null);
-          setBottomSheetClosing(false);
-        }, 200);
-      };
-
-      const handleBottomSheetSave = (data) => {
-        handleSave(data);
-        setBottomSheetClosing(true);
-        setTimeout(() => {
-          setBottomSheetItem(null);
-          setBottomSheetClosing(false);
-        }, 200);
-      };
-
-      const handleMobileEdit = (item, rect, visualDate) => {
-        setBottomSheetItem({ item, visualDate });
-      };
+      const goToToday = () => setViewBase(REAL_TODAY);
 
       const expandAll = () => {
         const allExpanded = {};
@@ -3814,125 +3284,13 @@
         setItems(p => p.map(i => i.completed ? { ...i, hiddenFromSidebar: true } : i));
       };
 
-      // Mobile helper: get items for current mobile day
-      const mobileIsToday = formatDate(currentMobileDay) === formatDate(REAL_TODAY);
-
-      // ===== RENDER =====
-      if (isMobile) {
-        // MOBILE LAYOUT
-        return (
-          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
-            {/* Mobile Header */}
-            <div style={{ padding: '8px 12px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '48px' }}>
-              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '10px' }}>
-                {getShortMonthName(currentMobileDay)} {currentMobileDay.getFullYear()}
-              </button>
-              {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '10px' }}>Hoy</button>}
-              <div style={{ flex: 1 }} />
-              <button onClick={() => setMobileViewMode(v => v === 'calendar' ? 'categories' : 'calendar')} className="btn" style={{ fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                {mobileViewMode === 'calendar' ? '📁 Categorías' : '📅 Calendario'}
-              </button>
-            </div>
-
-            {/* Mobile Content */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              {mobileViewMode === 'calendar' ? (
-                /* Mobile Calendar - Horizontal scroll with snap */
-                <div
-                  ref={mobileScrollRef}
-                  className="mobile-day-scroll"
-                  style={{ flex: 1, display: 'flex' }}
-                  onScroll={handleMobileScroll}
-                >
-                  {days.map(day => (
-                    <MobileDayColumn
-                      key={formatDate(day.date)}
-                      day={day}
-                      items={allItemsWithRecurring}
-                      categories={categories}
-                      dayEnergy={dayEnergy}
-                      onComplete={handleComplete}
-                      onEdit={handleMobileEdit}
-                      onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))}
-                      justDroppedItemId={justDroppedItemId}
-                    />
-                  ))}
-                </div>
-              ) : (
-                /* Mobile Categories - Fullwidth */
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
-                  <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={clearDone} className="btn" style={{ fontSize: '9px' }}>Limpiar hechos</button>
-                      <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700' }}>+</button>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, overflowY: 'auto' }}>
-                    {categories.map(cat => (
-                      <CategorySection
-                        key={cat.id}
-                        category={cat}
-                        items={allItemsWithRecurring}
-                        allItems={items}
-                        categories={categories}
-                        expanded={expanded[cat.id] || false}
-                        dragOverCat={dragOverCat}
-                        onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))}
-                        onComplete={handleComplete}
-                        onEdit={handleMobileEdit}
-                        onAdd={handleSave}
-                        onDrop={handleDropCategory}
-                        onEditCategory={handleEditCategory}
-                        onDelete={handleDelete}
-                        onSidebarGroupDrop={handleSidebarGroupDrop}
-                        groupsExpandedState={groupsExpandedState}
-                        justDroppedItemId={justDroppedItemId}
-                        groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
-                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* FAB */}
-            <button className="fab" onClick={handleFabClick}>+</button>
-
-            {/* Bottom Sheet for mobile editing */}
-            {bottomSheetItem && (
-              <BottomSheet
-                item={bottomSheetItem.item}
-                visualDate={bottomSheetItem.visualDate}
-                categories={categories}
-                onSave={handleBottomSheetSave}
-                onDelete={handleDelete}
-                onClose={handleBottomSheetClose}
-                closing={bottomSheetClosing}
-              />
-            )}
-
-            {/* Calendar Popover */}
-            {calendarRect && <CalendarPopover baseDate={currentMobileDay} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setCurrentMobileDay(d); setCalendarRect(null); }} />}
-
-            {/* New Category Popover */}
-            {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
-
-            {/* Toast */}
-            {toast && <Toast message={toast.message} onUndo={handleUndoDelete} onClose={() => setToast(null)} />}
-          </div>
-        );
-      }
-
-      // ===== DESKTOP LAYOUT (original) =====
       return (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {/* Calendar header */}
               <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
-                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '9px' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
+                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>📅 <span style={{ fontSize: '9px' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</span></button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button onClick={() => navigateDays(-12)} className="btn">««</button>
                   <button onClick={() => navigateDays(-1)} className="btn">«</button>
@@ -3949,7 +3307,7 @@
               <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
                 {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
               </div>
-              <div className="backlog-row" style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
                 <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
                   <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
                     <span style={{ fontSize: '14px' }}>🎲</span>
