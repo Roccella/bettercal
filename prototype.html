@@ -158,7 +158,7 @@
 
     .btn {
       padding: 3px 8px; background: var(--bg-input); border: none;
-      border-radius: 4px; font-size: 10px; color: var(--text-secondary); cursor: pointer; font-weight: 500;
+      border-radius: 4px; font-size: 0.625rem; color: var(--text-secondary); cursor: pointer; font-weight: 500;
       line-height: 1.4;
     }
     .btn:hover { background: var(--border-color); }
@@ -174,7 +174,7 @@
 
     .btn-icon-danger {
       padding: 6px 8px; background: var(--bg-input); border: none;
-      border-radius: 4px; cursor: pointer; color: var(--accent-red); font-size: 12px;
+      border-radius: 4px; cursor: pointer; color: var(--accent-red); font-size: 0.75rem;
     }
     [data-theme="dark"] .btn-icon-danger { background: var(--bg-card); }
     .btn-icon-danger:hover { background: var(--border-color); }
@@ -285,7 +285,7 @@
       position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
       width: 56px; height: 56px; border-radius: 50%;
       background: var(--accent-blue); color: white;
-      border: none; font-size: 28px; font-weight: 300;
+      border: none; font-size: 1.75rem; font-weight: 300;
       display: none; align-items: center; justify-content: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       z-index: 100; cursor: pointer; touch-action: manipulation;
@@ -294,7 +294,7 @@
 
     /* Mobile media query */
     @media (max-width: 600px) {
-      html { font-size: 200% !important; }
+      html { font-size: 150%; }
       body { overscroll-behavior-y: contain; -webkit-tap-highlight-color: transparent; }
 
       .mobile-only { display: flex; }
@@ -323,7 +323,7 @@
       }
 
       /* Larger touch targets */
-      .btn { padding: 8px 12px; font-size: 11px; }
+      .btn { padding: 8px 12px; font-size: 0.6875rem; }
       .item-card { padding: 8px 10px; }
 
       /* Mobile calendar alignment - slots get padding */
@@ -335,7 +335,7 @@
     }
   </style>
 </head>
-<body>DEBUGTEXT
+<body>
   <div id="root"></div>
 
   <script type="text/babel">
@@ -744,7 +744,7 @@
             border: 'none',
             borderRadius: '4px',
             background: energy === l ? 'var(--bg-input)' : 'transparent',
-            fontSize: '10px',
+            fontSize: '0.625rem',
             cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
@@ -862,10 +862,10 @@
         <>
           <div className="discard-overlay" onClick={onContinue} />
           <div className="discard-dialog">
-            <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.8125rem', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
               ¿Descartar cambios?
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
               Tienes cambios sin guardar. ¿Qué deseas hacer?
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -914,8 +914,8 @@
 
       return (
         <div className="toast">
-          <span style={{ fontSize: '12px' }}>{message}</span>
-          <button onClick={onUndo} className="btn" style={{ padding: '4px 10px', fontSize: '11px' }}>Deshacer</button>
+          <span style={{ fontSize: '0.75rem' }}>{message}</span>
+          <button onClick={onUndo} className="btn" style={{ padding: '4px 10px', fontSize: '0.6875rem' }}>Deshacer</button>
         </div>
       );
     };
@@ -952,12 +952,12 @@
         <div style={{ padding: '8px', background: 'var(--bg-card)', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))} className="btn" style={{ padding: '2px 6px' }}>◀</button>
-            <span style={{ fontSize: '11px', fontWeight: '600', textTransform: 'capitalize' }}>{monthName}</span>
+            <span style={{ fontSize: '0.6875rem', fontWeight: '600', textTransform: 'capitalize' }}>{monthName}</span>
             <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))} className="btn" style={{ padding: '2px 6px' }}>▶</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '8px' }}>
             {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
-              <div key={i} style={{ textAlign: 'center', fontSize: '9px', color: 'var(--text-muted)', padding: '2px' }}>{d}</div>
+              <div key={i} style={{ textAlign: 'center', fontSize: '0.5625rem', color: 'var(--text-muted)', padding: '2px' }}>{d}</div>
             ))}
             {days.map((day, i) => {
               if (!day) return <div key={i} />;
@@ -973,7 +973,7 @@
                     padding: '4px', border: 'none', borderRadius: '4px', cursor: 'pointer',
                     background: isSelected ? 'var(--accent-blue)' : isToday ? 'var(--today-header)' : 'transparent',
                     color: isSelected ? '#FFF' : 'var(--text-primary)',
-                    fontSize: '10px', fontWeight: isToday ? '700' : '400',
+                    fontSize: '0.625rem', fontWeight: isToday ? '700' : '400',
                   }}
                 >
                   {day.getDate()}
@@ -981,7 +981,7 @@
               );
             })}
           </div>
-          <button type="button" onClick={() => { onSelect(null); onClose(); }} className="btn" style={{ width: '100%', fontSize: '10px' }}>
+          <button type="button" onClick={() => { onSelect(null); onClose(); }} className="btn" style={{ width: '100%', fontSize: '0.625rem' }}>
             Sin fecha (Backlog)
           </button>
         </div>
@@ -1132,17 +1132,17 @@
           <Popover onClose={onClose} onRequestClose={handleRequestClose} targetRect={targetRect}>
             <form onSubmit={handleSubmit}>
               <input ref={inputRef} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Item..."
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '12px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.75rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
               />
               <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descripción..." rows={2}
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '11px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)', resize: 'none', fontFamily: 'inherit' }}
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)', resize: 'none', fontFamily: 'inherit' }}
               />
-              <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
               <div style={{ marginBottom: '8px', position: 'relative' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
                 <button
                   ref={dateButtonRef}
                   type="button"
@@ -1150,7 +1150,7 @@
                   style={{
                     width: '100%', padding: '6px 8px', border: 'none', borderRadius: '4px',
                     background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
-                    fontSize: '11px', textAlign: 'left', cursor: 'pointer',
+                    fontSize: '0.6875rem', textAlign: 'left', cursor: 'pointer',
                   }}
                 >
                   {getDateLabel()}
@@ -1164,8 +1164,8 @@
 
               {(scheduledDate || repeatType !== 'none') && (
                 <div style={{ marginBottom: '8px' }}>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
-                  <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
+                  <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
                     <option value="morning">Mañana</option>
                     <option value="afternoon">Tarde</option>
                     <option value="evening">Noche</option>
@@ -1174,13 +1174,13 @@
               )}
 
               {hadRepeat && userClearedDate && (
-                <div style={{ marginBottom: '8px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '10px', color: '#EF4444' }}>
+                <div style={{ marginBottom: '8px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
                   Al guardar se eliminará la recurrencia
                 </div>
               )}
 
               <div style={{ marginBottom: '10px' }}>
-                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '10px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
                   <option value="none">No repetir</option>
                   <option value="days">Cada X días</option>
                   <option value="weeks">Cada X semanas</option>
@@ -1188,26 +1188,26 @@
                 </select>
                 {repeatType !== 'none' && repeatType !== 'weekdays' && (
                   <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                    style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                    style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
                   />
                 )}
                 {repeatType === 'weekdays' && (
                   <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
                     {DAYS.map((d, i) => (
-                      <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '4px 2px', fontSize: '9px' }}>{d.charAt(0)}</button>
+                      <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '4px 2px', fontSize: '0.5625rem' }}>{d.charAt(0)}</button>
                     ))}
                   </div>
                 )}
               </div>
 
               <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   {[0,1,2,3].map(e => (
                     <button key={e} type="button" onClick={() => setEffort(e)} style={{
                       flex: 1, padding: '6px', borderRadius: '4px', border: 'none', cursor: 'pointer',
                       background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
-                      color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '11px',
+                      color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '0.6875rem',
                     }}>{e}</button>
                   ))}
                 </div>
@@ -1261,13 +1261,13 @@
         <>
           <Popover onClose={handleRequestClose} targetRect={targetRect}>
             <div style={{ marginBottom: '8px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Nombre</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Nombre</div>
               <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} placeholder="Categoría..."
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '11px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
               />
             </div>
             <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Color</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Color</div>
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                 {COLORS.map(c => (
                   <button key={c} type="button" onClick={() => setColor(c)} style={{
@@ -1280,7 +1280,7 @@
               {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}>🗑</button>}
               <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>{isNew ? 'Crear' : 'Guardar'}</button>
             </div>
-            {!isNew && !canDelete && <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
+            {!isNew && !canDelete && <div style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
           </Popover>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
         </>
@@ -1311,17 +1311,17 @@
         <Popover onClose={onClose} targetRect={targetRect}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <button onClick={() => canGoBack && (viewMonth === 0 ? (setViewMonth(11), setViewYear(y => y-1)) : setViewMonth(m => m-1))} className="btn" disabled={!canGoBack}>←</button>
-            <span style={{ fontWeight: '600', fontSize: '12px' }}>{getMonthName(new Date(viewYear, viewMonth))} {viewYear}</span>
+            <span style={{ fontWeight: '600', fontSize: '0.75rem' }}>{getMonthName(new Date(viewYear, viewMonth))} {viewYear}</span>
             <button onClick={() => canGoForward && (viewMonth === 11 ? (setViewMonth(0), setViewYear(y => y+1)) : setViewMonth(m => m+1))} className="btn" disabled={!canGoForward}>→</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '9px', textAlign: 'center', color: 'var(--text-muted)', marginBottom: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '0.5625rem', textAlign: 'center', color: 'var(--text-muted)', marginBottom: '4px' }}>
             {DAYS.map((d,i) => <div key={i}>{d.charAt(0)}</div>)}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
             {days.map((d, i) => (
               <button key={i} onClick={() => d && onSelectDate(d)} disabled={!d} style={{
                 width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: '4px', fontSize: '10px', border: 'none', cursor: d ? 'pointer' : 'default',
+                borderRadius: '4px', fontSize: '0.625rem', border: 'none', cursor: d ? 'pointer' : 'default',
                 background: d && isToday(d) ? 'var(--today-header)' : d && isVisible(d) ? 'var(--done-bg)' : 'transparent',
                 color: d ? (isToday(d) ? 'var(--accent-blue)' : 'var(--text-primary)') : 'transparent',
                 fontWeight: d && isToday(d) ? '700' : '400',
@@ -1417,19 +1417,19 @@
 
       return (
         <Popover onClose={onCancel} targetRect={computedRect}>
-          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
             <div style={{ fontWeight: '500', marginBottom: '4px' }}>{title}</div>
             <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{item.title}"</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+            <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               <div>Solo este evento</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '10px', marginTop: '2px' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
                 Se creará un item independiente en el backlog
               </div>
             </button>
             {!isDoneTarget && !showFollowingOptions && (
-              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
                 Este y los siguientes
               </button>
             )}
@@ -1440,7 +1440,7 @@
                 borderRadius: '6px',
                 marginTop: '4px'
               }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
                   La serie continuará a partir de {formatDateLabel(targetDate)}:
                 </div>
 
@@ -1453,7 +1453,7 @@
                     padding: '6px',
                     border: 'none',
                     borderRadius: '4px',
-                    fontSize: '10px',
+                    fontSize: '0.625rem',
                     background: 'var(--bg-input)',
                     outline: 'none',
                     color: 'var(--text-primary)',
@@ -1468,7 +1468,7 @@
                 {/* Days/Weeks frequency input */}
                 {(newRepeatType === 'days' || newRepeatType === 'weeks') && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--text-primary)' }}>Cada</span>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--text-primary)' }}>Cada</span>
                     <input
                       type="number"
                       min="1"
@@ -1480,13 +1480,13 @@
                         padding: '6px',
                         border: 'none',
                         borderRadius: '4px',
-                        fontSize: '11px',
+                        fontSize: '0.6875rem',
                         textAlign: 'center',
                         background: 'var(--bg-input)',
                         color: 'var(--text-primary)',
                       }}
                     />
-                    <span style={{ fontSize: '11px', color: 'var(--text-primary)' }}>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
                       {newRepeatType === 'days' ? (newEvery === 1 ? 'día' : 'días') : (newEvery === 1 ? 'semana' : 'semanas')}
                     </span>
                   </div>
@@ -1506,7 +1506,7 @@
                           border: 'none',
                           background: selectedDays.includes(idx) ? 'var(--accent-blue)' : 'var(--bg-tertiary)',
                           color: selectedDays.includes(idx) ? 'white' : 'var(--text-primary)',
-                          fontSize: '10px',
+                          fontSize: '0.625rem',
                           fontWeight: '500',
                           cursor: 'pointer',
                         }}
@@ -1524,7 +1524,7 @@
                   style={{
                     width: '100%',
                     padding: '8px',
-                    fontSize: '11px',
+                    fontSize: '0.6875rem',
                     opacity: (!hasValidConfig || (newRepeatType === 'weekdays' && !hasChanges)) ? 0.5 : 1,
                   }}
                 >
@@ -1540,7 +1540,7 @@
     const RemoveDatePopover = ({ itemTitle, onConfirm, onCancel, targetRect, isRecurring }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
-          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
             {isRecurring
               ? `Para hacer esto hay que eliminar la recurrencia de "${itemTitle}"`
               : `Para hacer esto hay que eliminar la fecha de "${itemTitle}"`
@@ -1558,15 +1558,15 @@
     const RecurringSavePopover = ({ itemTitle, onThis, onFollowing, onCancel, targetRect }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
-          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
             <div style={{ fontWeight: '500', marginBottom: '4px' }}>Guardar cambios</div>
             <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{itemTitle}"</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button onClick={onThis} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+            <button onClick={onThis} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               Solo este evento
             </button>
-            <button onClick={onFollowing} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+            <button onClick={onFollowing} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               Este y los siguientes
             </button>
           </div>
@@ -1781,14 +1781,14 @@
           {/* Center: Title + metadata */}
           <div style={{ flex: 1, minWidth: 0, marginTop: '1px' }}>
             <div style={{
-              fontSize: '10px', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              fontSize: '0.625rem', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               color: getTextColor(),
             }}>{item.title}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-              {!inSidebar && cat && <span style={{ fontSize: '8px', color: cat.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>}
-              {showDate && item.scheduledDate && !item.repeat && <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>{formatDateLabel(item.scheduledDate)}</span>}
-              {inSidebar && item.repeat && <span style={{ fontSize: '8px', color: 'var(--accent-blue)' }}>Recurrente</span>}
-              {!inSidebar && item.repeat && <span style={{ fontSize: '7px', color: 'var(--accent-blue)', flexShrink: 0 }}>🔄</span>}
+              {!inSidebar && cat && <span style={{ fontSize: '0.5rem', color: cat.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>}
+              {showDate && item.scheduledDate && !item.repeat && <span style={{ fontSize: '0.5rem', color: 'var(--text-muted)' }}>{formatDateLabel(item.scheduledDate)}</span>}
+              {inSidebar && item.repeat && <span style={{ fontSize: '0.5rem', color: 'var(--accent-blue)' }}>Recurrente</span>}
+              {!inSidebar && item.repeat && <span style={{ fontSize: '0.4375rem', color: 'var(--accent-blue)', flexShrink: 0 }}>🔄</span>}
             </div>
           </div>
           {/* Right: Effort bar */}
@@ -1939,7 +1939,7 @@
             <div onClick={(e) => handleAddItem(e, true)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '9px', color: isDone ? 'var(--accent-green)' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
+                  <span style={{ fontSize: '0.5625rem', color: isDone ? 'var(--accent-green)' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
                   {!isDone && <EffortBarSlot effort={slotEffort} energy={energy} />}
                 </div>
                 {!isDone && <button onClick={(e) => handleAddItem(e, false)} className="btn" style={{ fontWeight: '700', padding: '1px 5px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>}
@@ -1975,7 +1975,7 @@
                       border: '1px dashed var(--border-color)',
                       borderRadius: '4px',
                       color: 'var(--text-muted)',
-                      fontSize: '9px',
+                      fontSize: '0.5625rem',
                       cursor: 'pointer',
                       width: '100%',
                     }}
@@ -2040,8 +2040,8 @@
         }}>
           <div style={{ padding: '10px', minHeight: '44px', borderBottom: '1px solid var(--border-color)', background: isToday ? 'var(--today-header)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ fontSize: '13px', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
-              <span style={{ fontSize: '13px', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
+              <span style={{ fontSize: '0.8125rem', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
+              <span style={{ fontSize: '0.8125rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
             </div>
             <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
             <EffortBarSlot effort={dayEffort} energy={energy} />
@@ -2142,11 +2142,11 @@
         >
           <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', padding: '2px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '8px', color: labelColor }}>▶</span>
-              <span style={{ fontSize: '9px', color: labelColor, fontWeight: '500' }}>{label} ({count})</span>
+              <span style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: labelColor }}>▶</span>
+              <span style={{ fontSize: '0.5625rem', color: labelColor, fontWeight: '500' }}>{label} ({count})</span>
             </div>
             {isBacklog && onAddItem && (
-              <button onClick={(e) => { e.stopPropagation(); onAddItem(false); }} className="btn" style={{ fontWeight: '700', padding: '1px 5px', fontSize: '9px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+              <button onClick={(e) => { e.stopPropagation(); onAddItem(false); }} className="btn" style={{ fontWeight: '700', padding: '1px 5px', fontSize: '0.5625rem' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
             )}
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`} style={{ paddingTop: '4px' }}>
@@ -2186,7 +2186,7 @@
                   border: '1px dashed var(--border-color)',
                   borderRadius: '4px',
                   color: 'var(--text-muted)',
-                  fontSize: '9px',
+                  fontSize: '0.5625rem',
                   cursor: 'pointer',
                 }}
               >
@@ -2408,8 +2408,8 @@
             onDragEnd={() => setDragging(false)}
             onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '44px', background: expanded ? `${category.color}12` : 'transparent' }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
-            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '13px', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
-            <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '10px', padding: '4px' }}>▼</span>
+            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '0.625rem', padding: '4px' }}>▼</span>
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`}>
             <div ref={contentRef} style={{ padding: '6px 10px 8px' }}>
@@ -2439,8 +2439,8 @@
                 onDragLeave={(e) => { e.currentTarget.style.cursor = 'inherit'; }}
               >
                 <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
-                  <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '8px', color: 'var(--text-muted)' }}>▶</span>
-                  <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
+                  <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: 'var(--text-muted)' }}>▶</span>
+                  <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
                 </div>
                 <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
                   {recurringItems.map(item => (
@@ -2598,7 +2598,7 @@
               placeholder="Item..."
               style={{
                 width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '14px', background: 'var(--bg-input)', color: 'var(--text-primary)',
+                fontSize: '0.875rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
                 marginBottom: '10px', outline: 'none'
               }}
             />
@@ -2610,7 +2610,7 @@
               rows={2}
               style={{
                 width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)',
+                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
                 marginBottom: '10px', outline: 'none', resize: 'none', fontFamily: 'inherit'
               }}
             />
@@ -2620,7 +2620,7 @@
               onChange={(e) => setCategory(e.target.value)}
               style={{
                 width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)',
+                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
                 marginBottom: '10px', outline: 'none'
               }}
             >
@@ -2628,13 +2628,13 @@
             </select>
 
             <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
               <button
                 onClick={() => setShowDatePicker(!showDatePicker)}
                 style={{
                   width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
                   background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
-                  fontSize: '12px', textAlign: 'left', cursor: 'pointer'
+                  fontSize: '0.75rem', textAlign: 'left', cursor: 'pointer'
                 }}
               >
                 {getDateLabel()}
@@ -2648,10 +2648,10 @@
 
             {(scheduledDate || repeatType !== 'none') && (
               <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
                 <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{
                   width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
+                  fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
                 }}>
                   <option value="morning">Mañana</option>
                   <option value="afternoon">Tarde</option>
@@ -2661,16 +2661,16 @@
             )}
 
             {hadRepeat && userClearedDate && (
-              <div style={{ marginBottom: '10px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '10px', color: '#EF4444' }}>
+              <div style={{ marginBottom: '10px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
                 Al guardar se eliminará la recurrencia
               </div>
             )}
 
             <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
               <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{
                 width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '12px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
+                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
               }}>
                 <option value="none">No repetir</option>
                 <option value="days">Cada X días</option>
@@ -2679,26 +2679,26 @@
               </select>
               {repeatType !== 'none' && repeatType !== 'weekdays' && (
                 <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                  style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '12px', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+                  style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '0.75rem', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
                 />
               )}
               {repeatType === 'weekdays' && (
                 <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
                   {DAYS.map((d, i) => (
-                    <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '8px 4px', fontSize: '10px' }}>{d.charAt(0)}</button>
+                    <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '8px 4px', fontSize: '0.625rem' }}>{d.charAt(0)}</button>
                   ))}
                 </div>
               )}
             </div>
 
             <div style={{ marginBottom: '12px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
               <div style={{ display: 'flex', gap: '6px' }}>
                 {[0,1,2,3].map(e => (
                   <button key={e} type="button" onClick={() => setEffort(e)} style={{
                     flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                     background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
-                    color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '12px',
+                    color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '0.75rem',
                   }}>{e}</button>
                 ))}
               </div>
@@ -2706,7 +2706,7 @@
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}>🗑</button>}
-              <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '13px' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
+              <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '0.8125rem' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
             </div>
           </div>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
@@ -2734,14 +2734,14 @@
           {/* Day header */}
           <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
+              <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
               {['😴', '😊', '🔥'].map((emoji, i) => (
                 <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
-                  style={{ background: 'none', border: 'none', fontSize: '16px', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer' }}>
+                  style={{ background: 'none', border: 'none', fontSize: '1rem', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer' }}>
                   {emoji}
                 </button>
               ))}
@@ -2759,11 +2759,11 @@
 
             {getDoneItems().length > 0 && (
               <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-light)' }}>
-                <div style={{ fontSize: '9px', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '6px', textTransform: 'uppercase' }}>Hecho ({getDoneItems().length})</div>
+                <div style={{ fontSize: '0.5625rem', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '6px', textTransform: 'uppercase' }}>Hecho ({getDoneItems().length})</div>
                 {getDoneItems().slice(0, 3).map(item => (
                   <ItemCard key={item.id} item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
                 ))}
-                {getDoneItems().length > 3 && <div style={{ fontSize: '10px', color: 'var(--text-muted)', padding: '4px' }}>+{getDoneItems().length - 3} más</div>}
+                {getDoneItems().length > 3 && <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', padding: '4px' }}>+{getDoneItems().length - 3} más</div>}
               </div>
             )}
           </div>
@@ -3824,12 +3824,12 @@
           <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
             {/* Mobile Header */}
             <div style={{ padding: '8px 12px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '48px' }}>
-              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '10px' }}>
+              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.625rem' }}>
                 {getShortMonthName(currentMobileDay)} {currentMobileDay.getFullYear()}
               </button>
-              {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '10px' }}>Hoy</button>}
+              {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
               <div style={{ flex: 1 }} />
-              <button onClick={() => setMobileViewMode(v => v === 'calendar' ? 'categories' : 'calendar')} className="btn" style={{ fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button onClick={() => setMobileViewMode(v => v === 'calendar' ? 'categories' : 'calendar')} className="btn" style={{ fontSize: '0.625rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {mobileViewMode === 'calendar' ? '📁 Categorías' : '📅 Calendario'}
               </button>
             </div>
@@ -3862,9 +3862,9 @@
                 /* Mobile Categories - Fullwidth */
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
                   <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={clearDone} className="btn" style={{ fontSize: '9px' }}>Limpiar hechos</button>
+                      <button onClick={clearDone} className="btn" style={{ fontSize: '0.5625rem' }}>Limpiar hechos</button>
                       <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700' }}>+</button>
                     </div>
                   </div>
@@ -3932,12 +3932,12 @@
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {/* Calendar header */}
               <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
-                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '9px' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
+                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button onClick={() => navigateDays(-12)} className="btn">««</button>
                   <button onClick={() => navigateDays(-1)} className="btn">«</button>
                 </div>
-                <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
+                <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button onClick={() => navigateDays(1)} className="btn">»</button>
                   <button onClick={() => navigateDays(12)} className="btn">»»</button>
@@ -3952,8 +3952,8 @@
               <div className="backlog-row" style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
                 <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
                   <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
-                    <span style={{ fontSize: '14px' }}>🎲</span>
-                    <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '11px' }}>Backlogs</span>
+                    <span style={{ fontSize: '0.875rem' }}>🎲</span>
+                    <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '0.6875rem' }}>Backlogs</span>
                   </button>
                 </div>
                 <div className="hide-scrollbar" style={{ flex: 1, display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 12px', alignItems: 'center' }}>
@@ -3965,9 +3965,9 @@
             {/* Sidebar */}
             <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '44px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  <button onClick={clearDone} className="btn" style={{ fontSize: '8px' }}>Limpiar hechos</button>
+                  <button onClick={clearDone} className="btn" style={{ fontSize: '0.5rem' }}>Limpiar hechos</button>
                   <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700', opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
                 </div>
               </div>
