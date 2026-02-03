@@ -764,13 +764,15 @@
     const EnergySelector = ({ energy, onChange }) => (
       <div style={{ display: 'flex', gap: '2px' }}>
         {[1,2,3].map(l => (
-          <button key={l} onClick={(e) => { e.stopPropagation(); onChange(l); }} className="btn" style={{
-            width: '18px',
-            padding: '1px 0',
-            background: energy === l ? 'var(--bg-input)' : 'transparent',
+          <button key={l} onClick={(e) => { e.stopPropagation(); onChange(l); }} style={{
+            background: 'none',
+            border: 'none',
+            padding: '0',
+            fontSize: '0.875rem',
+            cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
-          }}><span style={{ position: 'relative', top: '-1px', left: '2px' }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</span></button>
+          }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</button>
         ))}
       </div>
     );
@@ -1234,21 +1236,21 @@
                 </div>
               </div>
 
-              {/* Mark as done button - only for editing non-completed items */}
-              {isEditing && !editItem.completed && onComplete && (
-                <button type="button" onClick={() => { onComplete(editItem.id); onClose(); }} style={{
-                  width: '100%', padding: '8px', marginBottom: '10px', border: 'none', borderRadius: '6px',
-                  background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.6875rem', cursor: 'pointer'
-                }}>
-                  Marcar como hecho
-                </button>
-              )}
-
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
                 <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '6px 10px', fontSize: '0.75rem' }}>✕</button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
+
+              {/* Mark as done button - only for editing non-completed items */}
+              {isEditing && !editItem.completed && onComplete && (
+                <button type="button" onClick={() => { onComplete(editItem.id); onClose(); }} style={{
+                  width: '100%', padding: '8px', marginTop: '10px', border: 'none', borderRadius: '6px',
+                  background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.6875rem', cursor: 'pointer'
+                }}>
+                  Marcar como hecho
+                </button>
+              )}
             </form>
           </Popover>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
@@ -1456,7 +1458,7 @@
             <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               <div>Solo este evento</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
-                Se creará un item independiente en el backlog
+                Crea una copia en el backlog
               </div>
             </button>
             {!isDoneTarget && !showFollowingOptions && (
@@ -2049,7 +2051,7 @@
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
-              <div style={{ marginTop: '2px' }}><EffortBarSlot effort={dayEffort} energy={energy} /></div>
+              <div style={{ marginTop: '-1px' }}><EffortBarSlot effort={dayEffort} energy={energy} /></div>
             </div>
           </div>
           <div className="slot-container">
@@ -2826,21 +2828,21 @@
               </div>
             </div>
 
-            {/* Mark as done button - only for editing non-completed items */}
-            {isEditing && !item.completed && onComplete && (
-              <button type="button" onClick={() => { onComplete(item.id); onClose(); }} style={{
-                width: '100%', padding: '12px', marginBottom: '12px', border: 'none', borderRadius: '8px',
-                background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.8125rem', cursor: 'pointer'
-              }}>
-                Marcar como hecho
-              </button>
-            )}
-
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
               <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '10px 12px', fontSize: '0.875rem' }}>✕</button>
               <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '0.8125rem' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
             </div>
+
+            {/* Mark as done button - only for editing non-completed items */}
+            {isEditing && !item.completed && onComplete && (
+              <button type="button" onClick={() => { onComplete(item.id); onClose(); }} style={{
+                width: '100%', padding: '12px', marginTop: '12px', border: 'none', borderRadius: '8px',
+                background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.8125rem', cursor: 'pointer'
+              }}>
+                Marcar como hecho
+              </button>
+            )}
           </div>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); lastPopoverCloseTime = Date.now(); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
         </>
@@ -4140,7 +4142,7 @@
                   </div>
                   <button onClick={goToToday} className="btn">Hoy</button>
                   <div style={{ flex: 1 }} />
-                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} className="btn" style={{ width: '18px', padding: '1px 0' }}><span style={{ position: 'relative', top: '-1px' }}>{theme === 'light' ? '🌙' : '☀️'}</span></button>
+                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} style={{ background: 'none', border: 'none', padding: '0', fontSize: '0.875rem', cursor: 'pointer' }}>{theme === 'light' ? '🌙' : '☀️'}</button>
                 </div>
                 <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
                   {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
