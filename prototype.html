@@ -354,9 +354,6 @@
       /* Mobile calendar alignment - slots get padding */
       .mobile-day-column .slot-row,
       .mobile-day-column .slot-row-done { padding-left: 12px; padding-right: 12px; }
-
-      /* Hide backlog row */
-      .backlog-row { display: none !important; }
     }
   </style>
 </head>
@@ -1798,7 +1795,7 @@
             </div>
           </div>
           {/* Right: Effort bar */}
-          <div style={{ flexShrink: 0, marginTop: '4px' }}>
+          <div style={{ flexShrink: 0, marginTop: '8px' }}>
             <EffortBar effort={item.effort} isToday={isToday} />
           </div>
         </div>
@@ -2038,7 +2035,7 @@
         <div style={{
           flex: `0 0 ${DAY_WIDTH}px`, minWidth: `${DAY_WIDTH}px`, display: 'flex', flexDirection: 'column',
           borderRight: '1px solid var(--border-color)',
-          borderLeft: (isSunday && !isSticky) ? `6px solid ${sundayLineColor}` : 'none',
+          borderLeft: (isSunday && !isSticky) ? `10px solid ${sundayLineColor}` : 'none',
           marginLeft: (isSunday && !isSticky) ? '-1px' : 0,
           background: isToday ? 'var(--today-bg)' : day.isPast ? 'var(--bg-secondary)' : 'var(--bg-primary)',
           position: isSticky ? 'sticky' : 'relative', left: isSticky ? 0 : 'auto',
@@ -2940,7 +2937,6 @@
       const [recurringEditPopover, setRecurringEditPopover] = useState(null);
       const [recurringSavePopover, setRecurringSavePopover] = useState(null); // For edit property confirmation
       const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
-      const [shuffledBacklog, setShuffledBacklog] = useState([]);
       const [toast, setToast] = useState(null);
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
 
@@ -3046,31 +3042,6 @@
       const backlogItems = useMemo(() => {
         return items.filter(i => !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat);
       }, [items]);
-
-      // Initialize shuffled backlog on mount
-      useEffect(() => {
-        if (shuffledBacklog.length === 0 && backlogItems.length > 0) {
-          const shuffled = [...backlogItems].sort(() => Math.random() - 0.5);
-          setShuffledBacklog(shuffled);
-        }
-      }, []);
-
-      // Update shuffled backlog when items change (keep order, just update/filter)
-      useEffect(() => {
-        const backlogIds = new Set(backlogItems.map(i => i.id));
-        // Keep items that still exist in backlog, in their current order
-        const stillExists = shuffledBacklog.filter(i => backlogIds.has(i.id));
-        // Add new items that aren't in shuffled yet - put them FIRST (they just moved to backlog)
-        const newItems = backlogItems.filter(i => !shuffledBacklog.find(s => s.id === i.id));
-        if (stillExists.length !== shuffledBacklog.length || newItems.length > 0) {
-          setShuffledBacklog([...newItems, ...stillExists]);
-        }
-      }, [backlogItems]);
-
-      const handleShuffle = useCallback(() => {
-        const shuffled = [...backlogItems].sort(() => Math.random() - 0.5);
-        setShuffledBacklog(shuffled);
-      }, [backlogItems]);
 
       const firstVisible = days[1].date;
       const lastVisible = days[days.length - 1].date;
@@ -4146,17 +4117,6 @@
                 </div>
                 <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
                   {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
-                </div>
-                <div className="backlog-row" style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
-                  <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
-                    <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
-                      <span style={{ fontSize: '0.875rem' }}>🎲</span>
-                      <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '0.6875rem' }}>Backlogs</span>
-                    </button>
-                  </div>
-                  <div className="hide-scrollbar" style={{ flex: 1, display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 12px', alignItems: 'center' }}>
-                    {shuffledBacklog.slice(0, 12).map(item => <div key={item.id} style={{ flex: `0 0 ${DAY_WIDTH}px` }}><ItemCard item={item} categories={categories} onComplete={handleComplete} onEdit={handleEdit} justDroppedItemId={justDroppedItemId} /></div>)}
-                  </div>
                 </div>
               </div>
             )}
