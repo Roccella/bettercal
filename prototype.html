@@ -264,33 +264,58 @@
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
     .bottom-sheet {
-      position: fixed; left: 0; right: 0; bottom: 0;
-      background: var(--bg-primary); border-radius: 16px 16px 0 0;
-      padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-      max-height: 85vh; overflow-y: auto; z-index: 10001;
+      position: fixed; left: 0; right: 0; top: 0; bottom: 0;
+      background: var(--bg-primary);
+      padding: 16px; padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto; z-index: 10001;
       animation: slideUp 0.3s ease-out;
+      display: flex; flex-direction: column;
     }
     .bottom-sheet.closing { animation: slideDown 0.2s ease-out forwards; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes slideDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
     [data-theme="dark"] .bottom-sheet { background: var(--bg-card); }
 
-    .bottom-sheet-handle {
-      width: 36px; height: 4px; background: var(--border-color);
-      border-radius: 2px; margin: 0 auto 12px;
+    /* Mobile Footer */
+    .mobile-footer {
+      display: none;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      padding: 8px 12px;
+      padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
     }
-
-    /* FAB */
-    .fab {
-      position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--accent-blue); color: white;
-      border: none; font-size: 1.75rem; font-weight: 300;
-      display: none; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 100; cursor: pointer; touch-action: manipulation;
+    .mobile-footer-inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
     }
-    .fab:active { transform: scale(0.95); background: #2d6bc4; }
+    .mobile-footer-section {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mobile-footer-section.center {
+      justify-content: center;
+      gap: 2px;
+    }
+    .mobile-footer-section.right {
+      justify-content: flex-end;
+    }
+    .mobile-tab-btn {
+      padding: 6px 10px;
+      border: none;
+      background: none;
+      font-size: 1.125rem;
+      opacity: 0.35;
+      filter: grayscale(100%);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .mobile-tab-btn.active {
+      opacity: 1;
+      filter: none;
+    }
 
     /* Mobile media query */
     @media (max-width: 600px) {
@@ -300,7 +325,7 @@
       .mobile-only { display: flex; }
       .desktop-only { display: none !important; }
 
-      .fab { display: flex; }
+      .mobile-footer { display: block; }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -347,7 +372,7 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Day width is base unit (50% more than before: 175 * 1.5 = 262), sidebar is 1.2x
-    const DAY_WIDTH = 240;
+    const DAY_WIDTH = 200;
     const SIDEBAR_WIDTH = 240;
 
     const initialCategories = [
@@ -748,7 +773,7 @@
             cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
-          }}>{l === 1 ? '😴' : l === 2 ? '😊' : '🔥'}</button>
+          }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</button>
         ))}
       </div>
     );
@@ -1215,6 +1240,7 @@
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger">🗑</button>}
+                <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '6px 10px', fontSize: '0.75rem' }}>✕</button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
             </form>
@@ -1792,7 +1818,7 @@
             </div>
           </div>
           {/* Right: Effort bar */}
-          <div style={{ flexShrink: 0, marginTop: '2px' }}>
+          <div style={{ flexShrink: 0, marginTop: '4px' }}>
             <EffortBar effort={item.effort} isToday={isToday} />
           </div>
         </div>
@@ -2522,6 +2548,9 @@
       const originalTitle = item?.title || '';
       const originalDescription = item?.description || '';
 
+      // Check if this is a new item created with empty title (from FAB click)
+      const isNewUntitledItem = !!item?._isNewItem || (!!item?.id && originalTitle === '');
+
       useEffect(() => {
         setTimeout(() => inputRef.current?.focus(), 100);
       }, []);
@@ -2530,8 +2559,6 @@
         category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
         scheduledDate !== initialDate || scheduledSlot !== (item?.scheduledSlot || 'morning') ||
         repeatType !== (item?.repeat?.type || 'none');
-
-      const isNewUntitledItem = isEditing && (item?._isNewItem || originalTitle === '');
 
       const hasUserChanges = isNewUntitledItem ? (
         title.trim() !== '' || description !== '' || category !== (item?.category || 'temp') ||
@@ -2543,6 +2570,7 @@
           setShowDiscardDialog(true);
         } else {
           if (isNewUntitledItem) onDelete(item.id);
+          lastPopoverCloseTime = Date.now();
           onClose();
         }
       };
@@ -2550,6 +2578,7 @@
       const handleSave = () => {
         if (!title.trim()) {
           if (isNewUntitledItem) onDelete(item.id);
+          lastPopoverCloseTime = Date.now();
           onClose();
           return;
         }
@@ -2562,6 +2591,7 @@
           finalScheduledDate = visualDate;
         }
 
+        lastPopoverCloseTime = Date.now();
         onSave({
           id: item?.id,
           title: title.trim(),
@@ -2589,8 +2619,6 @@
         <>
           <div className={`bottom-sheet-overlay ${closing ? 'closing' : ''}`} onClick={handleRequestClose} />
           <div className={`bottom-sheet ${closing ? 'closing' : ''}`}>
-            <div className="bottom-sheet-handle" />
-
             <input
               ref={inputRef}
               value={title}
@@ -2704,12 +2732,13 @@
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}>🗑</button>}
+              <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '10px 12px', fontSize: '0.875rem' }}>✕</button>
               <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '12px', fontSize: '0.8125rem' }}>{isEditing ? 'Guardar' : 'Agregar'}</button>
             </div>
           </div>
-          {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
+          {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); lastPopoverCloseTime = Date.now(); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
         </>
       );
     };
@@ -2732,14 +2761,14 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)' }}>
+          <div style={{ padding: '14px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
-              {['😴', '😊', '🔥'].map((emoji, i) => (
+              {['🪦', '😎', '🔥'].map((emoji, i) => (
                 <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
                   style={{ background: 'none', border: 'none', fontSize: '1rem', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer' }}>
                   {emoji}
@@ -3746,26 +3775,48 @@
         }
       }, [currentMobileDay, isMobile, days]);
 
-      const handleFabClick = () => {
-        const newItem = {
-          id: Date.now(),
-          title: '',
-          description: '',
-          category: 'temp',
-          effort: 1,
-          scheduledDate: null,
-          scheduledSlot: null,
-          completed: false,
-          completedDate: null,
-          createdAt: formatDate(REAL_TODAY),
-          isArchived: false,
-          repeat: null,
-          sortOrder: -1000,
-          _isNewItem: true,
-        };
-        setItems(p => [newItem, ...p]);
-        setMobileViewMode('categories');
-        setBottomSheetItem({ item: newItem, visualDate: null });
+      const handleMobileAddClick = () => {
+        if (mobileViewMode === 'calendar') {
+          // In calendar view: create item without title as first item of morning slot
+          const newItem = {
+            id: Date.now(),
+            title: '',
+            description: '',
+            category: 'temp',
+            effort: 1,
+            scheduledDate: formatDate(currentMobileDay),
+            scheduledSlot: 'morning',
+            completed: false,
+            completedDate: null,
+            createdAt: formatDate(REAL_TODAY),
+            isArchived: false,
+            repeat: null,
+            sortOrder: -1000,
+            _isNewItem: true,
+          };
+          setItems(p => [newItem, ...p]);
+          setBottomSheetItem({ item: newItem, visualDate: formatDate(currentMobileDay) });
+        } else {
+          // In categories view: create item in backlog (existing behavior)
+          const newItem = {
+            id: Date.now(),
+            title: '',
+            description: '',
+            category: 'temp',
+            effort: 1,
+            scheduledDate: null,
+            scheduledSlot: null,
+            completed: false,
+            completedDate: null,
+            createdAt: formatDate(REAL_TODAY),
+            isArchived: false,
+            repeat: null,
+            sortOrder: -1000,
+            _isNewItem: true,
+          };
+          setItems(p => [newItem, ...p]);
+          setBottomSheetItem({ item: newItem, visualDate: null });
+        }
       };
 
       const handleBottomSheetClose = () => {
@@ -3822,17 +3873,16 @@
         // MOBILE LAYOUT
         return (
           <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
-            {/* Mobile Header */}
-            <div style={{ padding: '8px 12px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '48px' }}>
-              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.625rem' }}>
-                {getShortMonthName(currentMobileDay)} {currentMobileDay.getFullYear()}
-              </button>
-              {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
-              <div style={{ flex: 1 }} />
-              <button onClick={() => setMobileViewMode(v => v === 'calendar' ? 'categories' : 'calendar')} className="btn" style={{ fontSize: '0.625rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                {mobileViewMode === 'calendar' ? '📁 Categorías' : '📅 Calendario'}
-              </button>
-            </div>
+            {/* Mobile Header - only shows in Categories view */}
+            {mobileViewMode === 'categories' && (
+              <div style={{ padding: '14px 12px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button onClick={clearDone} className="btn" style={{ fontSize: '0.5625rem' }}>Limpiar hechos</button>
+                  <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700' }}>+</button>
+                </div>
+              </div>
+            )}
 
             {/* Mobile Content */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -3861,13 +3911,6 @@
               ) : (
                 /* Mobile Categories - Fullwidth */
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
-                  <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={clearDone} className="btn" style={{ fontSize: '0.5625rem' }}>Limpiar hechos</button>
-                      <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700' }}>+</button>
-                    </div>
-                  </div>
                   <div style={{ flex: 1, overflowY: 'auto' }}>
                     {categories.map(cat => (
                       <CategorySection
@@ -3897,8 +3940,39 @@
               )}
             </div>
 
-            {/* FAB */}
-            <button className="fab" onClick={handleFabClick}>+</button>
+            {/* Mobile Footer */}
+            <div className="mobile-footer">
+              <div className="mobile-footer-inner">
+                {/* Left: Month selector */}
+                <div className="mobile-footer-section">
+                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.625rem' }}>
+                    {getShortMonthName(currentMobileDay)}
+                  </button>
+                  {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
+                </div>
+
+                {/* Center: View tabs */}
+                <div className="mobile-footer-section center">
+                  <button
+                    className={`mobile-tab-btn ${mobileViewMode === 'calendar' ? 'active' : ''}`}
+                    onClick={() => setMobileViewMode('calendar')}
+                  >
+                    📅
+                  </button>
+                  <button
+                    className={`mobile-tab-btn ${mobileViewMode === 'categories' ? 'active' : ''}`}
+                    onClick={() => setMobileViewMode('categories')}
+                  >
+                    📁
+                  </button>
+                </div>
+
+                {/* Right: Add button */}
+                <div className="mobile-footer-section right">
+                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.625rem', fontWeight: '700', lineHeight: '1' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+                </div>
+              </div>
+            </div>
 
             {/* Bottom Sheet for mobile editing */}
             {bottomSheetItem && (

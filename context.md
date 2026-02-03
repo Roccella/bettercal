@@ -29,7 +29,7 @@ Actualmente el prototipo usa CDN para:
 ## Estructura de la UI
 
 ### Layout Principal
-- **Calendario**: Vista de 12 días con scroll horizontal
+- **Calendario**: Vista de 12 días con scroll horizontal (columnas de 200px)
 - **Sidebar derecha**: Categorías con grupos Backlog, Agendado y Hecho (en ese orden)
 
 ### Slots del Calendario
@@ -40,7 +40,7 @@ Cada día tiene 4 slots:
 - `done` (Hecho) - altura fija de 145px
 
 ### Sistema de Energía
-- 3 niveles por día: 1 (bajo), 2 (medio), 3 (alto)
+- 3 niveles por día: 1 (bajo 🪦), 2 (medio 😎), 3 (alto 🔥)
 - Afecta capacidad de esfuerzo del día
 
 ## Modelo de Datos
@@ -138,7 +138,7 @@ El dragData incluye:
 
 ### ItemCard
 - Muestra checkbox, título, metadata y barra de esfuerzo
-- Estructura de 3 contenedores: izquierda (checkbox), centro (título+meta), derecha (effort)
+- Estructura de 3 contenedores: izquierda (checkbox), centro (título+meta), derecha (effort con margin-top: 4px para centrado vertical)
 - Props: `item`, `categories`, `onComplete`, `onEdit`, `inSidebar`, `isToday`, `isPast`, `showDate`
 - Atributo `data-item-id` para localizar el elemento en el DOM (usado por RecurringActionPopover)
 
@@ -157,7 +157,7 @@ El dragData incluye:
 - Recibe `groupsExp` y `onGroupToggle` props para estado de expansión persistente
 
 ### Popovers
-- `AddEditItemPopover`: Crear/editar items (incluye selector de fecha, horario, esfuerzo, recurrencia)
+- `AddEditItemPopover`: Crear/editar items (incluye selector de fecha, horario, esfuerzo, recurrencia). Tiene botones: 🗑 (si editando), ✕ (cancelar), Guardar/Agregar
 - `EditCategoryPopover`: Crear/editar categorías (con alerta de descartar cambios)
 - `RecurringActionPopover`: Opciones al mover items recurrentes
 - `RemoveDatePopover`: Confirmación al mover item agendado/recurrente a backlog
@@ -202,6 +202,7 @@ El dragData incluye:
 
 ## Control de Popovers
 - Variable global `lastPopoverCloseTime` previene reapertura accidental (threshold 200ms)
+- Funciona tanto en desktop (popovers) como en mobile (BottomSheet a pantalla completa)
 - Botón "+" de nueva categoría deshabilitado cuando hay popover de item abierto
 
 ## Notas de Implementación
@@ -225,6 +226,7 @@ El dragData incluye:
 - **Selector de horario**: Mañana/Tarde/Noche (solo visible si hay fecha o recurrencia)
 - **Alerta de recurrencia**: Muestra aviso cuando se quita fecha a un item recurrente
 - **Detección de cambios**: Incluye título, descripción, categoría, esfuerzo, fecha, horario, tipo de repetición, frecuencia y días de semana
+- **Botón X de cancelar**: En desktop y mobile, entre trash y guardar
 
 ### Flujos de Quitar Fecha/Recurrencia
 1. **Drag & drop a Backlog**: Muestra `RemoveDatePopover` con mensaje apropiado (fecha o recurrencia)
@@ -249,38 +251,41 @@ El dragData incluye:
 - Estado `justDroppedItemId` en App, se limpia después de 600ms
 - Funciona en calendario y sidebar, para items normales y recurrentes
 
-## Versión Mobile (PWA)
+## Versión Mobile
 
 ### Layout Responsive
 - Breakpoint: 600px
-- Desktop (>600px): Layout original con 12 días + sidebar
-- Mobile (≤600px): Vista de 1 día con swipe + FAB
+- Desktop (>600px): Layout original con 12 días + sidebar (columnas de 200px)
+- Mobile (≤600px): Vista de 1 día con swipe + footer con tabs
 
 ### Características Mobile
 - **Swipe navegación**: Scroll horizontal nativo con CSS `scroll-snap-type: x mandatory`. Permite ver parcialmente el día siguiente/anterior mientras se arrastra, con snap al soltar.
-- **FAB (Floating Action Button)**: Crea items en Temp backlog, abre BottomSheet
-- **BottomSheet**: Editor de items a pantalla completa desde abajo (reemplaza popovers)
-- **Toggle vistas**: Botón con ícono para cambiar entre 📅 Calendario y 📁 Categorías
-- **Header simplificado**: Selector de mes (sin ícono) y botón "Hoy"
+- **Footer con 3 secciones**:
+  - Izquierda: Selector de mes (solo mes, sin año) + botón "Hoy" (si no es hoy)
+  - Centro: Tabs 📅/📁 centrados respecto a la ventana (usando CSS grid)
+  - Derecha: Botón "+" primary para agregar items
+- **BottomSheet a pantalla completa**: Editor de items que ocupa toda la pantalla (reemplaza el bottom sheet parcial)
+- **Botón + según vista**: En calendario crea item en morning del día actual, en categorías crea en backlog
+- **Header de categorías**: Solo visible en vista categorías, con "Limpiar hechos" y botón "+" para nueva categoría
 
 ### Interacción Touch en Items (Mobile)
 - **Long-press para drag**: Los items requieren mantener presionado ~200ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
 - **Vibración feedback**: Al activarse el drag después del long-press, el dispositivo vibra brevemente (si soporta `navigator.vibrate`).
 - **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
 - **touch-action: pan-x**: Los items permiten scroll horizontal nativo mientras se tocan.
+- **Prevención de interacción post-cierre**: `lastPopoverCloseTime` evita que al cerrar el BottomSheet se active un item debajo
 
 ### Alineamiento Visual Mobile
 - Todos los elementos están alineados a 12px del borde izquierdo:
-  - Header principal (botón mes)
   - Header del día (Lun 2)
   - Labels de slots (Mañana, Tarde, Noche)
   - Items dentro de slots
   - Sección Hecho
 
 ### Componentes Mobile
-- `MobileDayColumn`: Renderiza un día completo (header + slots + done)
-- `BottomSheet`: Editor de items con todos los campos
-- `FAB`: Botón flotante "+" en esquina inferior derecha
+- `MobileDayColumn`: Renderiza un día completo (header con padding 14px + slots + done)
+- `BottomSheet`: Editor de items a pantalla completa con botones: 🗑 (si editando), ✕ (cancelar), Guardar/Agregar
+- `MobileFooter`: Barra inferior con selector de mes, tabs y botón agregar
 
 ### Estados Mobile
 - `isMobile`: Detecta viewport ≤600px
@@ -292,8 +297,9 @@ El dragData incluye:
 ### CSS Mobile
 - `.mobile-day-scroll`: Container horizontal con `scroll-snap-type: x mandatory` y `scroll-snap-stop: always`
 - `.mobile-day-column`: Cada día ocupa 100% del ancho con `scroll-snap-align: start`
-- `.fab`: Botón flotante con safe-area-inset
-- `.bottom-sheet`: Panel deslizante desde abajo
+- `.mobile-footer`: Footer fijo con grid de 3 columnas (1fr auto 1fr) para centrar tabs
+- `.mobile-tab-btn`: Botones de tabs con estilo similar a energía (activo=opacidad 100%, inactivo=35% + grayscale)
+- `.bottom-sheet`: Panel a pantalla completa con flexbox column y safe-area-inset
 - Slots en mobile tienen padding lateral 12px via CSS específico
 
 ### Tipografía Responsive
