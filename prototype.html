@@ -1,0 +1,3378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Better Cal - Prototype v23</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #F5F7FA;
+      --bg-tertiary: #E8ECF1;
+      --bg-app: #E8ECF1;
+      --bg-card: #F0F3F7;
+      --bg-card-past: #E5E8ED;
+      --bg-card-today: #FFFFFF;
+      --bg-card-future: #F5F7FA;
+      --bg-input: #E8ECF1;
+      --bg-sidebar: #FAFBFC;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --text-past: #94A3B8;
+      --border-color: #CBD5E1;
+      --border-light: #E2E8F0;
+      --accent-blue: #3B7DD8;
+      --accent-green: #2D9469;
+      --accent-red: #DC2626;
+      --today-bg: #EBF4FF;
+      --today-header: #D6E8FC;
+      --done-bg: #E8F8F0;
+      --done-border: #A7F3D0;
+      --temp-color: #4B5563;
+      --checkbox-bg: #D1D5DB;
+      --effort-bg-today: #C0C5CC;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f0f0f;
+      --bg-secondary: #141414;
+      --bg-tertiary: #1a1a1a;
+      --bg-app: #0a0a0a;
+      --bg-card: #1e1e1e;
+      --bg-card-past: #161616;
+      --bg-card-today: #242424;
+      --bg-card-future: #1a1a1a;
+      --bg-input: #2a2a2a;
+      --bg-sidebar: #0f0f0f;
+      --text-primary: #e8eaed;
+      --text-secondary: #9aa0a6;
+      --text-muted: #71767b;
+      --text-past: #5a5f66;
+      --border-color: #2a2a2a;
+      --border-light: #1a1a1a;
+      --effort-bg-today: #404040;
+      --accent-blue: #5a9cf5;
+      --accent-green: #5cb88a;
+      --accent-red: #e87777;
+      --today-bg: #0d1520;
+      --today-header: #152030;
+      --done-bg: #0f1f18;
+      --done-border: #1a3028;
+      --temp-color: #6B7280;
+      --checkbox-bg: #3a3a3a;
+    }
+
+    html { font-size: 130%; }
+    body { font-family: 'IBM Plex Sans', -apple-system, sans-serif; background: var(--bg-app); min-height: 100vh; color: var(--text-primary); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .collapsible { overflow: hidden; max-height: 0; transition: max-height 0.2s ease-out; }
+    .collapsible.expanded { max-height: 3000px; transition: max-height 0.25s ease-in; }
+
+    .popover {
+      position: fixed; background: var(--bg-primary); border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4); padding: 12px; z-index: 10000;
+      width: 280px;
+    }
+    [data-theme="dark"] .popover { background: var(--bg-card); }
+    .popover.ready { animation: popIn 0.1s ease-out; }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+    .draggable { cursor: grab; user-select: none; }
+    .draggable:active { cursor: grabbing; }
+    .dragging { opacity: 0.4; }
+    .drop-zone { transition: background 0.1s; }
+
+    .drop-indicator {
+      height: 0;
+      background: var(--accent-blue);
+      border-radius: 1px;
+      margin: 0;
+      opacity: 0;
+      transition: all 0.1s;
+    }
+    .drop-indicator.visible {
+      height: 2px;
+      margin: 2px 0;
+      opacity: 1;
+    }
+
+    /* Drop feedback shimmer effect */
+    @keyframes dropShimmer {
+      0% {
+        background-position: -100% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+    .just-dropped {
+      position: relative;
+      overflow: hidden;
+    }
+    .just-dropped::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: dropShimmer 0.5s ease-out;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    [data-theme="dark"] .just-dropped::after {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: dropShimmer 0.5s ease-out;
+    }
+
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .btn {
+      padding: 3px 8px; background: var(--bg-input); border: none;
+      border-radius: 4px; font-size: 10px; color: var(--text-secondary); cursor: pointer; font-weight: 500;
+      line-height: 1.4;
+    }
+    .btn:hover { background: var(--border-color); }
+    [data-theme="dark"] .btn:hover { background: #333; }
+    .btn-primary { background: var(--accent-blue); color: #FFF; }
+    [data-theme="dark"] .btn-primary { background: #3d6ba3; color: #FFF; }
+    .btn-primary:hover { background: #2d5a8a; }
+    [data-theme="dark"] .btn-primary:hover { background: #4a7ab5; }
+    .btn-primary:disabled { background: var(--text-muted); cursor: not-allowed; }
+    .btn-danger { background: var(--accent-red); color: #FFF; }
+    [data-theme="dark"] .btn-danger { background: #a85555; color: #FFF; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-icon-danger {
+      padding: 6px 8px; background: var(--bg-input); border: none;
+      border-radius: 4px; cursor: pointer; color: var(--accent-red); font-size: 12px;
+    }
+    [data-theme="dark"] .btn-icon-danger { background: var(--bg-card); }
+    .btn-icon-danger:hover { background: var(--border-color); }
+    [data-theme="dark"] .btn-icon-danger:hover { background: #2a2a2a; }
+
+    .clickable { cursor: pointer; }
+    .clickable:hover { opacity: 0.8; }
+
+    .effort-bar {
+      width: 20px; height: 5px; background: var(--border-color); border-radius: 2px; overflow: hidden; flex-shrink: 0;
+    }
+    .effort-bar-fill {
+      height: 100%; border-radius: 2px; transition: width 0.2s;
+    }
+
+    .slot-container {
+      flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    }
+    .slots-scrollable {
+      flex: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column;
+    }
+    .slot-row {
+      padding: 6px 10px 8px 10px;
+      border-bottom: 1px solid var(--border-light);
+      min-height: 50px;
+    }
+    .slot-row:last-child {
+      border-bottom: none;
+      flex: 1;
+    }
+    .slot-row-done {
+      height: 145px; min-height: 145px; max-height: 145px;
+      overflow-y: auto; padding: 6px 10px 8px 10px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .section-toggle {
+      cursor: pointer; user-select: none;
+    }
+    .section-toggle:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .category-heading {
+      cursor: pointer; user-select: none;
+    }
+    .category-heading:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-primary); color: var(--text-primary);
+      padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      z-index: 10001;
+      display: flex; align-items: center; gap: 12px;
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+    .discard-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6); z-index: 10001;
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .discard-dialog {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: var(--bg-primary); border-radius: 8px; padding: 16px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 10002;
+      width: 300px; animation: dialogPopIn 0.15s ease-out;
+    }
+    @keyframes dialogPopIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+    [data-theme="dark"] .discard-dialog { background: var(--bg-card); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect, useMemo, useCallback } = React;
+
+    const TEMP_COLOR = '#9CA3AF';
+    const COLORS = ['#2563EB','#059669','#DC2626','#7C3AED','#D97706','#DB2777','#4F46E5','#0D9488','#EA580C','#65A30D'];
+    const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+    // Day width is base unit (50% more than before: 175 * 1.5 = 262), sidebar is 1.2x
+    const DAY_WIDTH = 240;
+    const SIDEBAR_WIDTH = 240;
+
+    const initialCategories = [
+      { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
+      { id: 'ai', name: 'AI agents', color: '#0D9488' },
+      { id: 'work', name: 'Trabajo', color: '#D97706' },
+      { id: 'health', name: 'Salud', color: '#DC2626' },
+      { id: 'social', name: 'Social', color: '#DB2777' },
+      { id: 'music', name: 'Música', color: '#4F46E5' },
+      { id: 'entertainment', name: 'Entretenimiento', color: '#7C3AED' },
+      { id: 'home', name: 'Hogar', color: '#65A30D' },
+      { id: 'fitness', name: 'Fitness', color: '#059669' },
+    ];
+
+    const initialItems = [
+      // AI agents
+      { id: 1, title: 'Armar prototipo nuevo', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 2, title: 'Mejorar prompts de código', category: 'ai', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 3, title: 'Probar Kimi K2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: true, repeat: null, description: '' },
+      { id: 9, title: 'Revisar código OpenClaw', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 110, title: 'Leer artículo RL', category: 'ai', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 111, title: 'Testear Claude 4', category: 'ai', effort: 2, scheduledDate: '2026-02-05', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 112, title: 'Documentar agentes', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 200, title: 'Investigar MCP', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+      { id: 201, title: 'Probar Gemini 2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-17', isArchived: false, repeat: null, description: '' },
+
+      // Trabajo
+      { id: 10, title: 'Comprar verduras', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
+      { id: 11, title: 'Responder emails', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: true, completedDate: '2026-02-03', createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
+      { id: 12, title: 'Preparar presentación', category: 'work', effort: 3, scheduledDate: '2026-02-04', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-29', isArchived: false, repeat: null, description: '' },
+      { id: 13, title: 'Revisar inversiones', category: 'work', effort: 2, scheduledDate: '2026-02-07', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+      { id: 108, title: 'Review código equipo', category: 'work', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 109, title: 'Planificar semana', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 113, title: 'Llamar cliente', category: 'work', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 114, title: 'Enviar propuesta', category: 'work', effort: 2, scheduledDate: '2026-02-08', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 115, title: 'Actualizar CV', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 202, title: 'Revisar contratos', category: 'work', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+      { id: 203, title: 'Organizar archivos', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-14', isArchived: false, repeat: null, description: '' },
+
+      // Salud
+      { id: 107, title: 'Vitaminas', category: 'health', effort: 0, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'vitaminas', description: '' },
+      { id: 116, title: 'Turno dentista', category: 'health', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 117, title: 'Comprar medicamentos', category: 'health', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 204, title: 'Chequeo anual', category: 'health', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+
+      // Social
+      { id: 7, title: 'Llamar a mamá', category: 'social', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 8, title: 'Organizar juntada', category: 'social', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 118, title: 'Cumpleaños Pablo', category: 'social', effort: 1, scheduledDate: '2026-02-07', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 119, title: 'Cena con amigos', category: 'social', effort: 1, scheduledDate: '2026-02-10', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 205, title: 'Visitar abuelos', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+
+      // Música
+      { id: 132, title: 'Practicar teclado', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-02-02', isArchived: false, repeat: { type: 'days', every: 3, startDate: '2026-02-02' }, description: '' },
+      { id: 130, title: 'Practicar guitarra', category: 'music', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 131, title: 'Escuchar álbum nuevo', category: 'music', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 206, title: 'Comprar cuerdas', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+      { id: 207, title: 'Aprender canción nueva', category: 'music', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+
+      // Entretenimiento
+      { id: 4, title: 'Ver Severance S2', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 5, title: 'Jugar Balatro', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 6, title: 'Terminar Elden Ring DLC', category: 'entertainment', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-05', isArchived: true, repeat: null, description: '' },
+      { id: 120, title: 'Leer libro nuevo', category: 'entertainment', effort: 1, scheduledDate: '2026-02-05', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 121, title: 'Ver película', category: 'entertainment', effort: 1, scheduledDate: '2026-02-08', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 208, title: 'Terminar serie', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 209, title: 'Probar juego nuevo', category: 'entertainment', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+
+      // Hogar
+      { id: 106, title: 'Regar plantas', category: 'home', effort: 0, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [0, 3] }, repeatBaseId: 'plantas', description: '' },
+      { id: 122, title: 'Limpiar casa', category: 'home', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 123, title: 'Comprar supermercado', category: 'home', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'afternoon', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 124, title: 'Pagar facturas', category: 'home', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 125, title: 'Ordenar armario', category: 'home', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 210, title: 'Arreglar grifo', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+      { id: 211, title: 'Cambiar focos', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+
+      // Fitness
+      { id: 101, title: 'Gym abajo', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'gym-abajo', description: '' },
+      { id: 102, title: 'Gym arriba', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [2, 5] }, repeatBaseId: 'gym-arriba', description: '' },
+      { id: 126, title: 'Boxeo switch', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [3] }, repeatBaseId: 'boxeo', description: '' },
+      { id: 127, title: 'Correr 5km', category: 'fitness', effort: 2, scheduledDate: '2026-02-10', scheduledSlot: 'morning', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 212, title: 'Yoga', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 213, title: 'Nadar', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+
+      // Previous week items (Jan 27 - Feb 1)
+      { id: 300, title: 'Reunión equipo', category: 'work', effort: 1, scheduledDate: '2026-01-28', scheduledSlot: 'morning', completed: true, completedDate: '2026-01-28', createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 301, title: 'Deploy producción', category: 'ai', effort: 2, scheduledDate: '2026-01-29', scheduledSlot: 'afternoon', completed: true, completedDate: '2026-01-29', createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 302, title: 'Pagar alquiler', category: 'home', effort: 1, scheduledDate: '2026-01-30', scheduledSlot: 'morning', completed: true, completedDate: '2026-01-30', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 303, title: 'Cena con Ana', category: 'social', effort: 1, scheduledDate: '2026-01-31', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 304, title: 'Comprar regalo', category: 'social', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'afternoon', completed: true, completedDate: '2026-02-01', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 305, title: 'Backup laptop', category: 'work', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'evening', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+
+      // Additional backlog items
+      { id: 310, title: 'asdsad', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+    ];
+
+    const initialDayEnergy = { '2026-02-02': 2, '2026-02-03': 3, '2026-02-04': 2, '2026-02-05': 1, '2026-02-06': 2, '2026-02-07': 3, '2026-02-08': 2, '2026-02-09': 2 };
+    const REAL_TODAY = new Date('2026-02-03');
+
+    // Global timestamp to track when a popover was just closed
+    let lastPopoverCloseTime = 0;
+
+    const formatDate = (d) => d.toISOString().split('T')[0];
+    const formatDayName = (d) => DAYS[d.getDay()];
+    const formatDayNumber = (d) => d.getDate();
+    const getMonthName = (d) => ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][d.getMonth()];
+    const getShortMonthName = (d) => MONTHS[d.getMonth()];
+    const getEffortColor = (e) => e === 0 ? '#94A3B8' : e === 1 ? '#22C55E' : e === 2 ? '#F59E0B' : '#EF4444';
+
+    const formatDateLabel = (dateStr) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      return `${formatDayName(d)} ${formatDayNumber(d)} ${getShortMonthName(d)}`;
+    };
+
+    const formatRepeatLabel = (repeat) => {
+      if (!repeat) return '';
+      if (repeat.type === 'days') {
+        return repeat.every === 1 ? 'Todos los días' : `Cada ${repeat.every} días`;
+      }
+      if (repeat.type === 'weeks') {
+        return repeat.every === 1 ? 'Cada semana' : `Cada ${repeat.every} semanas`;
+      }
+      if (repeat.type === 'weekdays' && repeat.days) {
+        const dayNames = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+        const selectedDays = [...repeat.days].sort((a, b) => a - b).map(d => dayNames[d]).join(' ');
+        return selectedDays;
+      }
+      return '';
+    };
+
+    // === Funciones auxiliares para recurrencia ===
+    const getDayDiff = (date1, date2) => {
+      const d1 = new Date(date1 + 'T00:00:00');
+      const d2 = new Date(date2 + 'T00:00:00');
+      return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+    };
+
+    const shiftDate = (dateStr, days) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      return formatDate(d);
+    };
+
+    // Recalcular repeat config cuando se mueve "este y siguientes"
+    const recalculateRepeatFromMove = (repeat, origDate, newDate) => {
+      if (repeat.type === 'weekdays') {
+        const origDay = new Date(origDate + 'T00:00:00').getDay();
+        const newDay = new Date(newDate + 'T00:00:00').getDay();
+        const newDays = repeat.days.map(d => d === origDay ? newDay : d);
+        return { ...repeat, days: [...new Set(newDays)].sort((a, b) => a - b) };
+      }
+      return { ...repeat };
+    };
+
+    // Mover toda la configuración de repeat (para "todos los eventos")
+    const shiftRepeatConfig = (repeat, dayOffset) => {
+      if (repeat.type === 'weekdays') {
+        const newDays = repeat.days.map(d => ((d + dayOffset) % 7 + 7) % 7);
+        return { ...repeat, days: [...new Set(newDays)].sort((a, b) => a - b) };
+      }
+      return { ...repeat };
+    };
+
+    // Mover excepciones cuando se mueve toda la serie
+    // targetSlot: if provided and not 'done', remove completed state from exceptions
+    const shiftExceptions = (exceptions, dayOffset, targetSlot = null) => {
+      if (!exceptions) return undefined;
+      const newExceptions = {};
+      Object.entries(exceptions).forEach(([dateStr, exc]) => {
+        const newDateStr = shiftDate(dateStr, dayOffset);
+        const newExc = { ...exc };
+        if (exc.movedTo) {
+          newExc.movedTo = {
+            date: shiftDate(exc.movedTo.date, dayOffset),
+            slot: exc.movedTo.slot
+          };
+        }
+        if (exc.completedDate) {
+          newExc.completedDate = shiftDate(exc.completedDate, dayOffset);
+        }
+        // If moving to a non-done slot, remove completed state
+        if (targetSlot && targetSlot !== 'done' && newExc.completed) {
+          delete newExc.completed;
+          delete newExc.completedDate;
+        }
+        // Only add exception if it still has properties
+        if (Object.keys(newExc).length > 0) {
+          newExceptions[newDateStr] = newExc;
+        }
+      });
+      return Object.keys(newExceptions).length > 0 ? newExceptions : undefined;
+    };
+
+    const getEffortBarColor = (effort, max) => {
+      if (effort === 0) return 'var(--border-color)';
+      const ratio = effort / max;
+      if (effort > max) return '#EF4444';
+      if (ratio >= 1) return '#F59E0B';
+      if (ratio >= 0.6) return '#22C55E';
+      return '#3B82F6';
+    };
+
+    const getEffortBarWidth = (effort, max) => {
+      if (effort === 0) return 0;
+      const ratio = effort / max;
+      if (ratio <= 0.33) return 25;
+      if (ratio <= 0.66) return 50;
+      if (ratio <= 1) return 75;
+      return 100;
+    };
+
+    const getDaysArray = (base) => {
+      const days = [];
+      const yesterday = new Date(base); yesterday.setDate(yesterday.getDate() - 1);
+      days.push({ date: yesterday, isPast: yesterday < REAL_TODAY });
+      for (let i = 0; i < 11; i++) {
+        const day = new Date(base); day.setDate(day.getDate() + i);
+        days.push({ date: day, isPast: day < REAL_TODAY });
+      }
+      return days;
+    };
+
+    const generateRecurringInstances = (baseItems, startDate, endDate) => {
+      const instances = [];
+      const recurringItems = baseItems.filter(i => i.repeat);
+      const nonRecurringItems = baseItems.filter(i => !i.repeat);
+
+      recurringItems.forEach(item => {
+        let currentDate = new Date(startDate);
+        // Soportar endDate en la serie (para "este y siguientes")
+        const repeatEndDate = item.repeat.endDate ? new Date(item.repeat.endDate + 'T00:00:00') : endDate;
+        const effectiveEndDate = repeatEndDate < endDate ? repeatEndDate : endDate;
+
+        while (currentDate <= effectiveEndDate) {
+          const dateStr = formatDate(currentDate);
+
+          // Verificar excepciones
+          const exception = item.exceptions?.[dateStr];
+
+          // Si está eliminada, saltar
+          if (exception?.deleted) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            continue;
+          }
+
+          // Si está movida a otra fecha, no generar aquí (se genera abajo)
+          if (exception?.movedTo) {
+            console.log('Skipping', dateStr, 'for item', item.id, '- moved to', exception.movedTo.date);
+            currentDate.setDate(currentDate.getDate() + 1);
+            continue;
+          }
+
+          let shouldAdd = false;
+
+          // Verificar startDate de la serie (para "este y siguientes")
+          // Usamos comparación de strings (YYYY-MM-DD) para evitar problemas de timezone
+          const repeatStartDateStr = item.repeat.startDate || null;
+          if (repeatStartDateStr && dateStr < repeatStartDateStr) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            continue;
+          }
+
+          // Si es exactamente el startDate, forzar que aparezca (primera instancia de "este y siguientes")
+          const isExactStartDate = repeatStartDateStr && dateStr === repeatStartDateStr;
+
+          if (item.repeat.type === 'days') {
+            // Use startDate as base if available (for "este y los siguientes"), otherwise use createdAt
+            const baseDateStr = item.repeat.startDate || item.createdAt;
+            const baseDate = new Date(baseDateStr + 'T00:00:00');
+            const currentNormalized = new Date(dateStr + 'T00:00:00');
+            const daysSinceBase = Math.round((currentNormalized - baseDate) / (1000 * 60 * 60 * 24));
+            shouldAdd = daysSinceBase >= 0 && daysSinceBase % item.repeat.every === 0;
+          } else if (item.repeat.type === 'weeks') {
+            // Use startDate as base if available (for "este y los siguientes"), otherwise use createdAt
+            const baseDateStr = item.repeat.startDate || item.createdAt;
+            const baseDate = new Date(baseDateStr + 'T00:00:00');
+            const currentNormalized = new Date(dateStr + 'T00:00:00');
+            const daysSinceBase = Math.round((currentNormalized - baseDate) / (1000 * 60 * 60 * 24));
+            const weeksSinceBase = Math.floor(daysSinceBase / 7);
+            const dayOfWeek = baseDate.getDay();
+            shouldAdd = daysSinceBase >= 0 && currentNormalized.getDay() === dayOfWeek && weeksSinceBase % item.repeat.every === 0;
+          } else if (item.repeat.type === 'weekdays') {
+            shouldAdd = item.repeat.days.includes(currentDate.getDay());
+          }
+
+          // Si es exactamente el startDate, mostrar solo si también cumple las reglas de recurrencia
+          // (para weekdays, el startDate debe caer en un día válido)
+          if (isExactStartDate && !shouldAdd) {
+            // Solo forzar para tipos que no dependen del día de semana
+            if (item.repeat.type === 'days') {
+              shouldAdd = true;
+            }
+            // Para weekdays/weeks, el startDate ya debe cumplir las reglas (no forzar)
+          }
+
+          if (shouldAdd) {
+            const dateOverride = item.dateOverrides?.[dateStr] || {};
+            // Check if this instance is marked as completed via exception
+            const isCompleted = exception?.completed || false;
+            const completedDate = exception?.completedDate || null;
+            // Apply property overrides from exception (title, description, effort)
+            const propertyOverrides = {};
+            if (exception?.title !== undefined) propertyOverrides.title = exception.title;
+            if (exception?.description !== undefined) propertyOverrides.description = exception.description;
+            if (exception?.effort !== undefined) propertyOverrides.effort = exception.effort;
+            instances.push({
+              ...item,
+              ...propertyOverrides,
+              id: `${item.id}-${dateStr}`,
+              scheduledDate: dateStr,
+              originalId: item.id,
+              sortOrder: dateOverride.sortOrder ?? item.sortOrder ?? 0,
+              completed: isCompleted,
+              completedDate: completedDate,
+            });
+          }
+
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        // Generar instancias movidas (excepciones con movedTo)
+        if (item.exceptions) {
+          Object.entries(item.exceptions).forEach(([origDate, exc]) => {
+            if (exc.movedTo) {
+              const movedDate = new Date(exc.movedTo.date + 'T00:00:00');
+              if (movedDate >= startDate && movedDate <= endDate) {
+                const dateOverride = item.dateOverrides?.[exc.movedTo.date] || {};
+                // Check if this moved instance is marked as completed
+                const isCompleted = exc.completed || false;
+                const completedDate = exc.completedDate || null;
+                // Apply property overrides from exception (title, description, effort)
+                const propertyOverrides = {};
+                if (exc.title !== undefined) propertyOverrides.title = exc.title;
+                if (exc.description !== undefined) propertyOverrides.description = exc.description;
+                if (exc.effort !== undefined) propertyOverrides.effort = exc.effort;
+                instances.push({
+                  ...item,
+                  ...propertyOverrides,
+                  id: `${item.id}-${origDate}-moved`,
+                  scheduledDate: exc.movedTo.date,
+                  scheduledSlot: exc.movedTo.slot || item.scheduledSlot,
+                  originalId: item.id,
+                  originalScheduledDate: origDate,
+                  sortOrder: dateOverride.sortOrder ?? item.sortOrder ?? 0,
+                  completed: isCompleted,
+                  completedDate: completedDate,
+                  _isMoved: true,
+                });
+              }
+            }
+          });
+        }
+      });
+
+      return [...nonRecurringItems, ...instances];
+    };
+
+    // ============ COMPONENTS ============
+    const EffortBar = ({ effort, maxEffort = 3, isToday = false }) => {
+      // Darker colors for today's items to contrast with lighter background
+      const color = effort === 0 ? 'var(--border-color)'
+        : effort === 1 ? (isToday ? '#2563EB' : '#3B82F6')
+        : effort === 2 ? (isToday ? '#16A34A' : '#22C55E')
+        : (isToday ? '#D97706' : '#F59E0B');
+      const width = effort === 0 ? 0 : effort === 1 ? 33 : effort === 2 ? 50 : 100;
+      // Darker background for today - more visible against white/light card
+      const bgColor = isToday ? 'var(--effort-bg-today)' : 'var(--border-color)';
+
+      return (
+        <div className="effort-bar" style={{ background: bgColor }}>
+          <div className="effort-bar-fill" style={{ width: `${width}%`, background: color }} />
+        </div>
+      );
+    };
+
+    const EffortBarSlot = ({ effort, energy }) => {
+      const max = energy === 1 ? 4 : energy === 2 ? 7 : 10;
+      const color = getEffortBarColor(effort, max);
+      const width = getEffortBarWidth(effort, max);
+
+      return (
+        <div className="effort-bar">
+          <div className="effort-bar-fill" style={{ width: `${width}%`, background: color }} />
+        </div>
+      );
+    };
+
+    const EnergySelector = ({ energy, onChange }) => (
+      <div style={{ display: 'flex', gap: '2px' }}>
+        {[1,2,3].map(l => (
+          <button key={l} onClick={(e) => { e.stopPropagation(); onChange(l); }} style={{
+            padding: '2px 6px',
+            border: 'none',
+            borderRadius: '4px',
+            background: energy === l ? 'var(--bg-input)' : 'transparent',
+            fontSize: '10px',
+            cursor: 'pointer',
+          }}>{l === 1 ? '😴' : l === 2 ? '😊' : '🔥'}</button>
+        ))}
+      </div>
+    );
+
+    // Robust popover that calculates position after render
+    const Popover = ({ children, onClose, onRequestClose, targetRect }) => {
+      const ref = useRef(null);
+      const [pos, setPos] = useState(null);
+
+      // Use onRequestClose if provided, otherwise use onClose directly
+      const handleCloseAttempt = useCallback(() => {
+        if (onRequestClose) {
+          onRequestClose();
+        } else {
+          lastPopoverCloseTime = Date.now();
+          onClose();
+        }
+      }, [onClose, onRequestClose]);
+
+      // Calculate position after mount
+      useEffect(() => {
+        if (!targetRect || !ref.current) return;
+
+        // Use requestAnimationFrame to ensure DOM is painted
+        const raf = requestAnimationFrame(() => {
+          if (!ref.current) return;
+
+          const popW = ref.current.offsetWidth;
+          const popH = ref.current.offsetHeight;
+
+          // Calculate position below the target
+          let top = targetRect.bottom + 6;
+          let left = targetRect.left;
+
+          // Adjust if would go off bottom of screen
+          if (top + popH > window.innerHeight - 10) {
+            top = targetRect.top - popH - 6;
+          }
+
+          // Adjust if would go off right of screen
+          if (left + popW > window.innerWidth - 10) {
+            left = window.innerWidth - popW - 10;
+          }
+
+          // Ensure minimum margins
+          left = Math.max(10, left);
+          top = Math.max(10, top);
+
+          setPos({ top, left });
+        });
+
+        return () => cancelAnimationFrame(raf);
+      }, [targetRect]);
+
+      // Close on click outside
+      useEffect(() => {
+        const handler = (e) => {
+          if (ref.current && !ref.current.contains(e.target)) {
+            handleCloseAttempt();
+          }
+        };
+        // Delay to avoid immediate close from the click that opened it
+        const timer = setTimeout(() => {
+          document.addEventListener('mousedown', handler);
+        }, 10);
+        return () => {
+          clearTimeout(timer);
+          document.removeEventListener('mousedown', handler);
+        };
+      }, [handleCloseAttempt]);
+
+      // Close on Escape key
+      useEffect(() => {
+        const handler = (e) => {
+          if (e.key === 'Escape') {
+            handleCloseAttempt();
+          }
+        };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+      }, [handleCloseAttempt]);
+
+      return (
+        <div
+          ref={ref}
+          className={`popover ${pos ? 'ready' : ''}`}
+          style={{
+            top: pos ? pos.top : -9999,
+            left: pos ? pos.left : -9999,
+            opacity: pos ? 1 : 0,
+            visibility: pos ? 'visible' : 'hidden',
+          }}
+        >
+          {children}
+        </div>
+      );
+    };
+
+    const DiscardConfirmDialog = ({ onDiscard, onContinue }) => {
+      useEffect(() => {
+        const handler = (e) => {
+          if (e.key === 'Escape') {
+            onContinue();
+          }
+        };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+      }, [onContinue]);
+
+      return ReactDOM.createPortal(
+        <>
+          <div className="discard-overlay" onClick={onContinue} />
+          <div className="discard-dialog">
+            <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+              ¿Descartar cambios?
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              Tienes cambios sin guardar. ¿Qué deseas hacer?
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="btn" style={{ flex: 1, padding: '8px' }} onClick={onContinue}>
+                Seguir editando
+              </button>
+              <button className="btn btn-danger" style={{ flex: 1, padding: '8px' }} onClick={onDiscard}>
+                Descartar
+              </button>
+            </div>
+          </div>
+        </>,
+        document.body
+      );
+    };
+
+    const DropZone = ({ onDrop, children, style = {}, onDragEnter, onDragEnd, className = '' }) => {
+      const [over, setOver] = useState(false);
+      return (
+        <div className={`drop-zone ${over ? 'drag-over' : ''} ${className}`}
+          onDragOver={(e) => {
+            // Only show drop indicator for item drags, not category drags
+            if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+              e.preventDefault();
+              setOver(true);
+            }
+          }}
+          onDragEnter={(e) => {
+            if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+              setOver(true);
+              onDragEnter?.();
+            }
+          }}
+          onDragLeave={() => { setOver(false); }}
+          onDrop={(e) => { e.preventDefault(); setOver(false); onDragEnd?.(); const data = e.dataTransfer.getData('itemData'); if (data) onDrop(JSON.parse(data), e); }}
+          style={style}
+        >{children}</div>
+      );
+    };
+
+    const Toast = ({ message, onUndo, onClose, duration = 10000 }) => {
+      useEffect(() => {
+        const timer = setTimeout(onClose, duration);
+        return () => clearTimeout(timer);
+      }, [onClose, duration]);
+
+      return (
+        <div className="toast">
+          <span style={{ fontSize: '12px' }}>{message}</span>
+          <button onClick={onUndo} className="btn" style={{ padding: '4px 10px', fontSize: '11px' }}>Deshacer</button>
+        </div>
+      );
+    };
+
+    // Mini calendar for date picking
+    const MiniCalendar = ({ selectedDate, onSelect, onClose }) => {
+      const [viewMonth, setViewMonth] = useState(() => {
+        if (selectedDate) return new Date(selectedDate + 'T00:00:00');
+        return new Date(REAL_TODAY);
+      });
+
+      const getDaysInMonth = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const days = [];
+
+        // Add empty slots for days before first of month
+        for (let i = 0; i < firstDay.getDay(); i++) {
+          days.push(null);
+        }
+        // Add all days of month
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+          days.push(new Date(year, month, d));
+        }
+        return days;
+      };
+
+      const days = getDaysInMonth(viewMonth);
+      const monthName = viewMonth.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+
+      return (
+        <div style={{ padding: '8px', background: 'var(--bg-card)', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))} className="btn" style={{ padding: '2px 6px' }}>◀</button>
+            <span style={{ fontSize: '11px', fontWeight: '600', textTransform: 'capitalize' }}>{monthName}</span>
+            <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))} className="btn" style={{ padding: '2px 6px' }}>▶</button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '8px' }}>
+            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
+              <div key={i} style={{ textAlign: 'center', fontSize: '9px', color: 'var(--text-muted)', padding: '2px' }}>{d}</div>
+            ))}
+            {days.map((day, i) => {
+              if (!day) return <div key={i} />;
+              const dateStr = formatDate(day);
+              const isSelected = dateStr === selectedDate;
+              const isToday = dateStr === formatDate(REAL_TODAY);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => { onSelect(dateStr); onClose(); }}
+                  style={{
+                    padding: '4px', border: 'none', borderRadius: '4px', cursor: 'pointer',
+                    background: isSelected ? 'var(--accent-blue)' : isToday ? 'var(--today-header)' : 'transparent',
+                    color: isSelected ? '#FFF' : 'var(--text-primary)',
+                    fontSize: '10px', fontWeight: isToday ? '700' : '400',
+                  }}
+                >
+                  {day.getDate()}
+                </button>
+              );
+            })}
+          </div>
+          <button type="button" onClick={() => { onSelect(null); onClose(); }} className="btn" style={{ width: '100%', fontSize: '10px' }}>
+            Sin fecha (Backlog)
+          </button>
+        </div>
+      );
+    };
+
+    const AddEditItemPopover = ({ categories, onSave, onDelete, onClose, targetRect, editItem, defaultCategory, defaultSlot, defaultDate, addCompleted, visualDate }) => {
+      const [title, setTitle] = useState(editItem?.title || '');
+      const [description, setDescription] = useState(editItem?.description || '');
+      const [category, setCategory] = useState(editItem?.category || defaultCategory || 'temp');
+      const [effort, setEffort] = useState(editItem?.effort ?? 1);
+      // For recurring items, use visualDate as initial scheduled date
+      const initialDate = editItem?.scheduledDate || visualDate || defaultDate || null;
+      const [scheduledDate, setScheduledDate] = useState(initialDate);
+      const [scheduledSlot, setScheduledSlot] = useState(editItem?.scheduledSlot || defaultSlot || 'morning');
+      const [userClearedDate, setUserClearedDate] = useState(false); // Track if user explicitly chose "Sin fecha"
+      const [repeatType, setRepeatType] = useState(editItem?.repeat?.type || 'none');
+      const [repeatEvery, setRepeatEvery] = useState(editItem?.repeat?.every || 1);
+      const [repeatDays, setRepeatDays] = useState(editItem?.repeat?.days || []);
+      const [showDatePicker, setShowDatePicker] = useState(false);
+      const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+      const dateButtonRef = useRef(null);
+      const inputRef = useRef(null);
+
+      const isEditing = !!editItem;
+      const hadRepeat = !!editItem?.repeat;
+      const originalTitle = editItem?.title || '';
+      const originalDescription = editItem?.description || '';
+      const originalCategory = editItem?.category || defaultCategory || 'temp';
+      const originalEffort = editItem?.effort ?? 1;
+      // For recurring items, use the same initialDate logic to compare against
+      const originalScheduledDate = editItem?.scheduledDate || visualDate || defaultDate || null;
+      const originalScheduledSlot = editItem?.scheduledSlot || defaultSlot || 'morning';
+      const originalRepeatType = editItem?.repeat?.type || 'none';
+      const originalRepeatEvery = editItem?.repeat?.every || 1;
+      const originalRepeatDays = editItem?.repeat?.days || [];
+
+      // Helper to compare arrays (with numeric sort for day numbers)
+      const arraysEqual = (a, b) => {
+        if (a.length !== b.length) return false;
+        const sortedA = [...a].sort((x, y) => x - y);
+        const sortedB = [...b].sort((x, y) => x - y);
+        return sortedA.every((v, i) => v === sortedB[i]);
+      };
+
+      // Check if this is a new item created with empty title (using _isNewItem marker)
+      const isNewUntitledItem = isEditing && (editItem?._isNewItem || originalTitle === '');
+
+      // For new untitled items, check if user has made ANY changes from default state
+      const hasUserChanges = isNewUntitledItem ? (
+        title.trim() !== '' ||
+        description !== '' ||
+        category !== originalCategory ||
+        effort !== 1 ||
+        repeatType !== 'none'
+      ) : (
+        isEditing ? (
+          title !== originalTitle ||
+          description !== originalDescription ||
+          category !== originalCategory ||
+          effort !== originalEffort ||
+          scheduledDate !== originalScheduledDate ||
+          scheduledSlot !== originalScheduledSlot ||
+          repeatType !== originalRepeatType ||
+          repeatEvery !== originalRepeatEvery ||
+          !arraysEqual(repeatDays, originalRepeatDays)
+        ) : title.trim().length > 0
+      );
+
+      const hasChanges = isEditing ? (
+        title !== originalTitle ||
+        description !== originalDescription ||
+        category !== originalCategory ||
+        effort !== originalEffort ||
+        scheduledDate !== originalScheduledDate ||
+        scheduledSlot !== originalScheduledSlot ||
+        repeatType !== originalRepeatType ||
+        repeatEvery !== originalRepeatEvery ||
+        !arraysEqual(repeatDays, originalRepeatDays)
+      ) : title.trim().length > 0;
+
+      // Handle close attempt - show confirmation if there are user changes
+      const handleRequestClose = useCallback(() => {
+        if (hasUserChanges) {
+          // Show confirmation dialog
+          setShowDiscardDialog(true);
+        } else {
+          // No user changes - close directly
+          // If it's a new untitled item with no changes, delete it
+          if (isNewUntitledItem) {
+            onDelete(editItem.id);
+          }
+          lastPopoverCloseTime = Date.now();
+          onClose();
+        }
+      }, [hasUserChanges, isNewUntitledItem, editItem, onDelete, onClose]);
+
+      const handleDiscard = () => {
+        setShowDiscardDialog(false);
+        // If it's a new untitled item, delete it
+        if (isNewUntitledItem) {
+          onDelete(editItem.id);
+        }
+        lastPopoverCloseTime = Date.now();
+        onClose();
+      };
+
+      const handleContinueEditing = () => {
+        setShowDiscardDialog(false);
+      };
+
+      useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
+      const toggleDay = (d) => setRepeatDays(p => p.includes(d) ? p.filter(x => x !== d) : [...p, d]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!title.trim() || (isEditing && !hasChanges)) return;
+        let repeat = null;
+        if (repeatType === 'weekdays') repeat = { type: 'weekdays', days: repeatDays };
+        else if (repeatType !== 'none') repeat = { type: repeatType, every: repeatEvery };
+
+        // When removing repeat from an item, use visualDate as the scheduled date
+        // BUT only if user didn't explicitly clear the date
+        let finalScheduledDate = scheduledDate;
+        if (hadRepeat && !repeat && !scheduledDate && visualDate && !userClearedDate) {
+          finalScheduledDate = visualDate;
+        }
+
+        onSave({
+          id: editItem?.id, title, description, category, effort, repeat,
+          scheduledDate: finalScheduledDate,
+          scheduledSlot: (finalScheduledDate || repeat) ? scheduledSlot : null,
+          completed: addCompleted || editItem?.completed,
+          completedDate: addCompleted ? defaultDate : editItem?.completedDate,
+          isArchived: !finalScheduledDate && !addCompleted && !repeat,
+          dateOverrides: repeat ? editItem?.dateOverrides : undefined, // Clear dateOverrides if no longer recurring
+        });
+        onClose();
+      };
+
+      const getDateLabel = () => {
+        if (!scheduledDate) return 'Sin fecha (Backlog)';
+        return formatDateLabel(scheduledDate);
+      };
+
+      return (
+        <>
+          <Popover onClose={onClose} onRequestClose={handleRequestClose} targetRect={targetRect}>
+            <form onSubmit={handleSubmit}>
+              <input ref={inputRef} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Item..."
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '12px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+              />
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descripción..." rows={2}
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '11px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)', resize: 'none', fontFamily: 'inherit' }}
+              />
+              <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+
+              <div style={{ marginBottom: '8px', position: 'relative' }}>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
+                <button
+                  ref={dateButtonRef}
+                  type="button"
+                  onClick={() => setShowDatePicker(!showDatePicker)}
+                  style={{
+                    width: '100%', padding: '6px 8px', border: 'none', borderRadius: '4px',
+                    background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
+                    fontSize: '11px', textAlign: 'left', cursor: 'pointer',
+                  }}
+                >
+                  {getDateLabel()}
+                </button>
+                {showDatePicker && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, marginTop: '4px' }}>
+                    <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} />
+                  </div>
+                )}
+              </div>
+
+              {(scheduledDate || repeatType !== 'none') && (
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Horario</div>
+                  <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                    <option value="morning">Mañana</option>
+                    <option value="afternoon">Tarde</option>
+                    <option value="evening">Noche</option>
+                  </select>
+                </div>
+              )}
+
+              {hadRepeat && userClearedDate && (
+                <div style={{ marginBottom: '8px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '10px', color: '#EF4444' }}>
+                  Al guardar se eliminará la recurrencia
+                </div>
+              )}
+
+              <div style={{ marginBottom: '10px' }}>
+                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '10px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                  <option value="none">No repetir</option>
+                  <option value="days">Cada X días</option>
+                  <option value="weeks">Cada X semanas</option>
+                  <option value="weekdays">Días de semana</option>
+                </select>
+                {repeatType !== 'none' && repeatType !== 'weekdays' && (
+                  <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
+                    style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '11px', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                  />
+                )}
+                {repeatType === 'weekdays' && (
+                  <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
+                    {DAYS.map((d, i) => (
+                      <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '4px 2px', fontSize: '9px' }}>{d.charAt(0)}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: '10px' }}>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[0,1,2,3].map(e => (
+                    <button key={e} type="button" onClick={() => setEffort(e)} style={{
+                      flex: 1, padding: '6px', borderRadius: '4px', border: 'none', cursor: 'pointer',
+                      background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
+                      color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '11px',
+                    }}>{e}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger">🗑</button>}
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
+              </div>
+            </form>
+          </Popover>
+          {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
+        </>
+      );
+    };
+
+    const EditCategoryPopover = ({ category, itemCount, onSave, onDelete, onClose, targetRect }) => {
+      const [name, setName] = useState(category?.name || '');
+      const [color, setColor] = useState(category?.color || COLORS[0]);
+      const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+      const inputRef = useRef(null);
+      const canDelete = itemCount === 0;
+      const isNew = !category?.id;
+
+      useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
+
+      const originalName = category?.name || '';
+      const originalColor = category?.color || COLORS[0];
+      const hasChanges = isNew ? name.trim().length > 0 : (name !== originalName || color !== originalColor);
+
+      const handleRequestClose = () => {
+        if (hasChanges) {
+          setShowDiscardDialog(true);
+        } else {
+          lastPopoverCloseTime = Date.now();
+          onClose();
+        }
+      };
+
+      const handleDiscard = () => {
+        setShowDiscardDialog(false);
+        lastPopoverCloseTime = Date.now();
+        onClose();
+      };
+
+      const handleContinueEditing = () => {
+        setShowDiscardDialog(false);
+      };
+
+      return (
+        <>
+          <Popover onClose={handleRequestClose} targetRect={targetRect}>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Nombre</div>
+              <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} placeholder="Categoría..."
+                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '11px', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+              />
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Color</div>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                {COLORS.map(c => (
+                  <button key={c} type="button" onClick={() => setColor(c)} style={{
+                    width: '22px', height: '22px', borderRadius: '4px', cursor: 'pointer', border: 'none', outline: color === c ? '2px solid var(--text-primary)' : 'none', outlineOffset: '1px', background: c,
+                  }} />
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}>🗑</button>}
+              <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>{isNew ? 'Crear' : 'Guardar'}</button>
+            </div>
+            {!isNew && !canDelete && <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
+          </Popover>
+          {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
+        </>
+      );
+    };
+
+    const CalendarPopover = ({ baseDate, onSelectDate, onClose, targetRect, visibleDates }) => {
+      const [viewMonth, setViewMonth] = useState(baseDate.getMonth());
+      const [viewYear, setViewYear] = useState(baseDate.getFullYear());
+      const firstDay = new Date(viewYear, viewMonth, 1);
+      const lastDay = new Date(viewYear, viewMonth + 1, 0);
+      const days = [];
+      for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+      for (let i = 1; i <= lastDay.getDate(); i++) days.push(new Date(viewYear, viewMonth, i));
+
+      const isVisible = (d) => visibleDates.some(v => formatDate(v) === formatDate(d));
+      const isToday = (d) => formatDate(d) === formatDate(REAL_TODAY);
+
+      const minDate = new Date(REAL_TODAY);
+      minDate.setMonth(minDate.getMonth() - 2);
+      const maxDate = new Date(REAL_TODAY);
+      maxDate.setMonth(maxDate.getMonth() + 2);
+
+      const canGoBack = viewYear > minDate.getFullYear() || (viewYear === minDate.getFullYear() && viewMonth > minDate.getMonth());
+      const canGoForward = viewYear < maxDate.getFullYear() || (viewYear === maxDate.getFullYear() && viewMonth < maxDate.getMonth());
+
+      return (
+        <Popover onClose={onClose} targetRect={targetRect}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <button onClick={() => canGoBack && (viewMonth === 0 ? (setViewMonth(11), setViewYear(y => y-1)) : setViewMonth(m => m-1))} className="btn" disabled={!canGoBack}>←</button>
+            <span style={{ fontWeight: '600', fontSize: '12px' }}>{getMonthName(new Date(viewYear, viewMonth))} {viewYear}</span>
+            <button onClick={() => canGoForward && (viewMonth === 11 ? (setViewMonth(0), setViewYear(y => y+1)) : setViewMonth(m => m+1))} className="btn" disabled={!canGoForward}>→</button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '9px', textAlign: 'center', color: 'var(--text-muted)', marginBottom: '4px' }}>
+            {DAYS.map((d,i) => <div key={i}>{d.charAt(0)}</div>)}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+            {days.map((d, i) => (
+              <button key={i} onClick={() => d && onSelectDate(d)} disabled={!d} style={{
+                width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: '4px', fontSize: '10px', border: 'none', cursor: d ? 'pointer' : 'default',
+                background: d && isToday(d) ? 'var(--today-header)' : d && isVisible(d) ? 'var(--done-bg)' : 'transparent',
+                color: d ? (isToday(d) ? 'var(--accent-blue)' : 'var(--text-primary)') : 'transparent',
+                fontWeight: d && isToday(d) ? '700' : '400',
+              }}>{d?.getDate()}</button>
+            ))}
+          </div>
+        </Popover>
+      );
+    };
+
+    const RecurringActionPopover = ({ item, originalDate, visualDate, targetDate, targetSlot, action, onConfirm, onCancel, targetRect, pendingItemId }) => {
+      const originalRepeatType = item.repeat?.type || 'days';
+      const originalEvery = item.repeat?.every || 1;
+      const originalDays = item.repeat?.days || [];
+
+      console.log('RecurringActionPopover item:', item);
+      console.log('originalRepeatType:', originalRepeatType, 'originalEvery:', originalEvery);
+
+      const [showFollowingOptions, setShowFollowingOptions] = useState(false);
+      const [newRepeatType, setNewRepeatType] = useState(originalRepeatType);
+      const [selectedDays, setSelectedDays] = useState(originalDays);
+      const [newEvery, setNewEvery] = useState(originalEvery);
+      const [computedRect, setComputedRect] = useState(targetRect);
+
+      // Find the pending item element and position popover below it
+      useEffect(() => {
+        if (pendingItemId) {
+          // Small delay to let the DOM update
+          const timer = setTimeout(() => {
+            const pendingElement = document.querySelector(`[data-item-id="${pendingItemId}"]`);
+            if (pendingElement) {
+              const rect = pendingElement.getBoundingClientRect();
+              setComputedRect(rect);
+            }
+          }, 50);
+          return () => clearTimeout(timer);
+        }
+      }, [pendingItemId]);
+
+      const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+
+      // Check if config is valid (required to confirm)
+      const hasValidConfig = newRepeatType === 'weekdays'
+        ? selectedDays.length > 0
+        : newEvery >= 1;
+
+      // Check if anything changed from original
+      const typeChanged = newRepeatType !== originalRepeatType;
+      const everyChanged = newEvery !== originalEvery;
+      const daysChanged = newRepeatType === 'weekdays' && (
+        selectedDays.length !== originalDays.length ||
+        !selectedDays.every(d => originalDays.includes(d))
+      );
+      const hasChanges = typeChanged || everyChanged || daysChanged;
+
+      const getSlotName = (slot) => {
+        if (slot === 'morning') return 'Mañana';
+        if (slot === 'afternoon') return 'Tarde';
+        if (slot === 'evening') return 'Noche';
+        if (slot === 'done') return 'Hecho';
+        return slot;
+      };
+
+      const title = action === 'move'
+        ? `Mover a ${formatDateLabel(targetDate)}`
+        : `Cambiar a ${getSlotName(targetSlot)}`;
+
+      // If moving to "done", only "solo este evento" makes sense
+      const isDoneTarget = targetSlot === 'done';
+
+      const toggleDay = (dayIndex) => {
+        setSelectedDays(prev =>
+          prev.includes(dayIndex)
+            ? prev.filter(d => d !== dayIndex)
+            : [...prev, dayIndex].sort((a, b) => a - b)
+        );
+      };
+
+      const handleFollowingClick = () => {
+        setShowFollowingOptions(true);
+      };
+
+      const handleFollowingConfirm = () => {
+        const options = { newRepeatType };
+        if (newRepeatType === 'weekdays') {
+          options.newDays = selectedDays;
+        } else {
+          options.newEvery = newEvery;
+        }
+        console.log('handleFollowingConfirm options:', options);
+        onConfirm('following', options);
+      };
+
+      return (
+        <Popover onClose={onCancel} targetRect={computedRect}>
+          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '500', marginBottom: '4px' }}>{title}</div>
+            <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{item.title}"</div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+              <div>Solo este evento</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '10px', marginTop: '2px' }}>
+                Se creará un item independiente en el backlog
+              </div>
+            </button>
+            {!isDoneTarget && !showFollowingOptions && (
+              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+                Este y los siguientes
+              </button>
+            )}
+            {showFollowingOptions && (
+              <div style={{
+                padding: '12px',
+                background: 'var(--bg-secondary)',
+                borderRadius: '6px',
+                marginTop: '4px'
+              }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                  La serie continuará a partir de {formatDateLabel(targetDate)}:
+                </div>
+
+                {/* Repeat type selector */}
+                <select
+                  value={newRepeatType}
+                  onChange={(e) => setNewRepeatType(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    background: 'var(--bg-input)',
+                    outline: 'none',
+                    color: 'var(--text-primary)',
+                    marginBottom: '8px'
+                  }}
+                >
+                  <option value="days">Cada X días</option>
+                  <option value="weeks">Cada X semanas</option>
+                  <option value="weekdays">Días de semana</option>
+                </select>
+
+                {/* Days/Weeks frequency input */}
+                {(newRepeatType === 'days' || newRepeatType === 'weeks') && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-primary)' }}>Cada</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={newEvery}
+                      onChange={(e) => setNewEvery(Math.max(1, parseInt(e.target.value) || 1))}
+                      style={{
+                        width: '50px',
+                        padding: '6px',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        textAlign: 'center',
+                        background: 'var(--bg-input)',
+                        color: 'var(--text-primary)',
+                      }}
+                    />
+                    <span style={{ fontSize: '11px', color: 'var(--text-primary)' }}>
+                      {newRepeatType === 'days' ? (newEvery === 1 ? 'día' : 'días') : (newEvery === 1 ? 'semana' : 'semanas')}
+                    </span>
+                  </div>
+                )}
+
+                {/* Weekdays selector */}
+                {newRepeatType === 'weekdays' && (
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
+                    {dayNames.map((name, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => toggleDay(idx)}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          border: 'none',
+                          background: selectedDays.includes(idx) ? 'var(--accent-blue)' : 'var(--bg-tertiary)',
+                          color: selectedDays.includes(idx) ? 'white' : 'var(--text-primary)',
+                          fontSize: '10px',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleFollowingConfirm}
+                  className="btn btn-primary"
+                  disabled={!hasValidConfig || (newRepeatType === 'weekdays' && !hasChanges)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    fontSize: '11px',
+                    opacity: (!hasValidConfig || (newRepeatType === 'weekdays' && !hasChanges)) ? 0.5 : 1,
+                  }}
+                >
+                  Aplicar a este y los siguientes
+                </button>
+              </div>
+            )}
+          </div>
+        </Popover>
+      );
+    };
+
+    const RemoveDatePopover = ({ itemTitle, onConfirm, onCancel, targetRect, isRecurring }) => {
+      return (
+        <Popover onClose={onCancel} targetRect={targetRect}>
+          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+            {isRecurring
+              ? `Para hacer esto hay que eliminar la recurrencia de "${itemTitle}"`
+              : `Para hacer esto hay que eliminar la fecha de "${itemTitle}"`
+            }
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={onConfirm} className="btn btn-primary" style={{ flex: 1, padding: '8px' }}>
+              {isRecurring ? 'Eliminar recurrencia' : 'Eliminar fecha'}
+            </button>
+          </div>
+        </Popover>
+      );
+    };
+
+    const RecurringSavePopover = ({ itemTitle, onThis, onFollowing, onCancel, targetRect }) => {
+      return (
+        <Popover onClose={onCancel} targetRect={targetRect}>
+          <div style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '500', marginBottom: '4px' }}>Guardar cambios</div>
+            <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{itemTitle}"</div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button onClick={onThis} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+              Solo este evento
+            </button>
+            <button onClick={onFollowing} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '11px' }}>
+              Este y los siguientes
+            </button>
+          </div>
+        </Popover>
+      );
+    };
+
+    const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId }) => {
+      const [dragging, setDragging] = useState(false);
+      const mouseDownPos = useRef(null);
+      const cardRef = useRef(null);
+      const cat = categories.find(c => c.id === item.category);
+      // For completion, use full ID (keeps date for recurring items)
+      const completeId = item.id;
+      // For drag/edit, use base ID
+      const baseId = typeof item.id === 'string' && item.id.includes('-') ? item.originalId || item.id : item.id;
+
+      // Handle click to edit - only if not dragging (no significant mouse movement)
+      const handleMouseDown = (e) => {
+        // Don't track if clicking on checkbox area
+        if (e.target.closest('[data-checkbox]')) return;
+        mouseDownPos.current = { x: e.clientX, y: e.clientY };
+      };
+
+      const handleMouseUp = (e) => {
+        // Don't handle if clicking on checkbox area
+        if (e.target.closest('[data-checkbox]')) return;
+        if (!mouseDownPos.current) return;
+
+        const dx = Math.abs(e.clientX - mouseDownPos.current.x);
+        const dy = Math.abs(e.clientY - mouseDownPos.current.y);
+
+        // If mouse moved less than 5px, treat as click (not drag)
+        if (dx < 5 && dy < 5 && !dragging) {
+          e.stopPropagation();
+          // Don't open if a popover was just closed
+          if (Date.now() - lastPopoverCloseTime < 200) {
+            mouseDownPos.current = null;
+            return;
+          }
+          if (cardRef.current) {
+            onEdit(item, cardRef.current.getBoundingClientRect());
+          }
+        }
+        mouseDownPos.current = null;
+      };
+
+      // For recurring items, we need both:
+      // - exceptionDate: the date key in exceptions (for "solo este evento")
+      // - visualDate: where the item appears visually (for "este y siguientes" / "todos")
+      const getExceptionDate = () => {
+        if (!item.repeat) return item.scheduledDate;
+        // If it's a moved instance, use originalScheduledDate (the exception key)
+        if (item.originalScheduledDate) return item.originalScheduledDate;
+        // If id contains date, extract it (format: baseId-YYYY-MM-DD or baseId-YYYY-MM-DD-moved)
+        if (typeof item.id === 'string' && item.id.includes('-')) {
+          const parts = item.id.split('-');
+          if (parts.length >= 4) {
+            return `${parts[1]}-${parts[2]}-${parts[3]}`;
+          }
+        }
+        return item.scheduledDate;
+      };
+
+      const dragData = JSON.stringify({
+        id: baseId,
+        isRecurring: !!item.repeat,
+        exceptionDate: getExceptionDate(),
+        visualDate: item.scheduledDate,
+        originalSlot: item.scheduledSlot,
+        title: item.title
+      });
+
+      // Determine card background based on context
+      const getCardBackground = () => {
+        if (inSidebar) return 'var(--bg-card)';
+        if (isToday) return 'var(--bg-card-today)';
+        if (isPast) return 'var(--bg-card-past)';
+        return 'var(--bg-card-future)';
+      };
+
+      // Text color is muted for past items
+      const getTextColor = () => {
+        if (item.completed) return 'var(--text-muted)';
+        if (isPast) return 'var(--text-past)';
+        return 'var(--text-primary)';
+      };
+
+      // Checkbox visibility logic
+      const isRecurring = !!item.repeat;
+      const isScheduled = !!item.scheduledDate;
+      const hideCheckbox = inSidebar && isRecurring && !isScheduled;
+      const disableCheckbox = inSidebar && isRecurring && isScheduled;
+      const showCheckbox = !hideCheckbox;
+
+      // Check if this item was just dropped (for feedback animation)
+      const itemBaseId = typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id;
+      const isJustDropped = justDroppedItemId && itemBaseId === justDroppedItemId;
+
+      return (
+        <div
+          ref={cardRef}
+          data-item-id={item.id}
+          draggable
+          onDragStart={(e) => { e.dataTransfer.setData('itemData', dragData); setDragging(true); mouseDownPos.current = null; }}
+          onDragEnd={() => setDragging(false)}
+          className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''}`}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', padding: '5px 6px', background: getCardBackground(), borderRadius: '5px', opacity: item.completed ? 0.6 : (item._isPending ? 0.7 : 1) }}
+        >
+          {/* Left: Checkbox */}
+          {showCheckbox && (
+            <div
+              data-checkbox="true"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!disableCheckbox) onComplete(completeId);
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '20px', height: '20px', marginLeft: '-3px', marginTop: '-2px',
+                cursor: disableCheckbox ? 'default' : 'pointer', flexShrink: 0,
+                opacity: disableCheckbox ? 0.4 : 1,
+              }}
+            >
+              <div style={{
+                width: '14px', height: '14px', borderRadius: '4px',
+                background: item.completed ? 'var(--accent-green)' : 'var(--checkbox-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {item.completed && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
+              </div>
+            </div>
+          )}
+          {/* Center: Title + metadata */}
+          <div style={{ flex: 1, minWidth: 0, marginTop: '1px' }}>
+            <div style={{
+              fontSize: '10px', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              color: getTextColor(),
+            }}>{item.title}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+              {!inSidebar && cat && <span style={{ fontSize: '8px', color: cat.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>}
+              {showDate && item.scheduledDate && !item.repeat && <span style={{ fontSize: '8px', color: 'var(--text-muted)' }}>{formatDateLabel(item.scheduledDate)}</span>}
+              {inSidebar && item.repeat && <span style={{ fontSize: '8px', color: 'var(--accent-blue)' }}>Recurrente</span>}
+              {!inSidebar && item.repeat && <span style={{ fontSize: '7px', color: 'var(--accent-blue)', flexShrink: 0 }}>🔄</span>}
+            </div>
+          </div>
+          {/* Right: Effort bar */}
+          <div style={{ flexShrink: 0, marginTop: '2px' }}>
+            <EffortBar effort={item.effort} isToday={isToday} />
+          </div>
+        </div>
+      );
+    };
+
+    const SlotSection = ({ slot, label, items, energy, categories, onComplete, onEdit, onDelete, onDrop, onAdd, dateStr, isDone, isToday, isPast, justDroppedItemId }) => {
+      const [newItemId, setNewItemId] = useState(null);
+      const [editRect, setEditRect] = useState(null);
+      const [dropIndex, setDropIndex] = useState(-1);
+      const newItemRef = useRef(null);
+      const slotEffort = items.filter(i => !i.completed).reduce((s, i) => s + i.effort, 0);
+      const itemCount = items.length;
+
+      // Create item and show edit popover
+      // addAtEnd: true = add at bottom (click on empty area), false = add at top (+ button)
+      const handleAddItem = (e, addAtEnd = false) => {
+        e.stopPropagation();
+        // Don't create if a popover was just closed
+        if (Date.now() - lastPopoverCloseTime < 200) return;
+        // Calculate sortOrder: negative for top, positive for bottom
+        const minSortOrder = items.length > 0 ? Math.min(...items.map(i => i.sortOrder || 0)) : 0;
+        const maxSortOrder = items.length > 0 ? Math.max(...items.map(i => i.sortOrder || 0)) : 0;
+        const sortOrder = addAtEnd ? maxSortOrder + 1 : minSortOrder - 1;
+        onAdd({
+          title: '',
+          description: '',
+          category: 'temp',
+          effort: 1,
+          repeat: null,
+          scheduledDate: dateStr,
+          scheduledSlot: slot,
+          completed: isDone,
+          completedDate: isDone ? dateStr : null,
+          sortOrder,
+          _isNewItem: true, // Marker to identify this item
+          _addAtEnd: addAtEnd, // For finding the item in DOM
+        });
+        setNewItemId('pending'); // Flag that we're waiting for a new item
+      };
+
+      // Handle closing the popover - deletion is now handled by AddEditItemPopover
+      const handleClosePopover = () => {
+        setEditRect(null);
+      };
+
+      // Show edit popover once new item is rendered
+      useEffect(() => {
+        if (newItemId === 'pending') {
+          // Find the newest item with _isNewItem marker in this slot
+          const newestItem = items.find(i => i._isNewItem);
+          if (newestItem) {
+            // Use setTimeout to ensure DOM is fully rendered
+            const timer = setTimeout(() => {
+              if (newItemRef.current) {
+                const rect = newItemRef.current.getBoundingClientRect();
+                setEditRect({ itemId: newestItem.id, rect });
+                setNewItemId(null);
+              } else {
+                // Retry with another timeout if ref not ready
+                setTimeout(() => {
+                  if (newItemRef.current) {
+                    const rect = newItemRef.current.getBoundingClientRect();
+                    setEditRect({ itemId: newestItem.id, rect });
+                  }
+                  setNewItemId(null);
+                }, 50);
+              }
+            }, 10);
+            return () => clearTimeout(timer);
+          }
+        }
+      }, [newItemId, items]);
+
+      const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
+
+      const handleItemDragOver = (e, index) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Detect if cursor is in top or bottom half of item
+          const rect = e.currentTarget.getBoundingClientRect();
+          const y = e.clientY - rect.top;
+          const isTopHalf = y < rect.height / 2;
+          setDropIndex(isTopHalf ? index : index + 1);
+        }
+      };
+
+      const handleSlotDragOver = (e) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          // Only set drop index if not over any item
+          if (!e.target.closest('[data-item]')) {
+            // If empty slot or cursor is below all items, append at end
+            const slotArea = e.currentTarget.querySelector('.slot-empty-area');
+            if (slotArea) {
+              const itemElements = slotArea.querySelectorAll('[data-item]');
+              if (itemElements.length === 0) {
+                setDropIndex(0);
+              } else {
+                // Check if cursor is below all items
+                const lastItem = itemElements[itemElements.length - 1];
+                const lastRect = lastItem.getBoundingClientRect();
+                if (e.clientY > lastRect.bottom) {
+                  setDropIndex(items.length);
+                } else if (e.clientY < itemElements[0].getBoundingClientRect().top) {
+                  setDropIndex(0);
+                }
+              }
+            } else {
+              setDropIndex(0);
+            }
+          }
+        }
+      };
+
+      const handleDragLeave = (e) => {
+        // Only clear if leaving the slot entirely
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setDropIndex(-1);
+        }
+      };
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        const currentDropIndex = dropIndex;
+        setDropIndex(-1);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) onDrop(JSON.parse(data), slot, currentDropIndex, { x: e.clientX, y: e.clientY });
+      };
+
+      // Find the item we just created (by newItemId) to attach ref
+      const editingItem = editRect ? items.find(i => i.id === editRect.itemId) : null;
+
+      return (
+        <>
+          <div
+            className={isDone ? 'slot-row-done' : 'slot-row'}
+            style={{ cursor: 'pointer' }}
+            onDragOver={handleSlotDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div onClick={(e) => handleAddItem(e, true)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '9px', color: isDone ? 'var(--accent-green)' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
+                  {!isDone && <EffortBarSlot effort={slotEffort} energy={energy} />}
+                </div>
+                {!isDone && <button onClick={(e) => handleAddItem(e, false)} className="btn" style={{ fontWeight: '700', padding: '1px 5px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>}
+              </div>
+              <div className="slot-empty-area" style={{ flex: 1, minHeight: '20px', display: 'flex', flexDirection: 'column' }}>
+                {/* Drop indicator at top */}
+                <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
+                {items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    ref={item._isNewItem ? newItemRef : null}
+                    data-item="true"
+                    onDragOver={(e) => handleItemDragOver(e, index)}
+                  >
+                    <div
+                      style={{ marginBottom: '6px' }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+                    </div>
+                    {/* Drop indicator after each item (except last - that's handled by bottom area) */}
+                    {index < items.length - 1 && <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />}
+                  </div>
+                ))}
+                {/* Dashed add button - right after last item (not for Done slot) */}
+                <div className={`drop-indicator ${dropIndex === items.length && items.length > 0 ? 'visible' : ''}`} />
+                {!isDone && (
+                  <button
+                    onClick={(e) => handleAddItem(e, true)}
+                    style={{
+                      padding: '4px 8px',
+                      background: 'transparent',
+                      border: '1px dashed var(--border-color)',
+                      borderRadius: '4px',
+                      color: 'var(--text-muted)',
+                      fontSize: '9px',
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                  >
+                    Agregar
+                  </button>
+                )}
+                {/* Bottom padding for Done slot */}
+                {isDone && <div style={{ height: '6px', flexShrink: 0 }} />}
+                {/* Bottom drop area - only for Noche slot (allows clicking empty area to add) */}
+                {slot === 'evening' && (
+                  <div
+                    style={{ flex: 1, minHeight: '10px' }}
+                    onDragOver={(e) => {
+                      if (hasItemData(e)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDropIndex(items.length);
+                      }
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+          {editRect && editingItem && ReactDOM.createPortal(
+            <AddEditItemPopover
+              categories={categories}
+              onSave={onAdd}
+              onDelete={onDelete}
+              onClose={handleClosePopover}
+              targetRect={editRect.rect}
+              editItem={editingItem}
+            />,
+            document.body
+          )}
+        </>
+      );
+    };
+
+    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId }) => {
+      const dateStr = formatDate(day.date);
+      const energy = dayEnergy[dateStr] || 2;
+      const getSlotItems = (slot) => items.filter(i => i.scheduledDate === dateStr && i.scheduledSlot === slot && !i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      const completedItems = items.filter(i => i.completedDate === dateStr && i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      const dayEffort = ['morning','afternoon','evening'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
+      const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
+      const isSunday = day.date.getDay() === 0;
+
+      // Sunday line color - desaturated blue/gray
+      const sundayLineColor = 'rgba(100, 116, 139, 0.5)';
+
+      return (
+        <div style={{
+          flex: `0 0 ${DAY_WIDTH}px`, minWidth: `${DAY_WIDTH}px`, display: 'flex', flexDirection: 'column',
+          borderRight: '1px solid var(--border-color)',
+          borderLeft: (isSunday && !isSticky) ? `6px solid ${sundayLineColor}` : 'none',
+          marginLeft: (isSunday && !isSticky) ? '-1px' : 0,
+          background: isToday ? 'var(--today-bg)' : day.isPast ? 'var(--bg-secondary)' : 'var(--bg-primary)',
+          position: isSticky ? 'sticky' : 'relative', left: isSticky ? 0 : 'auto',
+          zIndex: isSticky ? 10 : 1, boxShadow: isSticky ? '4px 0 10px rgba(0,0,0,0.1)' : 'none',
+        }}>
+          <div style={{ padding: '10px', minHeight: '44px', borderBottom: '1px solid var(--border-color)', background: isToday ? 'var(--today-header)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '13px', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
+              <span style={{ fontSize: '13px', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
+            </div>
+            <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
+            <EffortBarSlot effort={dayEffort} energy={energy} />
+          </div>
+          <div className="slot-container">
+            <div className="slots-scrollable">
+              <SlotSection slot="morning" label="Mañana" items={getSlotItems('morning')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+              <SlotSection slot="afternoon" label="Tarde" items={getSlotItems('afternoon')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+              <SlotSection slot="evening" label="Noche" items={getSlotItems('evening')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+            </div>
+            <SlotSection slot="done" label="Hecho" items={completedItems} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isDone={true} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+          </div>
+        </div>
+      );
+    };
+
+    const SidebarGroup = ({ label, count, items, expanded, onToggle, categories, onComplete, onEdit, onDrop, labelColor = 'var(--text-muted)', itemOpacity = 1, showDate = false, showDropIndicator = false, onAddItem, isBacklog = false, newItemRef, justDroppedItemId }) => {
+      const [dropIndex, setDropIndex] = useState(-1);
+      const groupRef = useRef(null);
+
+      const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
+
+      const handleItemDragOver = (e, index) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const y = e.clientY - rect.top;
+          const isTopHalf = y < rect.height / 2;
+          setDropIndex(isTopHalf ? index : index + 1);
+        }
+      };
+
+      const handleGroupDragEnter = (e) => {
+        if (hasItemData(e)) {
+          e.stopPropagation();
+          if (!expanded) {
+            onToggle();
+          }
+          // Don't set dropIndex here - let handleGroupDragOver handle it
+        }
+      };
+
+      const handleGroupDragOver = (e) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Only update drop index if not over an item
+          if (!e.target.closest('[data-sidebar-item]')) {
+            const collapsible = groupRef.current?.querySelector('.collapsible');
+            if (collapsible) {
+              const itemElements = collapsible.querySelectorAll('[data-sidebar-item]');
+              if (itemElements.length === 0) {
+                setDropIndex(0);
+              } else {
+                // Check if cursor is below all items
+                const lastItem = itemElements[itemElements.length - 1];
+                const lastRect = lastItem.getBoundingClientRect();
+                if (e.clientY > lastRect.bottom) {
+                  setDropIndex(items.length);
+                } else if (e.clientY < itemElements[0].getBoundingClientRect().top) {
+                  setDropIndex(0);
+                }
+              }
+            } else {
+              setDropIndex(0);
+            }
+          }
+        }
+      };
+
+      const handleDragLeave = (e) => {
+        if (hasItemData(e)) {
+          // Only reset if truly leaving the group
+          if (groupRef.current && !groupRef.current.contains(e.relatedTarget)) {
+            setDropIndex(-1);
+          }
+        }
+      };
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentDropIndex = dropIndex;
+        setDropIndex(-1);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) onDrop(JSON.parse(data), currentDropIndex, e);
+      };
+
+      return (
+        <div
+          ref={groupRef}
+          style={{ marginBottom: '4px' }}
+          onDragEnter={handleGroupDragEnter}
+          onDragOver={handleGroupDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', padding: '2px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '8px', color: labelColor }}>▶</span>
+              <span style={{ fontSize: '9px', color: labelColor, fontWeight: '500' }}>{label} ({count})</span>
+            </div>
+            {isBacklog && onAddItem && (
+              <button onClick={(e) => { e.stopPropagation(); onAddItem(false); }} className="btn" style={{ fontWeight: '700', padding: '1px 5px', fontSize: '9px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+            )}
+          </div>
+          <div className={`collapsible ${expanded ? 'expanded' : ''}`} style={{ paddingTop: '4px' }}>
+            {/* Drop indicator at top - also show when dragging over parent category */}
+            <div className={`drop-indicator ${dropIndex === 0 || showDropIndicator ? 'visible' : ''}`} />
+            {items.map((item, index) => {
+              const isLastItem = index === items.length - 1;
+              const hasAgregarButton = isBacklog && onAddItem;
+              // Last item has no marginBottom when there's Agregar button (button provides its own marginTop)
+              const itemMargin = (hasAgregarButton && isLastItem) ? '0' : '6px';
+              return (
+                <div
+                  key={item.id}
+                  ref={item._isNewItem && newItemRef ? newItemRef : null}
+                  data-sidebar-item="true"
+                  onDragOver={(e) => handleItemDragOver(e, index)}
+                  style={{ marginBottom: itemMargin, opacity: itemOpacity }}
+                >
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} showDate={showDate} justDroppedItemId={justDroppedItemId} />
+                  {/* Drop indicator - not after last item if there's an Agregar button */}
+                  {!(hasAgregarButton && isLastItem) && (
+                    <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
+                  )}
+                </div>
+              );
+            })}
+            {/* Dashed Agregar button */}
+            {isBacklog && onAddItem && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onAddItem(true); }}
+                style={{
+                  width: '100%',
+                  padding: '4px 8px',
+                  marginTop: '6px',
+                  marginBottom: '6px',
+                  background: 'transparent',
+                  border: '1px dashed var(--border-color)',
+                  borderRadius: '4px',
+                  color: 'var(--text-muted)',
+                  fontSize: '9px',
+                  cursor: 'pointer',
+                }}
+              >
+                Agregar
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const CategorySection = ({ category, items, allItems, categories, expanded, onToggle, onComplete, onEdit, onAdd, onDrop, onEditCategory, dragOverCat, onDelete, onSidebarGroupDrop, groupsExpandedState, justDroppedItemId, groupsExp, onGroupToggle }) => {
+      const categoryItems = items.filter(i => i.category === category.id);
+
+      // Get unique items (for repeating items, show only once based on repeatBaseId)
+      const seenRepeatBaseIds = new Set();
+      const seenIds = new Set();
+      const uniqueItems = categoryItems.filter(item => {
+        if (item.repeatBaseId) {
+          if (seenRepeatBaseIds.has(item.repeatBaseId)) return false;
+          seenRepeatBaseIds.add(item.repeatBaseId);
+          return true;
+        }
+        const baseId = item.originalId || item.id;
+        if (seenIds.has(baseId)) return false;
+        seenIds.add(baseId);
+        return true;
+      });
+
+      const ongoing = uniqueItems.filter(i => !i.completed && !i.isArchived);
+      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      // Backlog = archived items + items without scheduled date (excluding recurring items)
+      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.completed && !i.repeat)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      // Scheduled = items with scheduledDate OR recurring items
+      const scheduled = ongoing.filter(i => i.scheduledDate || i.repeat);
+      // Separate recurring items (no scheduledDate) from date-scheduled items
+      const recurringItems = scheduled.filter(i => i.repeat && !i.scheduledDate);
+      const dateScheduled = scheduled.filter(i => i.scheduledDate);
+
+      // Group date-scheduled by date and sort
+      const byDate = {};
+      dateScheduled.forEach(item => {
+        if (!byDate[item.scheduledDate]) byDate[item.scheduledDate] = [];
+        byDate[item.scheduledDate].push(item);
+      });
+      const sortedDates = Object.keys(byDate).sort();
+
+      const scheduledCount = uniqueItems.filter(i => i.scheduledDate && !i.completed && !i.repeat).length;
+
+      // Use props for group expansion state (managed by App for persistence)
+      const scheduledExp = groupsExp?.scheduled ?? true;
+      const backlogExp = groupsExp?.backlog ?? true;
+      const doneExp = groupsExp?.done ?? true;
+
+      const [addRect, setAddRect] = useState(null);
+      const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const [editCatRect, setEditCatRect] = useState(null);
+      const [dragging, setDragging] = useState(false);
+      const [isDraggingItem, setIsDraggingItem] = useState(false);
+      const [newBacklogItemId, setNewBacklogItemId] = useState(null);
+      const [backlogEditRect, setBacklogEditRect] = useState(null);
+      const newBacklogItemRef = useRef(null);
+      const contentRef = useRef(null);
+      const expandTimeoutRef = useRef(null);
+
+      const handleCategoryDoubleClick = (e) => {
+        if (category.isFixed) return;
+        e.stopPropagation();
+        setEditCatRect(e.currentTarget.getBoundingClientRect());
+      };
+
+      // Create item in backlog - addAtEnd determines position
+      const handleBacklogAddItem = (addAtEnd) => {
+        // Don't create if a popover was just closed
+        if (Date.now() - lastPopoverCloseTime < 200) return;
+        // Make sure backlog is expanded
+        if (!backlogExp) setBacklogExp(true);
+        // Calculate sortOrder
+        const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+        const maxSortOrder = backlogItems.length > 0 ? Math.max(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+        const sortOrder = addAtEnd ? maxSortOrder + 1 : minSortOrder - 1;
+        onAdd({
+          title: '',
+          description: '',
+          category: category.id,
+          effort: 1,
+          repeat: null,
+          scheduledDate: null,
+          scheduledSlot: null,
+          completed: false,
+          completedDate: null,
+          sortOrder,
+          isArchived: true,
+          _isNewItem: true,
+          _addAtEnd: addAtEnd,
+        });
+        setNewBacklogItemId('pending');
+      };
+
+      // Show edit popover once new backlog item is rendered
+      useEffect(() => {
+        if (newBacklogItemId === 'pending') {
+          const newestItem = backlogItems.find(i => i._isNewItem);
+          if (newestItem) {
+            const timer = setTimeout(() => {
+              if (newBacklogItemRef.current) {
+                const rect = newBacklogItemRef.current.getBoundingClientRect();
+                setBacklogEditRect({ itemId: newestItem.id, rect });
+                setNewBacklogItemId(null);
+              } else {
+                setTimeout(() => {
+                  if (newBacklogItemRef.current) {
+                    const rect = newBacklogItemRef.current.getBoundingClientRect();
+                    setBacklogEditRect({ itemId: newestItem.id, rect });
+                  }
+                  setNewBacklogItemId(null);
+                }, 50);
+              }
+            }, 10);
+            return () => clearTimeout(timer);
+          }
+        }
+      }, [newBacklogItemId, backlogItems]);
+
+      const handleBacklogClosePopover = () => {
+        setBacklogEditRect(null);
+      };
+
+      const backlogEditingItem = backlogEditRect ? backlogItems.find(i => i.id === backlogEditRect.itemId) : null;
+
+      // Handle dropping on sidebar groups
+      const handleGroupDrop = (data, targetGroup, e, dropIdx) => {
+        const { id, isRecurring, originalDate, title } = data;
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : parseInt(id);
+        const item = allItems.find(i => i.id === numId);
+
+        if (!item) return;
+
+        // If item has a scheduled date OR is recurring, and dropping to backlog, show confirmation popover
+        if ((item.scheduledDate || item.repeat) && targetGroup === 'backlog') {
+          const rect = {
+            top: e?.clientY || window.innerHeight / 2,
+            bottom: (e?.clientY || window.innerHeight / 2) + 10,
+            left: (e?.clientX || window.innerWidth / 2) - 140,
+            right: (e?.clientX || window.innerWidth / 2) + 140,
+          };
+          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: !!item.repeat });
+          return;
+        }
+
+        // Call parent handler with target group and drop index
+        onSidebarGroupDrop?.(numId, targetGroup, category.id, dropIdx);
+      };
+
+      // Category itself is not draggable if fixed, but items inside are always draggable
+      const isCategoryDraggable = !category.isFixed;
+
+      // Track drag enter count to handle nested elements
+      const dragCountRef = useRef(0);
+
+      // Handle auto-expand when dragging over closed category
+      const handleCategoryDragEnter = (e) => {
+        // Check if dragging an item (not a category)
+        if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+          dragCountRef.current++;
+          setIsDraggingItem(true);
+          // Only start timer on first enter and if not expanded
+          if (dragCountRef.current === 1 && !expanded && !expandTimeoutRef.current) {
+            expandTimeoutRef.current = setTimeout(() => {
+              onToggle();
+              expandTimeoutRef.current = null;
+            }, 400);
+          }
+        }
+      };
+
+      const handleCategoryDragLeave = (e) => {
+        if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+          dragCountRef.current--;
+          // Only clear when truly leaving (count reaches 0)
+          if (dragCountRef.current === 0) {
+            if (expandTimeoutRef.current) {
+              clearTimeout(expandTimeoutRef.current);
+              expandTimeoutRef.current = null;
+            }
+            setIsDraggingItem(false);
+          }
+        }
+      };
+
+      const handleCategoryDrop = (e) => {
+        e.preventDefault();
+        dragCountRef.current = 0;
+        if (expandTimeoutRef.current) {
+          clearTimeout(expandTimeoutRef.current);
+          expandTimeoutRef.current = null;
+        }
+        setIsDraggingItem(false);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) {
+          // Drop on category goes to "anyday" by default
+          handleGroupDrop(JSON.parse(data), 'anyday', e);
+        }
+      };
+
+      return (
+        <div
+          className={dragging ? 'dragging' : ''}
+          onDragEnter={handleCategoryDragEnter}
+          onDragLeave={handleCategoryDragLeave}
+          onDragOver={(e) => { if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) e.preventDefault(); }}
+          onDrop={handleCategoryDrop}
+          style={{ background: 'var(--bg-sidebar)', borderBottom: '1px solid var(--border-color)', outline: dragOverCat === category.id ? '2px dashed var(--accent-blue)' : 'none' }}>
+          <div className="category-heading" draggable={isCategoryDraggable}
+            onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('categoryId', category.id); setDragging(true); }}
+            onDragEnd={() => setDragging(false)}
+            onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '44px', background: expanded ? `${category.color}12` : 'transparent' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
+            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '13px', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '10px', padding: '4px' }}>▼</span>
+          </div>
+          <div className={`collapsible ${expanded ? 'expanded' : ''}`}>
+            <div ref={contentRef} style={{ padding: '6px 10px 8px' }}>
+              {/* Backlog section - includes all non-scheduled items */}
+              <SidebarGroup
+                label="Backlog"
+                count={backlogItems.length}
+                items={backlogItems}
+                expanded={backlogExp}
+                onToggle={() => onGroupToggle?.('backlog')}
+                categories={categories}
+                onComplete={onComplete}
+                onEdit={onEdit}
+                onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)}
+                showDropIndicator={isDraggingItem}
+                isBacklog={true}
+                onAddItem={handleBacklogAddItem}
+                newItemRef={newBacklogItemRef}
+                justDroppedItemId={justDroppedItemId}
+              />
+
+              {/* Scheduled - Agendado - cursor not-allowed on drag over */}
+              <div
+                style={{ marginBottom: '4px', cursor: 'inherit' }}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}
+                onDragEnter={(e) => { e.currentTarget.style.cursor = 'not-allowed'; }}
+                onDragLeave={(e) => { e.currentTarget.style.cursor = 'inherit'; }}
+              >
+                <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
+                  <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '8px', color: 'var(--text-muted)' }}>▶</span>
+                  <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
+                </div>
+                <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
+                  {recurringItems.map(item => (
+                    <div key={item.id} style={{ marginBottom: '6px' }}>
+                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                    </div>
+                  ))}
+                  {sortedDates.flatMap(date => byDate[date]).map(item => (
+                    <div key={item.id} style={{ marginBottom: '6px' }}>
+                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hecho section - always visible for drop target */}
+              <SidebarGroup
+                label="Hecho"
+                count={doneItems.length}
+                items={doneItems}
+                expanded={doneExp}
+                onToggle={() => onGroupToggle?.('done')}
+                categories={categories}
+                onComplete={onComplete}
+                onEdit={onEdit}
+                onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'done', e, dropIdx)}
+                labelColor="var(--accent-green)"
+                justDroppedItemId={justDroppedItemId}
+              />
+            </div>
+          </div>
+          {backlogEditRect && backlogEditingItem && ReactDOM.createPortal(
+            <AddEditItemPopover
+              categories={categories}
+              onSave={onAdd}
+              onDelete={onDelete}
+              onClose={handleBacklogClosePopover}
+              targetRect={backlogEditRect.rect}
+              editItem={backlogEditingItem}
+            />,
+            document.body
+          )}
+          {editCatRect && <EditCategoryPopover category={category} itemCount={items.filter(i => i.category === category.id).length} onSave={onEditCategory} onDelete={() => {}} onClose={() => setEditCatRect(null)} targetRect={editCatRect} />}
+          {removeDatePopover && <RemoveDatePopover
+            itemTitle={removeDatePopover.item.title}
+            isRecurring={removeDatePopover.isRecurring}
+            onConfirm={() => {
+              onSidebarGroupDrop?.(removeDatePopover.item.id, 'backlog', category.id, removeDatePopover.dropIdx);
+              setRemoveDatePopover(null);
+            }}
+            onCancel={() => setRemoveDatePopover(null)}
+            targetRect={removeDatePopover.rect}
+          />}
+        </div>
+      );
+    };
+
+    // ============ MAIN APP ============
+    // Helper to load state from localStorage
+    const loadFromStorage = (key, defaultValue) => {
+      try {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : defaultValue;
+      } catch (e) {
+        return defaultValue;
+      }
+    };
+
+    const App = () => {
+      const [theme, setTheme] = useState('dark');
+      const [categories, setCategories] = useState(initialCategories);
+      const [items, setItems] = useState(initialItems);
+      const [dayEnergy, setDayEnergy] = useState(initialDayEnergy);
+
+      // Load expanded state from localStorage, fallback to all expanded
+      const defaultExpanded = { temp: true, ai: true, work: true, health: true, social: true, music: true, entertainment: true, home: true, fitness: true };
+      const [expanded, setExpanded] = useState(() => loadFromStorage('bettercal_expanded', defaultExpanded));
+
+      // Groups expanded state per category: { categoryId: { backlog: bool, scheduled: bool, done: bool } }
+      const defaultGroupsExp = {};
+      initialCategories.forEach(c => { defaultGroupsExp[c.id] = { backlog: true, scheduled: true, done: true }; });
+      const [categoryGroupsExp, setCategoryGroupsExp] = useState(() => loadFromStorage('bettercal_groups', defaultGroupsExp));
+
+      const [groupsExpandedState, setGroupsExpandedState] = useState(null); // null, 'expanded', 'collapsed'
+      const [calendarRect, setCalendarRect] = useState(null);
+      const [editPopover, setEditPopover] = useState(null);
+      const [newCatRect, setNewCatRect] = useState(null);
+      const [dragOverCat, setDragOverCat] = useState(null);
+      const [viewBase, setViewBase] = useState(REAL_TODAY);
+      const [recurringEditPopover, setRecurringEditPopover] = useState(null);
+      const [recurringSavePopover, setRecurringSavePopover] = useState(null); // For edit property confirmation
+      const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
+      const [shuffledBacklog, setShuffledBacklog] = useState([]);
+      const [toast, setToast] = useState(null);
+      const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
+
+      const scrollRef = useRef(null);
+      const [sticky, setSticky] = useState(false);
+      const days = getDaysArray(viewBase);
+
+      const minDate = useMemo(() => {
+        const d = new Date(REAL_TODAY);
+        d.setMonth(d.getMonth() - 2);
+        return d;
+      }, []);
+
+      const maxDate = useMemo(() => {
+        const d = new Date(REAL_TODAY);
+        d.setMonth(d.getMonth() + 2);
+        return d;
+      }, []);
+
+      // Persist expanded states to localStorage
+      useEffect(() => {
+        try {
+          localStorage.setItem('bettercal_expanded', JSON.stringify(expanded));
+        } catch (e) {}
+      }, [expanded]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('bettercal_groups', JSON.stringify(categoryGroupsExp));
+        } catch (e) {}
+      }, [categoryGroupsExp]);
+
+      const allItemsWithRecurring = useMemo(() => {
+        let result = generateRecurringInstances(items, minDate, maxDate);
+
+        // If there's a pending recurring drop, add the pending item and hide the original instance
+        if (pendingRecurringDrop) {
+          const originalId = pendingRecurringDrop.id.replace('-pending', '');
+          const originalVisualDate = pendingRecurringDrop._originalVisualDate;
+          const originalSlot = pendingRecurringDrop._originalSlot;
+          const targetDate = pendingRecurringDrop.scheduledDate;
+          const targetSlot = pendingRecurringDrop.scheduledSlot;
+          const dropIndex = pendingRecurringDrop._dropIndex;
+
+          // Hide the original instance at its original position
+          result = result.filter(item => {
+            // Check if this is the original instance we're moving
+            const itemBaseId = typeof item.id === 'string' ? item.id.split('-')[0] : String(item.id);
+            const isOriginalInstance = itemBaseId === originalId &&
+              item.scheduledDate === originalVisualDate &&
+              item.scheduledSlot === originalSlot;
+            return !isOriginalInstance;
+          });
+
+          // Get items in target slot (excluding the original we're moving)
+          const targetSlotItems = result.filter(i =>
+            i.scheduledDate === targetDate &&
+            i.scheduledSlot === targetSlot &&
+            !i.completed
+          ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+          // Insert pending item at correct position
+          const safeDropIndex = Math.max(0, Math.min(dropIndex || 0, targetSlotItems.length));
+          const newOrder = [...targetSlotItems];
+          newOrder.splice(safeDropIndex, 0, pendingRecurringDrop);
+
+          // Reassign consecutive sortOrders to all items in target slot
+          const newSortOrders = {};
+          newOrder.forEach((item, idx) => {
+            newSortOrders[item.id] = idx;
+          });
+
+          // Update sortOrders in result
+          result = result.map(item => {
+            if (newSortOrders[item.id] !== undefined) {
+              return { ...item, sortOrder: newSortOrders[item.id] };
+            }
+            return item;
+          });
+
+          // Add the pending item with correct sortOrder
+          result.push({ ...pendingRecurringDrop, sortOrder: newSortOrders[pendingRecurringDrop.id] });
+        }
+
+        return result;
+      }, [items, minDate, maxDate, pendingRecurringDrop]);
+
+      // Backlog: items without scheduled date, not completed, not archived, not recurring
+      const backlogItems = useMemo(() => {
+        return items.filter(i => !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat);
+      }, [items]);
+
+      // Initialize shuffled backlog on mount
+      useEffect(() => {
+        if (shuffledBacklog.length === 0 && backlogItems.length > 0) {
+          const shuffled = [...backlogItems].sort(() => Math.random() - 0.5);
+          setShuffledBacklog(shuffled);
+        }
+      }, []);
+
+      // Update shuffled backlog when items change (keep order, just update/filter)
+      useEffect(() => {
+        const backlogIds = new Set(backlogItems.map(i => i.id));
+        // Keep items that still exist in backlog, in their current order
+        const stillExists = shuffledBacklog.filter(i => backlogIds.has(i.id));
+        // Add new items that aren't in shuffled yet - put them FIRST (they just moved to backlog)
+        const newItems = backlogItems.filter(i => !shuffledBacklog.find(s => s.id === i.id));
+        if (stillExists.length !== shuffledBacklog.length || newItems.length > 0) {
+          setShuffledBacklog([...newItems, ...stillExists]);
+        }
+      }, [backlogItems]);
+
+      const handleShuffle = useCallback(() => {
+        const shuffled = [...backlogItems].sort(() => Math.random() - 0.5);
+        setShuffledBacklog(shuffled);
+      }, [backlogItems]);
+
+      const firstVisible = days[1].date;
+      const lastVisible = days[days.length - 1].date;
+      const rangeText = `${formatDayNumber(firstVisible)}-${formatDayNumber(lastVisible)} ${getShortMonthName(lastVisible)}`;
+
+      useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
+      useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const h = () => setSticky(el.scrollLeft > DAY_WIDTH);
+        el.addEventListener('scroll', h);
+        return () => el.removeEventListener('scroll', h);
+      }, []);
+
+      const handleComplete = (id) => {
+        // Check if this is a recurring instance with date in ID
+        // Format can be: baseId-YYYY-MM-DD or baseId-YYYY-MM-DD-moved
+        const isRecurringInstanceWithDate = typeof id === 'string' && /^\d+-\d{4}-\d{2}-\d{2}/.test(id);
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
+
+        if (isRecurringInstanceWithDate) {
+          // Extract the date part (YYYY-MM-DD), handling both regular and moved instances
+          const parts = id.split('-');
+          const instanceDate = `${parts[1]}-${parts[2]}-${parts[3]}`; // Always YYYY-MM-DD (original date for moved items)
+          const isMoved = id.endsWith('-moved');
+
+          setItems(p => p.map(i => {
+            if (i.id !== numId) return i;
+            const newExceptions = { ...(i.exceptions || {}) };
+            const currentException = newExceptions[instanceDate] || {};
+
+            // Determine the actual display date (for completedDate)
+            // For moved instances, use movedTo.date; otherwise use instanceDate
+            const displayDate = currentException.movedTo?.date || instanceDate;
+
+            // Toggle completed state for this instance
+            if (currentException.completed) {
+              delete newExceptions[instanceDate].completed;
+              delete newExceptions[instanceDate].completedDate;
+              // Clean up empty exception only if no other properties
+              if (Object.keys(newExceptions[instanceDate]).length === 0) {
+                delete newExceptions[instanceDate];
+              }
+            } else {
+              newExceptions[instanceDate] = {
+                ...currentException,
+                completed: true,
+                completedDate: displayDate
+              };
+            }
+            return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
+          }));
+        } else {
+          // For non-recurring items OR recurring items from sidebar (no date in ID)
+          setItems(p => p.map(i => {
+            if (i.id !== numId) return i;
+
+            // If it's a recurring item without date in ID (from sidebar), create exception for today
+            if (i.repeat) {
+              const todayStr = formatDate(REAL_TODAY);
+              const newExceptions = { ...(i.exceptions || {}) };
+              const currentException = newExceptions[todayStr] || {};
+              if (currentException.completed) {
+                delete newExceptions[todayStr].completed;
+                delete newExceptions[todayStr].completedDate;
+                if (Object.keys(newExceptions[todayStr]).length === 0) {
+                  delete newExceptions[todayStr];
+                }
+              } else {
+                newExceptions[todayStr] = {
+                  ...currentException,
+                  completed: true,
+                  completedDate: todayStr
+                };
+              }
+              return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
+            }
+
+            // For regular non-recurring items
+            const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
+            return { ...i, completed: !i.completed, completedDate };
+          }));
+        }
+      };
+
+      const handleSave = (data, forceApplyAll = false) => {
+        const numId = data.id && typeof data.id === 'string' ? parseInt(data.id.split('-')[0]) : data.id;
+        // Remove internal markers if present when updating existing items
+        const { _isNewItem, _addAtEnd, ...cleanData } = data;
+        if (numId) {
+          const existingItem = items.find(i => i.id === numId);
+          const wasScheduled = existingItem && (existingItem.scheduledDate || existingItem.repeat);
+          const isNowBacklog = !cleanData.scheduledDate && !cleanData.repeat && !cleanData.completed;
+          const isRecurring = existingItem?.repeat;
+
+          // Check if relevant properties changed for recurring items
+          const propsChanged = isRecurring && (
+            existingItem.title !== cleanData.title ||
+            existingItem.description !== cleanData.description ||
+            existingItem.effort !== cleanData.effort
+          );
+
+          // If recurring item with property changes, show confirmation popover
+          if (propsChanged && !forceApplyAll && editPopover?.visualDate) {
+            setRecurringSavePopover({
+              existingItem,
+              cleanData,
+              numId,
+              visualDate: editPopover.visualDate,
+              rect: editPopover.rect
+            });
+            return; // Don't save yet, wait for user choice
+          }
+
+          if (wasScheduled && isNowBacklog) {
+            // Item moved to backlog - put it first
+            setItems(p => [
+              { ...existingItem, ...cleanData, id: numId, _isNewItem: undefined, _addAtEnd: undefined },
+              ...p.filter(i => i.id !== numId)
+            ]);
+          } else {
+            setItems(p => p.map(i => i.id === numId ? { ...i, ...cleanData, id: numId, _isNewItem: undefined, _addAtEnd: undefined } : i));
+          }
+        } else {
+          // For new items, keep _isNewItem marker if present (for auto-opening popover)
+          const newItem = {
+            id: Date.now(),
+            ...cleanData,
+            completed: cleanData.completed || false,
+            completedDate: cleanData.completedDate || null,
+            createdAt: formatDate(REAL_TODAY),
+            isArchived: false,
+            _isNewItem: data._isNewItem || false,
+            _addAtEnd: data._addAtEnd || false,
+          };
+          setItems(p => [...p, newItem]);
+        }
+        setEditPopover(null);
+      };
+
+      // Handle recurring save choice: "Solo este evento"
+      const handleRecurringSaveThis = () => {
+        if (!recurringSavePopover) return;
+        const { existingItem, cleanData, numId, visualDate } = recurringSavePopover;
+
+        // Create exception with property overrides for this instance
+        setItems(p => p.map(i => {
+          if (i.id !== numId) return i;
+          const newExceptions = { ...(i.exceptions || {}) };
+          const existingException = newExceptions[visualDate] || {};
+          newExceptions[visualDate] = {
+            ...existingException,
+            title: cleanData.title,
+            description: cleanData.description,
+            effort: cleanData.effort,
+          };
+          return { ...i, exceptions: newExceptions };
+        }));
+
+        setRecurringSavePopover(null);
+        setEditPopover(null);
+      };
+
+      // Handle recurring save choice: "Este y los siguientes"
+      const handleRecurringSaveFollowing = () => {
+        if (!recurringSavePopover) return;
+        const { existingItem, cleanData, numId, visualDate } = recurringSavePopover;
+
+        setItems(p => {
+          // End the original series the day before visualDate
+          const endDateObj = new Date(visualDate + 'T00:00:00');
+          endDateObj.setDate(endDateObj.getDate() - 1);
+
+          const updated = p.map(i => {
+            if (i.id !== numId) return i;
+            return {
+              ...i,
+              repeat: { ...i.repeat, endDate: formatDate(endDateObj) }
+            };
+          });
+
+          // Create new series with updated properties
+          const newRepeat = { ...existingItem.repeat };
+          delete newRepeat.endDate;
+          newRepeat.startDate = visualDate;
+
+          const newItem = {
+            id: Date.now(),
+            title: cleanData.title,
+            description: cleanData.description,
+            category: cleanData.category,
+            effort: cleanData.effort,
+            scheduledSlot: cleanData.scheduledSlot || existingItem.scheduledSlot,
+            sortOrder: existingItem.sortOrder,
+            completed: false,
+            completedDate: null,
+            createdAt: existingItem.createdAt,
+            isArchived: false,
+            repeat: newRepeat,
+          };
+
+          return [...updated, newItem];
+        });
+
+        setRecurringSavePopover(null);
+        setEditPopover(null);
+      };
+
+      const handleDelete = (id) => {
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
+        const deletedItem = items.find(i => i.id === numId);
+        setItems(p => p.filter(i => i.id !== numId));
+
+        // Show undo toast only if item has a title (not empty/untitled items)
+        if (deletedItem && deletedItem.title && deletedItem.title.trim() !== '') {
+          setToast({
+            message: `"${deletedItem.title}" eliminado`,
+            item: deletedItem,
+          });
+        }
+      };
+
+      const handleUndoDelete = () => {
+        if (toast?.item) {
+          setItems(p => [...p, toast.item]);
+        }
+        setToast(null);
+      };
+
+      const handleDrop = (data, date, slot, dropIndex, coords) => {
+        console.log('handleDrop called', { data, date, slot, dropIndex, coords });
+        const { id, isRecurring, exceptionDate, visualDate, originalSlot, title } = data;
+        // For backward compatibility, use exceptionDate if visualDate not present
+        const effectiveVisualDate = visualDate || exceptionDate;
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : parseInt(id);
+        console.log('Parsed:', { numId, isRecurring, exceptionDate, visualDate, effectiveVisualDate });
+
+        // Find the original item to get full data for recurring edit
+        const originalItem = items.find(i => i.id === numId);
+
+        if (isRecurring && !originalItem) {
+          console.error('Could not find original item for recurring edit', numId);
+          return;
+        }
+
+        if (isRecurring) {
+          const sameDay = effectiveVisualDate === date;
+          const sameSlot = originalSlot === slot;
+          console.log('Recurring item check:', { sameDay, sameSlot, effectiveVisualDate, date, originalSlot, slot });
+
+          if (sameDay && sameSlot) {
+            // Solo reordenar dentro del mismo slot - no preguntar
+            console.log('Same day, same slot - just reorder');
+            performDrop(numId, date, slot, dropIndex);
+            return;
+          }
+
+          if (sameDay && !sameSlot) {
+            // Cambio de slot en el mismo día - aplicar "solo este evento" automáticamente
+            console.log('Same day, different slot - auto apply this event only');
+            handleRecurringMoveThis(originalItem, exceptionDate, originalSlot, date, slot, dropIndex);
+            return;
+          }
+
+          // Diferente día - mostrar popover de opciones
+          // Set pending drop to show item temporarily in target position
+          // Calculate proper sortOrder for the pending item
+          const slotItems = allItemsWithRecurring.filter(i => {
+            const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+            return i.scheduledDate === date &&
+              i.scheduledSlot === slot &&
+              !i.completed &&
+              baseId !== numId;
+          }).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+          const safeDropIndex = Math.max(0, Math.min(dropIndex || 0, slotItems.length));
+
+          const pendingItem = {
+            ...originalItem,
+            id: `${originalItem.id}-pending`,
+            scheduledDate: date,
+            scheduledSlot: slot,
+            sortOrder: 0, // Will be recalculated in allItemsWithRecurring
+            _isPending: true,
+            _originalVisualDate: effectiveVisualDate,
+            _originalSlot: originalSlot,
+            _dropIndex: safeDropIndex,
+          };
+
+          setPendingRecurringDrop(pendingItem);
+
+          console.log('Different day - showing popover');
+          setRecurringEditPopover({
+            item: originalItem,
+            exceptionDate,
+            visualDate: effectiveVisualDate,
+            originalSlot,
+            targetDate: date,
+            targetSlot: slot,
+            dropIndex,
+            action: 'move',
+            pendingItemId: pendingItem.id,
+            dropCoords: coords,
+          });
+          return;
+        }
+
+        performDrop(numId, date, slot, dropIndex);
+      };
+
+      const performDrop = (numId, date, slot, dropIndex) => {
+        // Get visual items in target slot (includes recurring instances)
+        const visualSlotItems = allItemsWithRecurring.filter(i =>
+          i.scheduledDate === date &&
+          i.scheduledSlot === slot &&
+          (slot === 'done' ? i.completed : !i.completed)
+        ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        // Find original index of dragged item in visual list (if it's already in this slot)
+        const originalIndex = visualSlotItems.findIndex(i => {
+          const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+          return baseId === numId;
+        });
+
+        // Check if item is coming from outside this slot
+        const isFromOutside = originalIndex === -1;
+
+        // Adjust dropIndex if dragging from before the drop position (only if already in this slot)
+        let adjustedDropIndex = dropIndex || 0;
+        if (!isFromOutside && originalIndex < adjustedDropIndex) {
+          adjustedDropIndex = adjustedDropIndex - 1;
+        }
+
+        // Remove dragged item from visual list (if it was there)
+        const visualWithoutDragged = visualSlotItems.filter(i => {
+          const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+          return baseId !== numId;
+        });
+
+        // Insert at correct position - use a placeholder for the dropped item
+        const safeDropIndex = Math.max(0, Math.min(adjustedDropIndex, visualWithoutDragged.length));
+        const newVisualOrder = [...visualWithoutDragged];
+        // Insert placeholder for dropped item
+        newVisualOrder.splice(safeDropIndex, 0, { id: numId, _isDropped: true });
+
+        // Calculate new sortOrders for all items in this slot
+        const newSortOrders = {};
+        newVisualOrder.forEach((item, idx) => {
+          if (item) {
+            const baseId = typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id;
+            newSortOrders[baseId] = { sortOrder: idx, isRecurring: !!item.originalId };
+          }
+        });
+
+        setItems(p => {
+          return p.map(i => {
+            const sortInfo = newSortOrders[i.id];
+
+            if (i.id === numId) {
+              // This is the dropped item
+              if (i.repeat) {
+                // Recurring item: store sortOrder in dateOverrides for this date
+                const newDateOverrides = { ...(i.dateOverrides || {}), [date]: { sortOrder: sortInfo?.sortOrder ?? 0 } };
+                return { ...i, dateOverrides: newDateOverrides };
+              } else {
+                // Non-recurring item: update directly
+                if (slot === 'done') {
+                  return { ...i, completed: true, completedDate: date, scheduledDate: date, scheduledSlot: i.scheduledSlot || 'morning', sortOrder: sortInfo?.sortOrder ?? 0 };
+                }
+                return { ...i, scheduledDate: date, scheduledSlot: slot, isArchived: false, completed: false, completedDate: null, sortOrder: sortInfo?.sortOrder ?? 0 };
+              }
+            }
+
+            // Update other items in the same slot
+            if (sortInfo !== undefined) {
+              if (i.repeat) {
+                // Recurring item: update dateOverrides
+                const newDateOverrides = { ...(i.dateOverrides || {}), [date]: { sortOrder: sortInfo.sortOrder } };
+                return { ...i, dateOverrides: newDateOverrides };
+              } else if (i.scheduledDate === date && i.scheduledSlot === slot) {
+                // Non-recurring item in same slot: update sortOrder
+                return { ...i, sortOrder: sortInfo.sortOrder };
+              }
+            }
+
+            return i;
+          });
+        });
+
+        // Trigger drop feedback animation
+        setJustDroppedItemId(numId);
+        setTimeout(() => setJustDroppedItemId(null), 600);
+      };
+
+      const handleDropCategory = (data, cat, archived) => {
+        const { id } = data;
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : parseInt(id);
+        setItems(p => p.map(i => i.id === numId ? { ...i, category: cat, isArchived: archived } : i));
+      };
+
+      // Handle dropping item on sidebar groups (anyday, backlog, done)
+      const handleSidebarGroupDrop = (itemId, targetGroup, categoryId, dropIndex) => {
+        setItems(p => {
+          // Get ALL items in target group (including the dropped item) to find original position
+          let allTargetItems;
+          if (targetGroup === 'backlog') {
+            allTargetItems = p.filter(i => i.category === categoryId && (i.isArchived || !i.scheduledDate) && !i.completed && !i.repeat);
+          } else if (targetGroup === 'done') {
+            allTargetItems = p.filter(i => i.category === categoryId && i.completedDate === formatDate(REAL_TODAY) && i.completed);
+          } else {
+            allTargetItems = [];
+          }
+          allTargetItems.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+          // Find original index of dragged item in the visual list
+          const originalIndex = allTargetItems.findIndex(i => i.id === itemId);
+
+          // Get items without the dragged one
+          const targetItems = allTargetItems.filter(i => i.id !== itemId);
+
+          // Adjust dropIndex: if dragging from before the drop position, subtract 1
+          let adjustedDropIndex = dropIndex || 0;
+          if (originalIndex !== -1 && originalIndex < adjustedDropIndex) {
+            adjustedDropIndex = adjustedDropIndex - 1;
+          }
+
+          // Insert dropped item at the correct position and reassign all sortOrders
+          const droppedItem = p.find(i => i.id === itemId);
+          const safeDropIndex = Math.max(0, Math.min(adjustedDropIndex, targetItems.length));
+          const newOrder = [...targetItems];
+          newOrder.splice(safeDropIndex, 0, droppedItem);
+
+          // Create a map of new sortOrders for all items in this group
+          const newSortOrders = {};
+          newOrder.forEach((item, idx) => {
+            if (item) newSortOrders[item.id] = idx;
+          });
+
+          return p.map(i => {
+            // Update sortOrder for all items in this group
+            if (newSortOrders[i.id] !== undefined && i.id !== itemId) {
+              return { ...i, sortOrder: newSortOrders[i.id] };
+            }
+            if (i.id !== itemId) return i;
+
+            // Update the dropped item
+            const baseUpdate = { category: categoryId, sortOrder: newSortOrders[itemId] };
+            switch (targetGroup) {
+              case 'backlog':
+                return { ...i, ...baseUpdate, scheduledDate: null, scheduledSlot: null, isArchived: false, completed: false, completedDate: null, repeat: null, exceptions: null };
+              case 'done':
+                return { ...i, ...baseUpdate, completed: true, completedDate: formatDate(REAL_TODAY), isArchived: false };
+              default:
+                return i;
+            }
+          });
+        });
+
+        // Trigger drop feedback animation
+        setJustDroppedItemId(itemId);
+        setTimeout(() => setJustDroppedItemId(null), 600);
+      };
+
+      const handleEditCategory = (u) => {
+        if (categories.find(c => c.id === u.id)) {
+          setCategories(p => p.map(c => c.id === u.id ? u : c));
+        } else {
+          // Add new category after Temp (index 1)
+          setCategories(p => [p[0], u, ...p.slice(1)]);
+          // Open the new category by default
+          setExpanded(p => ({ ...p, [u.id]: true }));
+        }
+      };
+
+      const handleReorderCategory = (dragId, dropId) => {
+        if (dragId === dropId) return;
+        // Don't allow reordering if dragging to/from Temp
+        const dragCat = categories.find(c => c.id === dragId);
+        const dropCat = categories.find(c => c.id === dropId);
+        if (dragCat?.isFixed || dropCat?.isFixed) return;
+
+        setCategories(p => {
+          const a = [...p];
+          const di = a.findIndex(c => c.id === dragId);
+          const [item] = a.splice(di, 1);
+          const dropIndex = a.findIndex(c => c.id === dropId);
+          a.splice(dropIndex, 0, item);
+          return a;
+        });
+      };
+
+      const handleEdit = (item, rect) => {
+        const originalId = item.originalId || (typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id);
+        const originalItem = items.find(i => i.id === originalId) || item;
+        // For recurring items, pass the visual date so it can be used if repeat is removed
+        const visualDate = item.scheduledDate;
+        setEditPopover({ item: originalItem, rect, visualDate });
+      };
+
+      // Handler principal para acciones de recurrencia
+      const handleRecurringAction = (choice, options = {}) => {
+        console.log('handleRecurringAction called with choice:', choice, 'options:', options);
+        if (!recurringEditPopover) {
+          console.log('No recurringEditPopover!');
+          return;
+        }
+        const { item, exceptionDate, visualDate, originalSlot, targetDate, targetSlot, dropIndex } = recurringEditPopover;
+        console.log('Popover data:', { itemId: item.id, exceptionDate, visualDate, targetDate, targetSlot });
+
+        // If target is "done", only "solo este evento" makes sense for recurring items
+        // (can't have a recurring series in "done" slot)
+        if (targetSlot === 'done' && choice !== 'this') {
+          handleRecurringMoveThis(item, exceptionDate, originalSlot, targetDate, targetSlot, dropIndex);
+          setRecurringEditPopover(null);
+          setPendingRecurringDrop(null);
+          return;
+        }
+
+        switch (choice) {
+          case 'this':
+            // "Solo este evento" uses exceptionDate (the key in exceptions)
+            handleRecurringMoveThis(item, exceptionDate, originalSlot, targetDate, targetSlot, dropIndex);
+            break;
+          case 'following':
+            // "Este y siguientes" uses visualDate (where the item appears)
+            // options contains: newRepeatType, newDays (for weekdays), newEvery (for days/weeks)
+            handleRecurringMoveFollowing(item, exceptionDate, visualDate, originalSlot, targetDate, targetSlot, dropIndex, options);
+            break;
+          case 'all':
+            // "Todos" uses visualDate for calculating the day offset
+            handleRecurringMoveAll(item, visualDate, originalSlot, targetDate, targetSlot, dropIndex);
+            break;
+        }
+        setRecurringEditPopover(null);
+        setPendingRecurringDrop(null);
+      };
+
+      // Calcular sortOrder para posicionar item en slot destino
+      // Retorna: { insertedSortOrder: number, otherSortOrders: { [itemId]: number } }
+      const calculateSortOrdersForDrop = (targetDate, targetSlot, dropIndex, excludeItemId) => {
+        // Obtener items del slot destino, excluyendo el item que estamos moviendo
+        const visualSlotItems = allItemsWithRecurring.filter(i => {
+          const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+          return i.scheduledDate === targetDate &&
+            i.scheduledSlot === targetSlot &&
+            !i.completed &&
+            baseId !== excludeItemId;
+        }).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        const safeDropIndex = Math.max(0, Math.min(dropIndex || 0, visualSlotItems.length));
+
+        // Crear nuevo orden con placeholder para el item insertado
+        const newOrder = [...visualSlotItems];
+        newOrder.splice(safeDropIndex, 0, { _inserted: true });
+
+        // Asignar sortOrders consecutivos
+        const otherSortOrders = {};
+        let insertedSortOrder = 0;
+
+        newOrder.forEach((item, idx) => {
+          if (item._inserted) {
+            insertedSortOrder = idx;
+          } else {
+            const baseId = typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id;
+            otherSortOrders[baseId] = idx;
+          }
+        });
+
+        return { insertedSortOrder, otherSortOrders };
+      };
+
+      // Solo este evento: marcar instancia como deleted y crear nuevo item independiente
+      const handleRecurringMoveThis = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
+        console.log('handleRecurringMoveThis called', { itemId: item.id, originalDate, targetDate, targetSlot });
+        const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
+
+        // Get any property overrides from existing exception (if instance was already modified)
+        const existingException = item.exceptions?.[originalDate] || {};
+        const instanceTitle = existingException.title ?? item.title;
+        const instanceDescription = existingException.description ?? item.description;
+        const instanceEffort = existingException.effort ?? item.effort;
+
+        setItems(p => {
+          // Mark this instance as deleted in the recurring item
+          const updated = p.map(i => {
+            if (i.id === item.id) {
+              const newExceptions = { ...(i.exceptions || {}) };
+              // Mark as deleted (removes from recurring series)
+              newExceptions[originalDate] = { ...existingException, deleted: true };
+              // Clean up movedTo if it existed
+              delete newExceptions[originalDate].movedTo;
+              return { ...i, exceptions: newExceptions };
+            }
+
+            // Actualizar sortOrder de otros items en el slot destino
+            if (otherSortOrders[i.id] !== undefined) {
+              if (i.repeat) {
+                const newDateOverrides = { ...(i.dateOverrides || {}), [targetDate]: { sortOrder: otherSortOrders[i.id] } };
+                return { ...i, dateOverrides: newDateOverrides };
+              } else if (i.scheduledDate === targetDate && i.scheduledSlot === targetSlot) {
+                return { ...i, sortOrder: otherSortOrders[i.id] };
+              }
+            }
+
+            return i;
+          });
+
+          // Create new independent item (no recurrence)
+          const newItemId = Date.now();
+          const newItem = {
+            id: newItemId,
+            title: instanceTitle,
+            description: instanceDescription || '',
+            category: item.category,
+            effort: instanceEffort,
+            scheduledDate: targetDate,
+            scheduledSlot: targetSlot,
+            sortOrder: insertedSortOrder,
+            completed: targetSlot === 'done',
+            completedDate: targetSlot === 'done' ? targetDate : null,
+            createdAt: formatDate(REAL_TODAY),
+            isArchived: false,
+            repeat: null, // No recurrence - independent item
+          };
+
+          // Trigger drop feedback animation for the new item
+          setTimeout(() => {
+            setJustDroppedItemId(newItemId);
+            setTimeout(() => setJustDroppedItemId(null), 600);
+          }, 0);
+
+          return [...updated, newItem];
+        });
+      };
+
+      // Este y los siguientes: terminar serie original, crear nueva
+      // exceptionDate: the key in exceptions (if this instance was moved/completed)
+      // visualDate: where the item appears visually (used to determine where to split the series)
+      // options: { newRepeatType, newDays (for weekdays), newEvery (for days/weeks) }
+      const handleRecurringMoveFollowing = (item, exceptionDate, visualDate, originalSlot, targetDate, targetSlot, dropIndex, options = {}) => {
+        const { newRepeatType, newDays, newEvery } = options;
+        const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
+
+        setItems(p => {
+          // Terminar la serie original el día anterior a donde aparece visualmente
+          const endDateObj = new Date(visualDate + 'T00:00:00');
+          endDateObj.setDate(endDateObj.getDate() - 1);
+
+          const updated = p.map(i => {
+            if (i.id === item.id) {
+              // Remove any exception for this instance since we're moving it to a new series
+              const newExceptions = { ...(i.exceptions || {}) };
+              if (exceptionDate && newExceptions[exceptionDate]) {
+                delete newExceptions[exceptionDate];
+              }
+
+              return {
+                ...i,
+                repeat: { ...i.repeat, endDate: formatDate(endDateObj) },
+                exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined
+              };
+            }
+
+            // Actualizar sortOrder de otros items en el slot destino
+            if (otherSortOrders[i.id] !== undefined) {
+              if (i.repeat) {
+                const newDateOverrides = { ...(i.dateOverrides || {}), [targetDate]: { sortOrder: otherSortOrders[i.id] } };
+                return { ...i, dateOverrides: newDateOverrides };
+              } else if (i.scheduledDate === targetDate && i.scheduledSlot === targetSlot) {
+                return { ...i, sortOrder: otherSortOrders[i.id] };
+              }
+            }
+
+            return i;
+          });
+
+          // Crear nueva serie que empieza a partir de targetDate
+          // startDate indica "no generar instancias antes de esta fecha"
+          const effectiveType = newRepeatType || item.repeat.type;
+          console.log('Creating new repeat:', { effectiveType, newRepeatType, newEvery, newDays, itemRepeat: item.repeat });
+
+          const newRepeat = {
+            type: effectiveType,
+            startDate: targetDate,
+          };
+
+          // Configurar según el tipo de recurrencia
+          if (effectiveType === 'weekdays') {
+            newRepeat.days = newDays || item.repeat.days || [];
+          } else {
+            // days or weeks
+            newRepeat.every = newEvery || item.repeat.every || 1;
+          }
+
+          console.log('newRepeat:', newRepeat);
+
+          const newItemId = Date.now();
+          const newItem = {
+            id: newItemId,
+            title: item.title,
+            description: item.description || '',
+            category: item.category,
+            effort: item.effort,
+            scheduledSlot: targetSlot,
+            sortOrder: insertedSortOrder,
+            completed: false,
+            completedDate: null,
+            createdAt: item.createdAt,
+            isArchived: false,
+            repeat: newRepeat,
+            repeatBaseId: item.repeatBaseId ? `${item.repeatBaseId}-following` : undefined,
+          };
+
+          // Trigger drop feedback animation for the new item
+          setTimeout(() => {
+            setJustDroppedItemId(newItemId);
+            setTimeout(() => setJustDroppedItemId(null), 600);
+          }, 0);
+
+          return [...updated, newItem];
+        });
+      };
+
+      // Todos los eventos: mover toda la serie
+      const handleRecurringMoveAll = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
+        const dayOffset = getDayDiff(originalDate, targetDate);
+        const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
+
+        setItems(p => p.map(i => {
+          if (i.id === item.id) {
+            // Actualizar configuración de repeat
+            const newRepeat = shiftRepeatConfig(i.repeat, dayOffset);
+
+            return {
+              ...i,
+              repeat: newRepeat,
+              scheduledSlot: targetSlot,
+              sortOrder: insertedSortOrder,
+              exceptions: shiftExceptions(i.exceptions, dayOffset, targetSlot),
+              createdAt: shiftDate(i.createdAt, dayOffset),
+            };
+          }
+
+          // Actualizar sortOrder de otros items en el slot destino
+          if (otherSortOrders[i.id] !== undefined) {
+            if (i.repeat) {
+              const newDateOverrides = { ...(i.dateOverrides || {}), [targetDate]: { sortOrder: otherSortOrders[i.id] } };
+              return { ...i, dateOverrides: newDateOverrides };
+            } else if (i.scheduledDate === targetDate && i.scheduledSlot === targetSlot) {
+              return { ...i, sortOrder: otherSortOrders[i.id] };
+            }
+          }
+
+          return i;
+        }));
+
+        // Trigger drop feedback animation for the moved item
+        setJustDroppedItemId(item.id);
+        setTimeout(() => setJustDroppedItemId(null), 600);
+      };
+
+      const navigateDays = (numDays) => {
+        const newBase = new Date(viewBase);
+        newBase.setDate(newBase.getDate() + numDays);
+        if (newBase >= minDate && newBase <= maxDate) {
+          setViewBase(newBase);
+        }
+      };
+
+      const goToToday = () => setViewBase(REAL_TODAY);
+
+      const expandAll = () => {
+        const allExpanded = {};
+        const allGroupsExp = {};
+        categories.forEach(c => {
+          allExpanded[c.id] = true;
+          allGroupsExp[c.id] = { backlog: true, scheduled: true, done: true };
+        });
+        setExpanded(allExpanded);
+        setCategoryGroupsExp(allGroupsExp);
+      };
+
+      const collapseAll = () => {
+        const allGroupsExp = {};
+        categories.forEach(c => {
+          allGroupsExp[c.id] = { backlog: false, scheduled: false, done: false };
+        });
+        setExpanded({});
+        setCategoryGroupsExp(allGroupsExp);
+      };
+
+      const clearDone = () => {
+        // Hide completed items from sidebar only (calendar Hecho sections are not affected)
+        setItems(p => p.map(i => i.completed ? { ...i, hiddenFromSidebar: true } : i));
+      };
+
+      return (
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              {/* Calendar header */}
+              <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
+                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>📅 <span style={{ fontSize: '9px' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</span></button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button onClick={() => navigateDays(-12)} className="btn">««</button>
+                  <button onClick={() => navigateDays(-1)} className="btn">«</button>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button onClick={() => navigateDays(1)} className="btn">»</button>
+                  <button onClick={() => navigateDays(12)} className="btn">»»</button>
+                </div>
+                <button onClick={goToToday} className="btn">Hoy</button>
+                <div style={{ flex: 1 }} />
+                <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} className="btn">{theme === 'light' ? '🌙' : '☀️'}</button>
+              </div>
+              <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
+                {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
+              </div>
+              <div style={{ display: 'flex', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)' }}>
+                <div style={{ padding: '8px 10px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px', minWidth: '90px' }}>
+                  <button onClick={handleShuffle} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', margin: '-4px -8px' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onMouseOut={(e) => e.currentTarget.style.background = 'none'}>
+                    <span style={{ fontSize: '14px' }}>🎲</span>
+                    <span style={{ fontWeight: '600', color: 'var(--text-secondary)', fontSize: '11px' }}>Backlogs</span>
+                  </button>
+                </div>
+                <div className="hide-scrollbar" style={{ flex: 1, display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 12px', alignItems: 'center' }}>
+                  {shuffledBacklog.slice(0, 12).map(item => <div key={item.id} style={{ flex: `0 0 ${DAY_WIDTH}px` }}><ItemCard item={item} categories={categories} onComplete={handleComplete} onEdit={handleEdit} justDroppedItemId={justDroppedItemId} /></div>)}
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '44px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button onClick={clearDone} className="btn" style={{ fontSize: '8px' }}>Limpiar hechos</button>
+                  <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ fontWeight: '700', opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+                </div>
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {categories.map(cat => (
+                  <div key={cat.id}
+                    onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
+                    onDragLeave={() => setDragOverCat(null)}
+                    onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}>
+                    <CategorySection category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} expanded={expanded[cat.id] || false} dragOverCat={dragOverCat}
+                      onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} groupsExpandedState={groupsExpandedState} justDroppedItemId={justDroppedItemId}
+                      groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
+                      onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
+          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onClose={() => setEditPopover(null)} targetRect={editPopover.rect} />}
+          {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
+          {recurringEditPopover && <RecurringActionPopover
+            item={recurringEditPopover.item}
+            originalDate={recurringEditPopover.originalDate}
+            visualDate={recurringEditPopover.visualDate}
+            targetDate={recurringEditPopover.targetDate}
+            targetSlot={recurringEditPopover.targetSlot}
+            action={recurringEditPopover.action}
+            targetRect={recurringEditPopover.rect}
+            pendingItemId={recurringEditPopover.pendingItemId}
+            onConfirm={handleRecurringAction}
+            onCancel={() => { setRecurringEditPopover(null); setPendingRecurringDrop(null); }}
+          />}
+          {recurringSavePopover && <RecurringSavePopover
+            itemTitle={recurringSavePopover.cleanData.title}
+            targetRect={recurringSavePopover.rect}
+            onThis={handleRecurringSaveThis}
+            onFollowing={handleRecurringSaveFollowing}
+            onCancel={() => { setRecurringSavePopover(null); setEditPopover(null); }}
+          />}
+          {toast && <Toast message={toast.message} onUndo={handleUndoDelete} onClose={() => setToast(null)} />}
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
