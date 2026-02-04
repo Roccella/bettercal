@@ -42,6 +42,7 @@ Actualmente el prototipo usa CDN para:
 - **Calendario**: Vista de 12 días con scroll horizontal (columnas de 200px)
 - **Sidebar derecha**: Categorías (300px de ancho) con grupos Backlog, Hacer y Hecho (en ese orden)
 - **Ancho sidebar**: SIDEBAR_WIDTH = 300px (fijo tanto en vista calendario como en modo ampliado)
+- **Borde de domingo**: Línea vertical de 10px en color gris desaturado para separar semanas
 
 ### Modo Ampliado de Categorías (Desktop)
 - Botón "Ampliar" en el header del sidebar de categorías
@@ -53,19 +54,21 @@ Actualmente el prototipo usa CDN para:
 
 ### Slots del Calendario
 Cada día tiene 3 slots:
-- `important` (Importante) - tareas prioritarias del día, label en color rojo
+- `important` (Importante) - tareas prioritarias del día, label en color rojo (#EF4444)
 - `todo` (Pendiente) - tareas pendientes, permite click en zona vacía para crear items
 - `done` (Hecho) - altura fija de 145px
 
 ### Sistema de Energía
-- 3 niveles por día: 1 (baja ❤️‍🩹), 2 (media ❤️), 3 (alta ❤️‍🔥)
+- 3 niveles por día: 1 (baja 🪦), 2 (media 😎), 3 (alta 🔥)
 - Default: 2 (media) para todos los días
-- Capacidad máxima por energía: baja=30, media=60, alta=90
+- Capacidad máxima por energía: baja=4, media=7, alta=10 (para barra de esfuerzo del día)
+- Botones de energía sin fondo, solo emoji con opacidad (activo=100%, inactivo=30% + grayscale)
 
 ### Sistema de Esfuerzo
-- 4 niveles: 0 (ninguno), 3 (Low), 6 (Mid), 9 (High)
-- Botones en UI muestran: 0, Low, Mid, High
+- 4 niveles: 0 (ninguno), 1 (Low), 2 (Mid), 3 (High)
+- Botones en UI muestran: 0, 1, 2, 3
 - Colores: gris (#94A3B8), verde (#22C55E), naranja (#F59E0B), rojo (#EF4444)
+- Barra de esfuerzo en items con marginTop: 8px
 
 ## Modelo de Datos
 
@@ -76,9 +79,9 @@ Cada día tiene 3 slots:
   title: string,
   description: string,
   category: string,
-  effort: number (0, 3, 6, 9),
+  effort: number (0, 1, 2, 3),
   scheduledDate: string | null (YYYY-MM-DD),
-  scheduledSlot: string | null,
+  scheduledSlot: 'important' | 'todo' | null,
   sortOrder: number,
   completed: boolean,
   completedDate: string | null,
@@ -124,6 +127,10 @@ Cada día tiene 3 slots:
 #### Mismo día, mismo slot
 - Solo reordena (sin popover)
 
+#### Mismo día, diferente slot (ej: Importante ↔ Pendiente)
+- Aplica automáticamente "Solo este evento" sin mostrar popover
+- Permite mover recurrentes entre Importante y Pendiente sin confirmación
+
 #### Mismo día, slot Hecho
 - Aplica automáticamente "Solo este evento"
 - No muestra popover de opciones
@@ -136,7 +143,7 @@ Al soltar el item:
 4. Si se cancela, el item vuelve a su posición original
 
 Muestra popover con 2 opciones:
-1. **Solo este evento**: Marca instancia como `deleted` en la serie y crea un item independiente (sin recurrencia) en la fecha/slot destino
+1. **Solo este evento**: Marca instancia como `deleted` en la serie y crea un item independiente (sin recurrencia) en la fecha/slot destino. Texto: "Crea una copia en el backlog"
 2. **Este y siguientes**: Termina serie original, crea nueva serie desde fecha destino
    - Para items tipo `weekdays`: Muestra selector de días, botón "Aplicar" deshabilitado hasta que se modifiquen los días
    - Para otros tipos (`days`, `weeks`): Muestra input de frecuencia con el valor actual, botón "Aplicar" siempre habilitado (permite mover manteniendo la misma frecuencia)
@@ -155,7 +162,7 @@ El dragData incluye:
 ### Completar Items
 Los items se pueden marcar como completados de dos formas:
 1. Arrastrándolos al slot "Hecho" (en el calendario o en categorías)
-2. Usando el botón verde "Marcar como hecho" en el popover de edición
+2. Usando el botón verde "Marcar como hecho" en el popover de edición (debajo de los botones principales)
 
 Para items recurrentes, completar crea una excepción `completed` para esa instancia específica.
 
@@ -163,7 +170,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 
 ### ItemCard
 - Muestra título, metadata y barra de esfuerzo (sin checkbox)
-- Estructura de 2 contenedores: izquierda (título+meta), derecha (effort bar)
+- Estructura de 2 contenedores: izquierda (título+meta), derecha (effort bar con marginTop: 8px)
 - Props: `item`, `categories`, `onEdit`, `inSidebar`, `isToday`, `isPast`, `showDate`
 - Atributo `data-item-id` para localizar el elemento en el DOM (usado por RecurringActionPopover)
 - Sin checkboxes - los items se completan arrastrándolos al slot "Hecho"
@@ -172,18 +179,19 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - Contenedor de items para un slot específico
 - Maneja drag & drop y creación de nuevos items
 - Botón "+" para agregar items
+- Prop `allowClickToAdd` para permitir click en zona vacía (solo en slot Pendiente)
 
 ### SidebarGroup
-- Grupo colapsable en sidebar (Backlog, Agendado, Hecho)
+- Grupo colapsable en sidebar (Backlog, Hacer, Hecho)
 - Maneja drag & drop entre grupos
 
 ### CategorySection
 - Sección de categoría en sidebar
-- Contiene los 3 grupos en orden: Backlog, Agendado, Hecho
+- Contiene los 3 grupos en orden: Backlog, Hacer, Hecho
 - Recibe `groupsExp` y `onGroupToggle` props para estado de expansión persistente
 
 ### Popovers
-- `AddEditItemPopover`: Crear/editar items (incluye selector de fecha, esfuerzo, recurrencia). Tiene botones: 🗑 (si editando), ✕ (cancelar), Guardar/Agregar. Si es edición y el item no está completado, muestra botón verde "Marcar como hecho" debajo
+- `AddEditItemPopover`: Crear/editar items (incluye selector de fecha, esfuerzo, recurrencia). Tiene botones: 🗑 (SVG, si editando), ✕ (cancelar), Guardar/Agregar. Si es edición y el item no está completado, muestra botón verde "Marcar como hecho" DEBAJO de los botones principales
 - `EditCategoryPopover`: Crear/editar categorías (con alerta de descartar cambios)
 - `RecurringActionPopover`: Opciones al mover items recurrentes
 - `RemoveDatePopover`: Confirmación al mover item agendado/recurrente a backlog
@@ -200,9 +208,8 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - `--bg-card-future`: Items futuros
 
 ### Otros
-- `--checkbox-bg`: Fondo del checkbox
 - `--effort-bg-today`: Fondo de barra de esfuerzo en items de hoy
-- `--accent-green`: Checkbox completado
+- `--accent-green`: Items completados, botón "Marcar como hecho"
 - `--accent-blue`: Indicadores de recurrencia
 
 ## Funciones Clave
@@ -236,6 +243,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 ### Barras de Esfuerzo
 - Colores más oscuros para items de hoy
 - Fondo más oscuro (`--effort-bg-today`) para contraste en tarjetas blancas
+- marginTop: 8px en items, marginTop: -1px en header del día
 
 ### Alertas de Descartar
 - Items: Muestra si hay cambios desde estado inicial
@@ -244,9 +252,12 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 
 ### Popover de Edición de Items
 - **Selector de fecha**: MiniCalendar con opción "Sin fecha (Backlog)"
+- **Selector de prioridad**: Dropdown con "Importante" y "Pendiente" (reemplaza el antiguo selector de horario)
 - **Alerta de recurrencia**: Muestra aviso cuando se quita fecha a un item recurrente
 - **Detección de cambios**: Incluye título, descripción, categoría, esfuerzo, fecha, tipo de repetición, frecuencia y días de semana
 - **Botón X de cancelar**: En desktop y mobile, entre trash y guardar
+- **Botón "Marcar como hecho"**: Verde, debajo de los botones principales (solo en edición de items no completados)
+- **Ícono de trash**: SVG 2D (no emoji)
 
 ### Flujos de Quitar Fecha/Recurrencia
 1. **Drag & drop a Backlog**: Muestra `RemoveDatePopover` con mensaje apropiado (fecha o recurrencia)
@@ -285,7 +296,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
   - Centro: Tabs 📅/📁 centrados respecto a la ventana (usando CSS grid)
   - Derecha: Botón "+" primary para agregar items
 - **BottomSheet a pantalla completa**: Editor de items que ocupa toda la pantalla (reemplaza el bottom sheet parcial)
-- **Botón + según vista**: En calendario crea item en el slot "To do" del día actual, en categorías crea en backlog
+- **Botón + según vista**: En calendario crea item en el slot "Pendiente" del día actual, en categorías crea en backlog
 - **Header de categorías**: Solo visible en vista categorías, con "Limpiar hechos" y botón "+" para nueva categoría
 
 ### Interacción Touch en Items (Mobile)
@@ -298,13 +309,13 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 ### Alineamiento Visual Mobile
 - Todos los elementos están alineados a 12px del borde izquierdo:
   - Header del día (Lun 2)
-  - Label del slot (To do)
+  - Label del slot (Importante/Pendiente)
   - Items dentro de slots
   - Sección Hecho
 
 ### Componentes Mobile
-- `MobileDayColumn`: Renderiza un día completo (header con padding 14px + slot "To do" + done)
-- `BottomSheet`: Editor de items a pantalla completa con botones: 🗑 (si editando), ✕ (cancelar), Guardar/Agregar
+- `MobileDayColumn`: Renderiza un día completo (header con padding 14px + slots Importante/Pendiente + done)
+- `BottomSheet`: Editor de items a pantalla completa con botones: 🗑 (SVG, si editando), ✕ (cancelar), Guardar/Agregar. Botón "Marcar como hecho" debajo.
 - `MobileFooter`: Barra inferior con selector de mes, tabs y botón agregar
 
 ### Estados Mobile
@@ -344,9 +355,9 @@ Clases CSS para mantener consistencia visual:
   - Ejemplo: `<button className="btn btn-icon"><span>+</span></button>`
 
 - **Botones de emoji** (ej: energía 🪦😎🔥, tema 🌙☀️):
-  - Usan clase `.btn` con ancho fijo `width: 18px` y `padding: 1px 0`
-  - Requieren `<span>` interno con `position: relative`, `top: -1px`, `left: 2px` para centrar el emoji
+  - Sin fondo (`background: none`), solo emoji
+  - `font-size: 0.875rem`, `opacity` y `filter: grayscale` para estado inactivo
 
 - **`.btn-primary`**: Variante azul para acciones principales
 - **`.btn-danger`**: Variante roja para acciones destructivas
-- **`.btn-icon-danger`**: Botón de ícono rojo (ej: trash icon en popovers)
+- **`.btn-icon-danger`**: Botón de ícono rojo con SVG (ej: trash icon en popovers)
