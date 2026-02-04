@@ -1682,7 +1682,7 @@
             setCanDrag(true);
             // Vibrate if supported to indicate drag is enabled
             if (navigator.vibrate) navigator.vibrate(50);
-          }, 50); // 50ms long press
+          }, 30); // 30ms long press
         }
       };
 
@@ -1791,6 +1791,10 @@
             if (isMobileDevice && !canDrag) { e.preventDefault(); return; }
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('itemData', dragData);
+            // Hide the default drag ghost image
+            const emptyImg = new Image();
+            emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            e.dataTransfer.setDragImage(emptyImg, 0, 0);
             setDragging(true);
             mouseDownPos.current = null;
           }}
