@@ -292,19 +292,22 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 ### Características Mobile
 - **Swipe navegación**: Scroll horizontal nativo con CSS `scroll-snap-type: x mandatory`. Permite ver parcialmente el día siguiente/anterior mientras se arrastra, con snap al soltar.
 - **Footer con 3 secciones**:
-  - Izquierda: Selector de mes (solo mes, sin año) + botón "Hoy" (si no es hoy)
+  - Izquierda: Selector de mes (solo mes, sin año) + botón "Hoy" (solo en vista categorías)
   - Centro: Tabs 📅/📁 centrados respecto a la ventana (usando CSS grid)
   - Derecha: Botón "+" primary para agregar items
-- **BottomSheet a pantalla completa**: Editor de items que ocupa toda la pantalla (reemplaza el bottom sheet parcial)
+- **BottomSheet a pantalla completa**: Editor de items que ocupa toda la pantalla con botón X para cerrar arriba a la derecha
 - **Botón + según vista**: En calendario crea item en el slot "Pendiente" del día actual, en categorías crea en backlog
-- **Header de categorías**: Solo visible en vista categorías, con "Limpiar hechos" y botón "+" para nueva categoría
+- **Header de categorías**: Dentro del panel de categorías (no afuera), con "Limpiar hechos" y botón "+" para nueva categoría
+- **Transición entre vistas**: Animación slide horizontal (0.3s ease-out) entre calendario y categorías usando CSS transform
 
 ### Interacción Touch en Items (Mobile)
-- **Long-press para drag**: Los items requieren mantener presionado ~200ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
+- **Long-press para drag**: Los items requieren mantener presionado ~30ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
 - **Vibración feedback**: Al activarse el drag después del long-press, el dispositivo vibra brevemente (si soporta `navigator.vibrate`).
 - **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
-- **touch-action: pan-x**: Los items permiten scroll horizontal nativo mientras se tocan.
+- **touch-action: manipulation**: Los items permiten scroll en ambas direcciones (vertical y horizontal).
+- **Drag ghost oculto**: Se usa `setDragImage` con imagen transparente para ocultar la copia fantasma durante el drag.
 - **Prevención de interacción post-cierre**: `lastPopoverCloseTime` evita que al cerrar el BottomSheet se active un item debajo
+- **Sin selección de texto**: CSS global `user-select: none` y `-webkit-touch-callout: none` previenen selección de texto en toda la app
 
 ### Alineamiento Visual Mobile
 - Todos los elementos están alineados a 12px del borde izquierdo:
@@ -314,8 +317,8 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
   - Sección Hecho
 
 ### Componentes Mobile
-- `MobileDayColumn`: Renderiza un día completo (header con padding 14px + slots Importante/Pendiente + done)
-- `BottomSheet`: Editor de items a pantalla completa con botones: 🗑 (SVG, si editando), ✕ (cancelar), Guardar/Agregar. Botón "Marcar como hecho" debajo.
+- `MobileDayColumn`: Renderiza un día completo (header con padding 14px + slots Importante/Pendiente + done). Recibe props `onDrop`, `onAdd`, `onDelete` para drag & drop funcional.
+- `BottomSheet`: Editor de items a pantalla completa con botón X arriba a la derecha para cerrar, botones: 🗑 (SVG, si editando), ✕ (cancelar), Guardar/Agregar. Botón "Marcar como hecho" debajo.
 - `MobileFooter`: Barra inferior con selector de mes, tabs y botón agregar
 
 ### Estados Mobile
@@ -331,6 +334,8 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - `.mobile-footer`: Footer fijo con grid de 3 columnas (1fr auto 1fr) para centrar tabs
 - `.mobile-tab-btn`: Botones de tabs con estilo similar a energía (activo=opacidad 100%, inactivo=35% + grayscale)
 - `.bottom-sheet`: Panel a pantalla completa con flexbox column y safe-area-inset
+- `.mobile-views-container`: Container 200% ancho con ambas vistas lado a lado, transición con transform
+- `.mobile-view-panel`: Cada panel (calendario/categorías) ocupa 50% del container
 - Slots en mobile tienen padding lateral 12px via CSS específico
 
 ### Tipografía Responsive
