@@ -9,6 +9,7 @@
   - Agregar funcionalidades nuevas completas
   - Refactors que afectan múltiples componentes
   - El mensaje del commit debe describir el cambio principal realizado
+- **🔓 PERMISOS DE EDICIÓN**: No pedir permisos para modificar archivos ya existentes en el directorio del proyecto. Proceder directamente con las ediciones solicitadas.
 
 ## Repositorio
 - **GitHub**: https://github.com/Roccella/bettercal (privado)

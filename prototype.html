@@ -430,8 +430,8 @@
     const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-    // Day width is base unit (50% more than before: 175 * 1.5 = 262), sidebar is 1.2x
-    const DAY_WIDTH = 200;
+    // Day width is base unit, sidebar is 1.2x
+    const DAY_WIDTH = 220;
     const SIDEBAR_WIDTH = 300;
 
     const initialCategories = [
@@ -827,7 +827,7 @@
             background: 'none',
             border: 'none',
             padding: '0',
-            fontSize: '0.875rem',
+            fontSize: '0.7rem',
             cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
@@ -1746,7 +1746,7 @@
             setTimeout(() => setJustGrabbed(false), 300);
             // Vibrate if supported to indicate drag is enabled
             if (navigator.vibrate) navigator.vibrate(50);
-          }, 5); // 5ms long press
+          }, 150); // 150ms long press - needs to match Safari's drag activation time
         }
       };
 
@@ -2986,10 +2986,10 @@
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '0' }}>
               {['🪦', '😎', '🔥'].map((emoji, i) => (
                 <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
-                  style={{ background: 'none', border: 'none', fontSize: '1rem', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer' }}>
+                  style={{ background: 'none', border: 'none', fontSize: '1rem', padding: '8px 12px', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer', touchAction: 'manipulation' }}>
                   {emoji}
                 </button>
               ))}
