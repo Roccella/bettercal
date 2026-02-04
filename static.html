@@ -443,7 +443,7 @@
 
     // Column widths - both calendar and category columns are same width
     const DAY_WIDTH = 200;
-    const CATEGORY_WIDTH = 200;
+    const CATEGORY_WIDTH = 240;
 
     const initialCategories = [
       { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
@@ -2092,11 +2092,11 @@
         return 'var(--bg-card-future)';
       };
 
-      // Text color: important=red, completed=muted, recurring=blue, past=past, else normal
+      // Text color: important=red, completed=muted, recurring=yellow, past=past, else normal
       const getTextColor = () => {
         if (item.completed) return 'var(--text-muted)';
         if (item.isImportant) return 'var(--accent-red)';
-        if (item.repeat) return 'var(--accent-blue)';
+        if (item.repeat) return 'var(--accent-yellow)';
         if (isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -2175,19 +2175,20 @@
             }}>
               {/* Important button - visible on hover */}
               {onToggleImportant && (
-                <button
+                <div
+                  data-important-btn="true"
                   onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
                   style={{
-                    background: 'transparent',
-                    border: 'none',
+                    width: '14px',
+                    height: '14px',
                     cursor: 'pointer',
-                    padding: '2px',
-                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-muted)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     opacity: isHovered || item.isImportant ? 1 : 0,
                     transition: 'opacity 0.1s',
+                    flexShrink: 0,
+                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-muted)',
                   }}
                   title={item.isImportant ? "Quitar importante" : "Marcar importante"}
                 >
@@ -2196,7 +2197,7 @@
                     <line x1="12" y1="8" x2="12" y2="12"/>
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                   </svg>
-                </button>
+                </div>
               )}
               {/* Checkbox - visible on hover */}
               <div
@@ -2218,7 +2219,7 @@
                 }}
               >
                 {item.completed && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 )}
@@ -2627,7 +2628,7 @@
                   ref={item._isNewItem ? newItemRef : null}
                   data-day-item="true"
                   onDragOver={(e) => handleItemDragOver(e, index)}
-                  style={{ marginBottom: '2px' }}
+                  style={{ marginBottom: '0' }}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
@@ -3381,7 +3382,7 @@
                 key={item.id}
                 data-backlog-item="true"
                 onDragOver={(e) => handleItemDragOver(e, index)}
-                style={{ marginBottom: '2px' }}
+                style={{ marginBottom: '0' }}
               >
                 <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} />
                 <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
@@ -3768,7 +3769,7 @@
               fontWeight: '500',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              marginBottom: '2px',
+              marginBottom: '0',
             }}>
               {formatDayNumber(day.date)} {getShortMonthName(day.date)} {day.date.getFullYear()}
             </div>
@@ -3790,7 +3791,7 @@
                 key={item.id}
                 data-mobile-item="true"
                 onDragOver={(e) => handleItemDragOver(e, index)}
-                style={{ marginBottom: '2px' }}
+                style={{ marginBottom: '0' }}
               >
                 <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
                 <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
@@ -5211,7 +5212,7 @@
                           {/* Items list */}
                           <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
                             {backlogItems.map((item) => (
-                              <div key={item.id} style={{ marginBottom: '2px' }}>
+                              <div key={item.id} style={{ marginBottom: '0' }}>
                                 <ItemCard
                                   item={item}
                                   categories={categories}
@@ -5351,8 +5352,8 @@
       // ===== DESKTOP LAYOUT - Two rows: Calendar top, Categories bottom =====
       return (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
-          {/* Row 1: Calendar with header */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
+          {/* Row 1: Calendar with header - 60% height */}
+          <div style={{ flex: '0 0 60%', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
             {/* Calendar header */}
             <div style={{ padding: '8px 10px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
               <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-button)' }}>
@@ -5383,8 +5384,8 @@
             </div>
           </div>
 
-          {/* Row 2: Categories - horizontal scroll */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-header)' }}>
+          {/* Row 2: Categories - horizontal scroll - 40% height */}
+          <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-header)' }}>
             <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
               {categories.map(cat => (
                 <div key={cat.id}
