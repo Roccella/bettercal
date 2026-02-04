@@ -31,6 +31,7 @@
       --accent-blue: #3B7DD8;
       --accent-green: #2D9469;
       --accent-red: #DC2626;
+      --accent-yellow: #D97706;
       --today-bg: #EBF4FF;
       --today-header: #D6E8FC;
       --done-bg: #E8F8F0;
@@ -65,6 +66,7 @@
       --accent-blue: #5a9cf5;
       --accent-green: #5cb88a;
       --accent-red: #e87777;
+      --accent-yellow: #F59E0B;
       --today-bg: #0d1520;
       --today-header: #152030;
       --done-bg: #0f1f18;
@@ -329,7 +331,7 @@
     /* Mobile Footer */
     .mobile-footer {
       display: none;
-      background: var(--bg-primary);
+      background: var(--bg-header);
       border-top: 1px solid var(--border-color);
       padding: 0 12px;
       padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
@@ -457,15 +459,19 @@
 
     const initialItems = [
       // AI agents
-      { id: 1, title: 'Armar prototipo nuevo', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 1, title: 'Armar prototipo nuevo', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '', isImportant: true, sortOrder: -10 },
       { id: 2, title: 'Mejorar prompts de código', category: 'ai', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 3, title: 'Probar Kimi K2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: true, repeat: null, description: '' },
-      { id: 9, title: 'Revisar código OpenClaw', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 9, title: 'Revisar código OpenClaw', category: 'ai', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '', isImportant: true, sortOrder: -9 },
       { id: 110, title: 'Leer artículo RL', category: 'ai', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 111, title: 'Testear Claude 4', category: 'ai', effort: 2, scheduledDate: '2026-02-05', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 112, title: 'Documentar agentes', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 200, title: 'Investigar MCP', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
       { id: 201, title: 'Probar Gemini 2.5', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-17', isArchived: false, repeat: null, description: '' },
+      { id: 400, title: 'Leer paper LLM routing', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 401, title: 'Configurar RAG local', category: 'ai', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 402, title: 'Benchmarks de velocidad', category: 'ai', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 403, title: 'Fine-tuning experimento', category: 'ai', effort: 3, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-05', isArchived: false, repeat: null, description: '' },
 
       // Trabajo
       { id: 10, title: 'Comprar verduras', category: 'work', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-31', isArchived: false, repeat: null, description: '' },
@@ -479,12 +485,19 @@
       { id: 115, title: 'Actualizar CV', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 202, title: 'Revisar contratos', category: 'work', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
       { id: 203, title: 'Organizar archivos', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-14', isArchived: false, repeat: null, description: '' },
+      { id: 404, title: 'Preparar agenda semanal', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 405, title: 'Escribir informe mensual', category: 'work', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 406, title: 'Contactar proveedores', category: 'work', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 407, title: 'Revisar presupuesto Q2', category: 'work', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-06', isArchived: false, repeat: null, description: '' },
 
       // Salud
       { id: 107, title: 'Vitaminas', category: 'health', effort: 0, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'vitaminas', description: '' },
       { id: 116, title: 'Turno dentista', category: 'health', effort: 1, scheduledDate: '2026-02-06', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 117, title: 'Comprar medicamentos', category: 'health', effort: 1, scheduledDate: '2026-02-09', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
       { id: 204, title: 'Chequeo anual', category: 'health', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 424, title: 'Renovar receta', category: 'health', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 425, title: 'Pedir turno oftalmólogo', category: 'health', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-06', isArchived: false, repeat: null, description: '' },
+      { id: 426, title: 'Análisis de sangre', category: 'health', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-04', isArchived: false, repeat: null, description: '' },
 
       // Social
       { id: 7, title: 'Llamar a mamá', category: 'social', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
@@ -492,6 +505,9 @@
       { id: 118, title: 'Cumpleaños Pablo', category: 'social', effort: 1, scheduledDate: '2026-02-07', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 119, title: 'Cena con amigos', category: 'social', effort: 1, scheduledDate: '2026-02-10', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 205, title: 'Visitar abuelos', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      { id: 427, title: 'Escribir a Juan', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+      { id: 428, title: 'Planear viaje grupal', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 429, title: 'Responder mensajes pendientes', category: 'social', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
 
       // Música
       { id: 132, title: 'Practicar teclado', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-02-02', isArchived: false, repeat: { type: 'days', every: 3, startDate: '2026-02-02' }, description: '' },
@@ -499,6 +515,10 @@
       { id: 131, title: 'Escuchar álbum nuevo', category: 'music', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 206, title: 'Comprar cuerdas', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
       { id: 207, title: 'Aprender canción nueva', category: 'music', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+      { id: 408, title: 'Grabar demo', category: 'music', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 409, title: 'Afinar piano', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 410, title: 'Ver tutorial acordes jazz', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 411, title: 'Organizar partituras', category: 'music', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-06', isArchived: false, repeat: null, description: '' },
 
       // Entretenimiento
       { id: 4, title: 'Ver Severance S2', category: 'entertainment', effort: 1, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
@@ -508,6 +528,10 @@
       { id: 121, title: 'Ver película', category: 'entertainment', effort: 1, scheduledDate: '2026-02-08', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
       { id: 208, title: 'Terminar serie', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
       { id: 209, title: 'Probar juego nuevo', category: 'entertainment', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 412, title: 'Ver documental naturaleza', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-06', isArchived: false, repeat: null, description: '' },
+      { id: 413, title: 'Escuchar podcast historia', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-04', isArchived: false, repeat: null, description: '' },
+      { id: 414, title: 'Empezar libro nuevo', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-02', isArchived: false, repeat: null, description: '' },
+      { id: 415, title: 'Ir al cine', category: 'entertainment', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2025-12-28', isArchived: false, repeat: null, description: '' },
 
       // Hogar
       { id: 106, title: 'Regar plantas', category: 'home', effort: 0, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [0, 3] }, repeatBaseId: 'plantas', description: '' },
@@ -517,6 +541,10 @@
       { id: 125, title: 'Ordenar armario', category: 'home', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 210, title: 'Arreglar grifo', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
       { id: 211, title: 'Cambiar focos', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 416, title: 'Limpiar ventanas', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
+      { id: 417, title: 'Organizar garage', category: 'home', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-06', isArchived: false, repeat: null, description: '' },
+      { id: 418, title: 'Llamar plomero', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-04', isArchived: false, repeat: null, description: '' },
+      { id: 419, title: 'Comprar plantas nuevas', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-02', isArchived: false, repeat: null, description: '' },
 
       // Fitness
       { id: 101, title: 'Gym abajo', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-01', isArchived: false, repeat: { type: 'weekdays', days: [1, 4] }, repeatBaseId: 'gym-abajo', description: '' },
@@ -525,6 +553,10 @@
       { id: 127, title: 'Correr 5km', category: 'fitness', effort: 2, scheduledDate: '2026-02-10', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 212, title: 'Yoga', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
       { id: 213, title: 'Nadar', category: 'fitness', effort: 2, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-18', isArchived: false, repeat: null, description: '' },
+      { id: 420, title: 'Comprar proteína', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-15', isArchived: false, repeat: null, description: '' },
+      { id: 421, title: 'Nuevo plan entrenamiento', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-12', isArchived: false, repeat: null, description: '' },
+      { id: 422, title: 'Estiramientos mañana', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-10', isArchived: false, repeat: null, description: '' },
+      { id: 423, title: 'Comprar zapatillas nuevas', category: 'fitness', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-08', isArchived: false, repeat: null, description: '' },
 
       // Previous week items (Jan 27 - Feb 1)
       { id: 300, title: 'Reunión equipo', category: 'work', effort: 1, scheduledDate: '2026-01-28', scheduledSlot: 'todo', completed: true, completedDate: '2026-01-28', createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
@@ -534,8 +566,9 @@
       { id: 304, title: 'Comprar regalo', category: 'social', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'todo', completed: true, completedDate: '2026-02-01', createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
       { id: 305, title: 'Backup laptop', category: 'work', effort: 1, scheduledDate: '2026-02-01', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
 
-      // Additional backlog items
-      { id: 310, title: 'asdsad', category: 'home', effort: 1, scheduledDate: null, scheduledSlot: null, completed: false, completedDate: null, createdAt: '2026-01-20', isArchived: false, repeat: null, description: '' },
+      // Additional scheduled items
+      { id: 430, title: 'Reunión proyecto X', category: 'work', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 431, title: 'Entregar informe', category: 'work', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
     ];
 
     const initialDayEnergy = { '2026-02-02': 2, '2026-02-03': 3, '2026-02-04': 2, '2026-02-05': 1, '2026-02-06': 2, '2026-02-07': 3, '2026-02-08': 2, '2026-02-09': 2 };
@@ -1379,6 +1412,9 @@
         categories.filter(c => !c.isFixed).map(c => ({ ...c }))
       );
       const [draggedIndex, setDraggedIndex] = useState(null);
+      const [colorPickerIndex, setColorPickerIndex] = useState(null);
+      const newCatInputRef = useRef(null);
+      const [newCatIndex, setNewCatIndex] = useState(null);
 
       const getItemCount = (catId) => items.filter(i => i.category === catId).length;
 
@@ -1388,6 +1424,7 @@
           updated[index] = { ...updated[index], color: newColor };
           return updated;
         });
+        setColorPickerIndex(null);
       };
 
       const handleNameChange = (index, newName) => {
@@ -1405,7 +1442,16 @@
           color: COLORS[localCategories.length % COLORS.length],
         };
         setLocalCategories(prev => [...prev, newCat]);
+        setNewCatIndex(localCategories.length);
       };
+
+      // Focus new category input after render
+      useEffect(() => {
+        if (newCatIndex !== null && newCatInputRef.current) {
+          newCatInputRef.current.focus();
+          setNewCatIndex(null);
+        }
+      }, [localCategories.length, newCatIndex]);
 
       const handleDeleteCategory = (index) => {
         const cat = localCategories[index];
@@ -1467,12 +1513,17 @@
             maxHeight: '80vh',
             overflow: 'auto',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600' }}>Editar categorías</h3>
-              <button onClick={onClose} className="btn" style={{ padding: '4px 8px' }}>✕</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600' }}>Editar categorías</h3>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  {items.length} items en total
+                </div>
+              </div>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', padding: '0', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>✕</button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px', marginTop: '12px' }}>
               {localCategories.map((cat, index) => (
                 <div
                   key={cat.id}
@@ -1489,42 +1540,63 @@
                     borderRadius: '8px',
                     opacity: draggedIndex === index ? 0.5 : 1,
                     cursor: 'grab',
+                    position: 'relative',
                   }}
                 >
                   {/* Drag handle */}
                   <div style={{ color: 'var(--text-muted)', cursor: 'grab' }}>⋮⋮</div>
 
-                  {/* Color picker */}
-                  <select
-                    value={cat.color}
-                    onChange={(e) => handleColorChange(index, e.target.value)}
+                  {/* Color swatch that opens color popover */}
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setColorPickerIndex(colorPickerIndex === index ? null : index); }}
                     style={{
-                      width: '30px',
-                      height: '30px',
-                      padding: 0,
-                      border: 'none',
+                      width: '24px',
+                      height: '24px',
                       borderRadius: '4px',
                       background: cat.color,
+                      flexShrink: 0,
                       cursor: 'pointer',
-                      appearance: 'none',
                     }}
-                  >
-                    {COLORS.map(c => (
-                      <option key={c} value={c} style={{ background: c }}>{c}</option>
-                    ))}
-                  </select>
+                  />
 
-                  {/* Color swatch that opens color dropdown */}
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '4px',
-                    background: cat.color,
-                    flexShrink: 0,
-                  }} />
+                  {/* Color picker popover */}
+                  {colorPickerIndex === index && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '32px',
+                      marginTop: '4px',
+                      padding: '8px',
+                      background: 'var(--bg-card)',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                      zIndex: 10,
+                      display: 'flex',
+                      gap: '4px',
+                      flexWrap: 'wrap',
+                      width: '140px',
+                    }}>
+                      {COLORS.map(c => (
+                        <button
+                          key={c}
+                          onClick={(e) => { e.stopPropagation(); handleColorChange(index, c); }}
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '4px',
+                            border: cat.color === c ? '2px solid var(--text-primary)' : 'none',
+                            background: c,
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
 
                   {/* Name input */}
                   <input
+                    ref={index === localCategories.length - 1 && newCatIndex === index ? newCatInputRef : null}
                     value={cat.name}
                     onChange={(e) => handleNameChange(index, e.target.value)}
                     placeholder="Nombre..."
@@ -1540,25 +1612,17 @@
                     }}
                   />
 
-                  {/* Delete button */}
-                  <button
-                    onClick={() => handleDeleteCategory(index)}
-                    disabled={getItemCount(cat.id) > 0}
-                    className={getItemCount(cat.id) === 0 ? 'btn-icon-danger' : 'btn'}
-                    style={{ padding: '4px 6px', opacity: getItemCount(cat.id) > 0 ? 0.3 : 1 }}
-                    title={getItemCount(cat.id) > 0 ? `${getItemCount(cat.id)} items` : 'Eliminar'}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                    </svg>
-                  </button>
+                  {/* Item count */}
+                  <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)', minWidth: '20px', textAlign: 'right' }}>
+                    {getItemCount(cat.id)}
+                  </span>
                 </div>
               ))}
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={handleAddCategory} className="btn" style={{ flex: 1, padding: '10px' }}>
-                + Nueva categoría
+                Agregar categoría
               </button>
               <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '10px' }}>
                 Guardar
@@ -1836,6 +1900,27 @@
       );
     };
 
+    const RemoveRecurrenceAlertPopover = ({ itemTitle, onConfirm, onCancel, targetRect }) => {
+      return (
+        <Popover onClose={onCancel} targetRect={targetRect}>
+          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: '500', marginBottom: '4px' }}>¿Quitar recurrencia?</div>
+            <div style={{ color: 'var(--text-muted)' }}>
+              Al mover "{itemTitle}" a esta posición, solo se modificará este evento sin afectar los siguientes.
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={onCancel} className="btn" style={{ flex: 1, padding: '8px' }}>
+              Cancelar
+            </button>
+            <button onClick={onConfirm} className="btn btn-primary" style={{ flex: 1, padding: '8px' }}>
+              Confirmar
+            </button>
+          </div>
+        </Popover>
+      );
+    };
+
     const RecurringSavePopover = ({ itemTitle, onThis, onFollowing, onCancel, targetRect }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
@@ -2007,11 +2092,11 @@
         return 'var(--bg-card-future)';
       };
 
-      // Text color: important=red, completed=muted, recurring=green, past=past, else normal
+      // Text color: important=red, completed=muted, recurring=blue, past=past, else normal
       const getTextColor = () => {
         if (item.completed) return 'var(--text-muted)';
         if (item.isImportant) return 'var(--accent-red)';
-        if (item.repeat) return 'var(--accent-green)';
+        if (item.repeat) return 'var(--accent-blue)';
         if (isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -2069,31 +2154,6 @@
             touchAction: 'manipulation',
           }}
         >
-          {/* Checkbox - visible on hover */}
-          <div
-            data-checkbox="true"
-            onClick={handleCheckboxClick}
-            style={{
-              width: '14px',
-              height: '14px',
-              borderRadius: '3px',
-              border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
-              background: item.completed ? 'var(--accent-green)' : 'transparent',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: isHovered || item.completed ? 1 : 0,
-              transition: 'opacity 0.1s',
-              flexShrink: 0,
-            }}
-          >
-            {item.completed && (
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-          </div>
           {/* Title */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
@@ -2106,36 +2166,14 @@
               textDecoration: item.completed ? 'line-through' : 'none',
             }}>{item.title}{item.repeat ? ' (R)' : ''}</div>
           </div>
-          {/* Hover buttons: Delete and Important */}
+          {/* Hover buttons: Important and Checkbox */}
           {!isMobileDevice && (
             <div style={{
               display: 'flex',
               gap: '4px',
-              opacity: isHovered ? 1 : 0,
-              transition: 'opacity 0.1s',
+              alignItems: 'center',
             }}>
-              {/* Delete button */}
-              {onDelete && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    color: 'var(--text-muted)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  title="Eliminar"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                  </svg>
-                </button>
-              )}
-              {/* Important button */}
+              {/* Important button - visible on hover */}
               {onToggleImportant && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
@@ -2148,6 +2186,8 @@
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    opacity: isHovered || item.isImportant ? 1 : 0,
+                    transition: 'opacity 0.1s',
                   }}
                   title={item.isImportant ? "Quitar importante" : "Marcar importante"}
                 >
@@ -2158,6 +2198,31 @@
                   </svg>
                 </button>
               )}
+              {/* Checkbox - visible on hover */}
+              <div
+                data-checkbox="true"
+                onClick={handleCheckboxClick}
+                style={{
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '3px',
+                  border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
+                  background: item.completed ? 'var(--accent-green)' : 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: isHovered || item.completed ? 1 : 0,
+                  transition: 'opacity 0.1s',
+                  flexShrink: 0,
+                }}
+              >
+                {item.completed && (
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -2387,10 +2452,20 @@
       const isSunday = day.date.getDay() === 0;
 
       // Get all items for this day (both pending and completed, all slots merged)
+      // Sort: recurring first (sorted by sortOrder), then important, then normal (both sorted by sortOrder)
       const dayItems = items.filter(i =>
         (i.scheduledDate === dateStr && !i.completed) ||
         (i.completedDate === dateStr && i.completed)
-      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      ).sort((a, b) => {
+        // Completed items go last
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        // Recurring items go first
+        if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
+        // Important items go before normal items (but after recurring)
+        if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
+        // Within same group, sort by sortOrder
+        return (a.sortOrder || 0) - (b.sortOrder || 0);
+      });
 
       const [dropIndex, setDropIndex] = useState(-1);
       const [newItemId, setNewItemId] = useState(null);
@@ -2522,8 +2597,8 @@
                 minHeight: '44px',
                 cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
               }}>
               <div style={{
                 fontSize: '0.875rem',
@@ -2536,17 +2611,14 @@
               {isToday && (
                 <span style={{
                   fontSize: '0.5rem',
-                  fontWeight: '700',
-                  color: 'white',
-                  background: 'var(--accent-blue)',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
+                  fontWeight: '600',
+                  color: 'var(--accent-blue)',
                 }}>HOY</span>
               )}
             </div>
 
-            {/* Items list */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px' }}>
+            {/* Items list - flex column to allow click area to expand */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
               {/* Drop indicator at top */}
               <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -2562,11 +2634,11 @@
                   <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
                 </div>
               ))}
-              {/* Click area to add at end */}
+              {/* Click area to add at end - takes all remaining space */}
               <div
                 onClick={(e) => handleAddItem(e, true)}
                 style={{
-                  minHeight: '40px',
+                  minHeight: '80px',
                   flex: 1,
                   cursor: 'pointer',
                 }}
@@ -3300,8 +3372,8 @@
             </div>
           </div>
 
-          {/* Items list */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px' }}>
+          {/* Items list - flex column to allow click area to expand */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => (
@@ -3315,11 +3387,11 @@
                 <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
               </div>
             ))}
-            {/* Click area to add at end */}
+            {/* Click area to add at end - takes all remaining space */}
             <div
               onClick={() => handleAddItem(true)}
               style={{
-                minHeight: '40px',
+                minHeight: '80px',
                 flex: 1,
                 cursor: 'pointer',
               }}
@@ -3345,7 +3417,7 @@
     // ============ MOBILE COMPONENTS ============
 
     // BottomSheet for mobile item editing
-    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onComplete, onClose, closing }) => {
+    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onComplete, onToggleImportant, onClose, closing }) => {
       const [title, setTitle] = useState(item?.title || '');
       const [description, setDescription] = useState(item?.description || '');
       const [category, setCategory] = useState(item?.category || 'temp');
@@ -3552,7 +3624,54 @@
               )}
             </div>
 
-            {/* Bottom actions */}
+            {/* Bottom actions - mobile only: important and complete buttons */}
+            {isEditing && (
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '12px', marginBottom: '8px' }}>
+                {/* Important button */}
+                <button
+                  type="button"
+                  onClick={() => { onToggleImportant?.(item.id); onClose(); }}
+                  className="btn"
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-secondary)',
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-red)' : 'none'} stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {item.isImportant ? 'Quitar importante' : 'Importante'}
+                </button>
+                {/* Complete button */}
+                <button
+                  type="button"
+                  onClick={() => { onComplete?.(item.id); onClose(); }}
+                  className="btn"
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    color: item.completed ? 'var(--accent-green)' : 'var(--text-secondary)',
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  {item.completed ? 'Desmarcar' : 'Completar'}
+                </button>
+              </div>
+            )}
+            {/* Delete button */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
             </div>
@@ -3569,10 +3688,20 @@
       const dateStr = formatDate(day.date);
 
       // Get all items for this day (both pending and completed, all slots merged)
+      // Sort: recurring first (sorted by sortOrder), then important, then normal
       const dayItems = items.filter(i =>
         (i.scheduledDate === dateStr && !i.completed) ||
         (i.completedDate === dateStr && i.completed)
-      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      ).sort((a, b) => {
+        // Completed items go last
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        // Recurring items go first
+        if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
+        // Important items go before normal items (but after recurring)
+        if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
+        // Within same group, sort by sortOrder
+        return (a.sortOrder || 0) - (b.sortOrder || 0);
+      });
 
       const [dropIndex, setDropIndex] = useState(-1);
       const columnRef = useRef(null);
@@ -3709,6 +3838,7 @@
       const [recurringEditPopover, setRecurringEditPopover] = useState(null);
       const [recurringSavePopover, setRecurringSavePopover] = useState(null); // For edit property confirmation
       const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
+      const [removeRecurrenceAlert, setRemoveRecurrenceAlert] = useState(null); // Alert when moving recurring to normal zone
       const [toast, setToast] = useState(null);
       const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
@@ -3735,22 +3865,6 @@
       // Mobile scroll ref
       const mobileScrollRef = useRef(null);
       const isScrollingRef = useRef(false);
-      const categoriesScrollRef = useRef(null);
-      const lastScrollY = useRef(0);
-      const [catHeaderVisible, setCatHeaderVisible] = useState(true);
-
-      // Handle categories scroll to show/hide header
-      const handleCategoriesScroll = useCallback((e) => {
-        const currentY = e.target.scrollTop;
-        const isScrollingDown = currentY > lastScrollY.current;
-        // Only hide header after scrolling down a bit (threshold 10px)
-        if (isScrollingDown && currentY > 10) {
-          setCatHeaderVisible(false);
-        } else if (!isScrollingDown) {
-          setCatHeaderVisible(true);
-        }
-        lastScrollY.current = currentY;
-      }, []);
 
       const scrollRef = useRef(null);
       const days = getDaysArray(viewBase);
@@ -4168,8 +4282,38 @@
           console.log('Recurring item check:', { sameDay, sameSlot, effectiveVisualDate, date, originalSlot, slot });
 
           if (sameDay && sameSlot) {
-            // Solo reordenar dentro del mismo slot - no preguntar
-            console.log('Same day, same slot - just reorder');
+            // Solo reordenar dentro del mismo slot
+            console.log('Same day, same slot - checking if moving to normal zone');
+
+            // Get all items for this day (excluding the dragged one)
+            const dayItemsExcludingDragged = allItemsWithRecurring.filter(i => {
+              const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+              if (baseId === numId) return false;
+              return (i.scheduledDate === date && !i.completed);
+            });
+
+            // Count recurring items among the others (they appear first due to sorting)
+            const otherRecurringCount = dayItemsExcludingDragged.filter(i => i.repeat || i.originalId).length;
+
+            // Count non-recurring items
+            const normalItemsCount = dayItemsExcludingDragged.filter(i => !i.repeat && !i.originalId).length;
+
+            // If there are normal items and dropIndex is beyond the recurring zone, show alert
+            // The recurring zone ends at index = otherRecurringCount (0-indexed, so position otherRecurringCount is the first normal position)
+            // We show alert only if moving to normal items zone (where normal items exist)
+            if (normalItemsCount > 0 && dropIndex > otherRecurringCount) {
+              console.log('Moving recurring to normal zone - showing alert', { dropIndex, otherRecurringCount, normalItemsCount });
+              setRemoveRecurrenceAlert({
+                item: originalItem,
+                date,
+                slot,
+                dropIndex,
+                coords,
+              });
+              return;
+            }
+
+            // Otherwise just reorder within recurring zone or append after all items
             performDrop(numId, date, slot, dropIndex);
             return;
           }
@@ -5001,51 +5145,131 @@
                   </div>
                 </div>
 
-                {/* Mobile Categories */}
-                <div className="mobile-view-panel" style={{ background: 'var(--bg-primary)' }}>
-                  {/* Categories Header - inside the panel, collapsible on scroll */}
-                  <div style={{
-                    background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)',
-                    display: 'flex', flexDirection: 'column', flexShrink: 0, touchAction: 'none',
-                    maxHeight: catHeaderVisible ? '200px' : '0px',
-                    overflow: 'hidden',
-                    transition: 'max-height 0.2s ease-out',
-                    opacity: catHeaderVisible ? 1 : 0
-                  }}>
-                    <div style={{ padding: '14px 12px', display: 'flex', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
+                {/* Mobile Categories - horizontal scroll like desktop */}
+                <div className="mobile-view-panel" style={{ background: 'var(--bg-header)', display: 'flex', flexDirection: 'column' }}>
+                  {/* Horizontal scroll container for category columns */}
+                  <div
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      WebkitOverflowScrolling: 'touch',
+                    }}
+                  >
+                    {categories.map(cat => {
+                      const categoryItems = allItemsWithRecurring.filter(i => i.category === cat.id);
+                      const backlogItems = categoryItems.filter(i =>
+                        !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat
+                      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+                      return (
+                        <div
+                          key={cat.id}
+                          style={{
+                            flex: '0 0 200px',
+                            width: '200px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            borderRight: '1px solid var(--border-color)',
+                            height: '100%',
+                            background: 'var(--bg-primary)',
+                          }}
+                        >
+                          {/* Category header */}
+                          <div
+                            onClick={() => {
+                              const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+                              handleSave({
+                                title: '',
+                                description: '',
+                                category: cat.id,
+                                effort: 1,
+                                repeat: null,
+                                scheduledDate: null,
+                                scheduledSlot: null,
+                                completed: false,
+                                completedDate: null,
+                                sortOrder: minSortOrder - 1,
+                                _isNewItem: true,
+                              });
+                            }}
+                            style={{
+                              padding: '8px 12px',
+                              minHeight: '44px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <div style={{ fontSize: '0.875rem', color: cat.color }}>
+                              <span style={{ fontWeight: '700' }}>{cat.name}</span>
+                              <span style={{ fontWeight: '400', opacity: 0.7 }}> ({backlogItems.length})</span>
+                            </div>
+                          </div>
+
+                          {/* Items list */}
+                          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+                            {backlogItems.map((item) => (
+                              <div key={item.id} style={{ marginBottom: '2px' }}>
+                                <ItemCard
+                                  item={item}
+                                  categories={categories}
+                                  onComplete={handleComplete}
+                                  onEdit={handleMobileEdit}
+                                  onDelete={handleDelete}
+                                  onToggleImportant={handleToggleImportant}
+                                  inSidebar={true}
+                                  justDroppedItemId={justDroppedItemId}
+                                />
+                              </div>
+                            ))}
+                            {/* Click area to add at end */}
+                            <div
+                              onClick={() => {
+                                const maxSortOrder = backlogItems.length > 0 ? Math.max(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+                                handleSave({
+                                  title: '',
+                                  description: '',
+                                  category: cat.id,
+                                  effort: 1,
+                                  repeat: null,
+                                  scheduledDate: null,
+                                  scheduledSlot: null,
+                                  completed: false,
+                                  completedDate: null,
+                                  sortOrder: maxSortOrder + 1,
+                                  _isNewItem: true,
+                                });
+                              }}
+                              style={{
+                                minHeight: '80px',
+                                flex: 1,
+                                cursor: 'pointer',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Add category button as column */}
+                    <div
+                      onClick={() => setCategoriesModalOpen(true)}
+                      style={{
+                        flex: '0 0 200px',
+                        width: '200px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRight: '1px solid var(--border-color)',
+                        height: '100%',
+                        background: 'var(--bg-primary)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
                     </div>
-                    <div style={{ padding: '0 12px 10px', display: 'flex', gap: '6px' }}>
-                      <button onClick={(e) => { if (!bottomSheetItem) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ flex: 1, fontSize: '0.5625rem', opacity: bottomSheetItem ? 0.5 : 1, cursor: bottomSheetItem ? 'default' : 'pointer' }}>Agregar categoría</button>
-                      <button onClick={clearDone} className="btn" style={{ flex: 1, fontSize: '0.5625rem' }}>Limpiar hechos</button>
-                    </div>
-                  </div>
-                  <div ref={categoriesScrollRef} onScroll={handleCategoriesScroll} style={{ flex: 1, overflowY: 'auto' }}>
-                    {categories.map(cat => (
-                      <CategorySection
-                        key={cat.id}
-                        category={cat}
-                        items={allItemsWithRecurring}
-                        allItems={items}
-                        categories={categories}
-                        expanded={expanded[cat.id] || false}
-                        dragOverCat={dragOverCat}
-                        onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))}
-                        onComplete={handleComplete}
-                        onEdit={handleMobileEdit}
-                        onAdd={handleSave}
-                        onDrop={handleDropCategory}
-                        onEditCategory={handleEditCategory}
-                        onDelete={handleDelete}
-                        onSidebarGroupDrop={handleSidebarGroupDrop}
-                        groupsExpandedState={groupsExpandedState}
-                        justDroppedItemId={justDroppedItemId}
-                        groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
-                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))}
-                        draggingUnscheduledItem={draggingUnscheduledItem}
-                        onScheduledItemClick={handleScheduledItemClick}
-                      />
-                    ))}
                   </div>
                 </div>
               </div>
@@ -5069,7 +5293,7 @@
                     onClick={() => setMobileViewMode('calendar')}
                     style={{ paddingLeft: '40px' }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                       <line x1="16" y1="2" x2="16" y2="6"/>
                       <line x1="8" y1="2" x2="8" y2="6"/>
@@ -5081,7 +5305,7 @@
                     onClick={() => setMobileViewMode('categories')}
                     style={{ paddingRight: '40px' }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7"/>
                       <rect x="14" y="3" width="7" height="7"/>
                       <rect x="14" y="14" width="7" height="7"/>
@@ -5092,7 +5316,7 @@
 
                 {/* Right: Add button */}
                 <div className="mobile-footer-section right">
-                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.625rem', fontWeight: '700', lineHeight: '1' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+                  <button className="btn" onClick={handleMobileAddClick} style={{ fontSize: '0.625rem', background: 'var(--bg-button)' }}>Agregar</button>
                 </div>
               </div>
             </div>
@@ -5106,6 +5330,7 @@
                 onSave={handleBottomSheetSave}
                 onDelete={handleDelete}
                 onComplete={handleComplete}
+                onToggleImportant={handleToggleImportant}
                 onClose={handleBottomSheetClose}
                 closing={bottomSheetClosing}
               />
@@ -5148,7 +5373,7 @@
                 <button onClick={() => navigateDays(1)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
                 <button onClick={() => navigateDays(12)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
               </div>
-              {!isTodayVisible && <button onClick={goToToday} className="btn btn-primary">Hoy</button>}
+              <button onClick={goToToday} className="btn" style={{ background: isTodayVisible ? 'var(--bg-button)' : 'var(--accent-blue)', color: isTodayVisible ? 'var(--text-secondary)' : '#FFF' }}>Hoy</button>
               <div style={{ flex: 1 }} />
               <button onClick={clearCategoryDone} className="btn" style={{ background: 'var(--bg-button)' }}>Borrar hechos</button>
               <button onClick={() => setCategoriesModalOpen(true)} className="btn" style={{ background: 'var(--bg-button)' }}>Editar categorías</button>
@@ -5159,7 +5384,7 @@
           </div>
 
           {/* Row 2: Categories - horizontal scroll */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-categories)' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-header)' }}>
             <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
               {categories.map(cat => (
                 <div key={cat.id}
@@ -5170,9 +5395,21 @@
                   <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} />
                 </div>
               ))}
-              {/* Add category button */}
-              <div style={{ flex: '0 0 60px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '12px' }}>
-                <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>+</button>
+              {/* Add category button - entire cell is clickable */}
+              <div
+                onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }}
+                style={{
+                  flex: '0 0 60px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: editPopover ? 'default' : 'pointer',
+                  opacity: editPopover ? 0.5 : 1,
+                  borderRight: '1px solid var(--border-color)',
+                  height: '100%',
+                }}
+              >
+                <span style={{ fontSize: '1.25rem', fontWeight: '400', color: 'var(--text-muted)' }}>+</span>
               </div>
             </div>
           </div>
@@ -5199,6 +5436,47 @@
             onThis={handleRecurringSaveThis}
             onFollowing={handleRecurringSaveFollowing}
             onCancel={() => { setRecurringSavePopover(null); setEditPopover(null); }}
+          />}
+          {removeRecurrenceAlert && <RemoveRecurrenceAlertPopover
+            itemTitle={removeRecurrenceAlert.item.title}
+            targetRect={removeRecurrenceAlert.coords ? { left: removeRecurrenceAlert.coords.x, top: removeRecurrenceAlert.coords.y, width: 0, height: 0 } : null}
+            onConfirm={() => {
+              // Create exception that removes recurrence for this date only
+              const { item, date, slot, dropIndex } = removeRecurrenceAlert;
+              setItems(p => p.map(i => {
+                if (i.id === item.id) {
+                  // Add exception to skip this date from recurring
+                  const newExceptions = { ...(i.exceptions || {}), [date]: { skip: true } };
+                  return { ...i, exceptions: newExceptions };
+                }
+                return i;
+              }));
+              // Create new non-recurring item at the drop position
+              const newId = Date.now();
+              const newItem = {
+                id: newId,
+                title: item.title,
+                description: item.description || '',
+                category: item.category,
+                effort: item.effort || 0,
+                scheduledDate: date,
+                scheduledSlot: slot || 'todo',
+                sortOrder: dropIndex || 0,
+                completed: false,
+                completedDate: null,
+                isArchived: false,
+                hiddenFromSidebar: false,
+                isImportant: false,
+                repeat: null,
+                exceptions: null,
+                dateOverrides: null,
+              };
+              setItems(p => [...p, newItem]);
+              // Reorder items to put new item at correct position
+              performDrop(newId, date, slot, dropIndex);
+              setRemoveRecurrenceAlert(null);
+            }}
+            onCancel={() => setRemoveRecurrenceAlert(null)}
           />}
           {toast && <Toast message={toast.message} onUndo={handleUndoDelete} onClose={() => setToast(null)} />}
         </div>
