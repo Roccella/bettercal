@@ -45,12 +45,16 @@
       --bg-secondary: #141414;
       --bg-tertiary: #1a1a1a;
       --bg-app: #0a0a0a;
+      --bg-header: #1a1a1a;
+      --bg-categories: #161616;
       --bg-card: #1e1e1e;
       --bg-card-past: #161616;
       --bg-card-today: #242424;
       --bg-card-future: #1a1a1a;
       --bg-input: #2a2a2a;
       --bg-sidebar: #0f0f0f;
+      --bg-button: #2a2a2a;
+      --bg-button-hover: #333333;
       --text-primary: #e8eaed;
       --text-secondary: #9aa0a6;
       --text-muted: #71767b;
@@ -436,8 +440,8 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Column widths - both calendar and category columns are same width
-    const DAY_WIDTH = 240;
-    const CATEGORY_WIDTH = 240;
+    const DAY_WIDTH = 200;
+    const CATEGORY_WIDTH = 200;
 
     const initialCategories = [
       { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
@@ -1267,16 +1271,6 @@
                 )}
               </div>
 
-              {(scheduledDate || repeatType !== 'none') && (
-                <div style={{ marginBottom: '8px' }}>
-                  <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Prioridad</div>
-                  <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
-                    <option value="important">Importante</option>
-                    <option value="todo">Pendiente</option>
-                  </select>
-                </div>
-              )}
-
               {hadRepeat && userClearedDate && (
                 <div style={{ marginBottom: '8px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
                   Al guardar se eliminará la recurrencia
@@ -1309,16 +1303,6 @@
                 <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '6px 10px', fontSize: '0.75rem' }}>✕</button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
-
-              {/* Mark as done button - only for editing non-completed items */}
-              {isEditing && !editItem.completed && onComplete && (
-                <button type="button" onClick={() => { onComplete(editItem.id); onClose(); }} style={{
-                  width: '100%', padding: '8px', marginTop: '10px', border: 'none', borderRadius: '6px',
-                  background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.6875rem', cursor: 'pointer'
-                }}>
-                  Marcar como hecho
-                </button>
-              )}
             </form>
           </Popover>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
@@ -1386,6 +1370,202 @@
           </Popover>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={handleDiscard} onContinue={handleContinueEditing} />}
         </>
+      );
+    };
+
+    // ============ CATEGORIES MODAL ============
+    const CategoriesModal = ({ categories, items, onSave, onDelete, onReorder, onClose }) => {
+      const [localCategories, setLocalCategories] = useState(
+        categories.filter(c => !c.isFixed).map(c => ({ ...c }))
+      );
+      const [draggedIndex, setDraggedIndex] = useState(null);
+
+      const getItemCount = (catId) => items.filter(i => i.category === catId).length;
+
+      const handleColorChange = (index, newColor) => {
+        setLocalCategories(prev => {
+          const updated = [...prev];
+          updated[index] = { ...updated[index], color: newColor };
+          return updated;
+        });
+      };
+
+      const handleNameChange = (index, newName) => {
+        setLocalCategories(prev => {
+          const updated = [...prev];
+          updated[index] = { ...updated[index], name: newName };
+          return updated;
+        });
+      };
+
+      const handleAddCategory = () => {
+        const newCat = {
+          id: `cat_${Date.now()}`,
+          name: '',
+          color: COLORS[localCategories.length % COLORS.length],
+        };
+        setLocalCategories(prev => [...prev, newCat]);
+      };
+
+      const handleDeleteCategory = (index) => {
+        const cat = localCategories[index];
+        if (getItemCount(cat.id) === 0) {
+          setLocalCategories(prev => prev.filter((_, i) => i !== index));
+          if (cat.id && !cat.id.startsWith('cat_')) {
+            onDelete(cat.id);
+          }
+        }
+      };
+
+      const handleDragStart = (index) => {
+        setDraggedIndex(index);
+      };
+
+      const handleDragOver = (e, index) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === index) return;
+        setLocalCategories(prev => {
+          const updated = [...prev];
+          const [dragged] = updated.splice(draggedIndex, 1);
+          updated.splice(index, 0, dragged);
+          return updated;
+        });
+        setDraggedIndex(index);
+      };
+
+      const handleDragEnd = () => {
+        setDraggedIndex(null);
+      };
+
+      const handleSave = () => {
+        // Save all categories and their new order
+        localCategories.forEach((cat, index) => {
+          if (cat.name.trim()) {
+            onSave({ ...cat, name: cat.name.trim(), sortOrder: index });
+          }
+        });
+        onReorder(localCategories.filter(c => c.name.trim()).map(c => c.id));
+        onClose();
+      };
+
+      return (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }} onClick={onClose}>
+          <div style={{
+            background: 'var(--bg-secondary)',
+            borderRadius: '12px',
+            padding: '20px',
+            width: '90%',
+            maxWidth: '400px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600' }}>Editar categorías</h3>
+              <button onClick={onClose} className="btn" style={{ padding: '4px 8px' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+              {localCategories.map((cat, index) => (
+                <div
+                  key={cat.id}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px',
+                    background: 'var(--bg-primary)',
+                    borderRadius: '8px',
+                    opacity: draggedIndex === index ? 0.5 : 1,
+                    cursor: 'grab',
+                  }}
+                >
+                  {/* Drag handle */}
+                  <div style={{ color: 'var(--text-muted)', cursor: 'grab' }}>⋮⋮</div>
+
+                  {/* Color picker */}
+                  <select
+                    value={cat.color}
+                    onChange={(e) => handleColorChange(index, e.target.value)}
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      padding: 0,
+                      border: 'none',
+                      borderRadius: '4px',
+                      background: cat.color,
+                      cursor: 'pointer',
+                      appearance: 'none',
+                    }}
+                  >
+                    {COLORS.map(c => (
+                      <option key={c} value={c} style={{ background: c }}>{c}</option>
+                    ))}
+                  </select>
+
+                  {/* Color swatch that opens color dropdown */}
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '4px',
+                    background: cat.color,
+                    flexShrink: 0,
+                  }} />
+
+                  {/* Name input */}
+                  <input
+                    value={cat.name}
+                    onChange={(e) => handleNameChange(index, e.target.value)}
+                    placeholder="Nombre..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      background: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.75rem',
+                      outline: 'none',
+                    }}
+                  />
+
+                  {/* Delete button */}
+                  <button
+                    onClick={() => handleDeleteCategory(index)}
+                    disabled={getItemCount(cat.id) > 0}
+                    className={getItemCount(cat.id) === 0 ? 'btn-icon-danger' : 'btn'}
+                    style={{ padding: '4px 6px', opacity: getItemCount(cat.id) > 0 ? 0.3 : 1 }}
+                    title={getItemCount(cat.id) > 0 ? `${getItemCount(cat.id)} items` : 'Eliminar'}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={handleAddCategory} className="btn" style={{ flex: 1, padding: '10px' }}>
+                + Nueva categoría
+              </button>
+              <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '10px' }}>
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
       );
     };
 
@@ -1675,7 +1855,7 @@
       );
     };
 
-    const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId, justShimmeredItemId }) => {
+    const ItemCard = ({ item, categories, onComplete, onEdit, onDelete, onToggleImportant, inSidebar, isToday, isPast, showDate, justDroppedItemId, justShimmeredItemId }) => {
       const [dragging, setDragging] = useState(false);
       const [canDrag, setCanDrag] = useState(true); // For mobile long-press
       const [justGrabbed, setJustGrabbed] = useState(false); // For grab animation
@@ -1827,9 +2007,11 @@
         return 'var(--bg-card-future)';
       };
 
-      // Text color is muted for past items
+      // Text color: important=red, completed=muted, recurring=green, past=past, else normal
       const getTextColor = () => {
         if (item.completed) return 'var(--text-muted)';
+        if (item.isImportant) return 'var(--accent-red)';
+        if (item.repeat) return 'var(--accent-green)';
         if (isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -1922,11 +2104,61 @@
               whiteSpace: 'nowrap',
               color: getTextColor(),
               textDecoration: item.completed ? 'line-through' : 'none',
-            }}>{item.title}</div>
+            }}>{item.title}{item.repeat ? ' (R)' : ''}</div>
           </div>
-          {/* Recurring indicator */}
-          {item.repeat && (
-            <span style={{ fontSize: '0.4375rem', color: 'var(--accent-blue)', flexShrink: 0, opacity: 0.7 }}>🔄</span>
+          {/* Hover buttons: Delete and Important */}
+          {!isMobileDevice && (
+            <div style={{
+              display: 'flex',
+              gap: '4px',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.1s',
+            }}>
+              {/* Delete button */}
+              {onDelete && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title="Eliminar"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                  </svg>
+                </button>
+              )}
+              {/* Important button */}
+              {onToggleImportant && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title={item.isImportant ? "Quitar importante" : "Marcar importante"}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-red)' : 'none'} stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </button>
+              )}
+            </div>
           )}
         </div>
       );
@@ -2149,7 +2381,7 @@
       );
     };
 
-    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId }) => {
+    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onToggleImportant, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId }) => {
       const dateStr = formatDate(day.date);
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isSunday = day.date.getDay() === 0;
@@ -2254,9 +2486,9 @@
 
       const editingItem = editRect ? dayItems.find(i => i.id === editRect.itemId) : null;
 
-      // Header text color based on day type
+      // Header text color based on day type (today is white, not blue)
       const getHeaderColor = () => {
-        if (isToday) return 'var(--accent-blue)';
+        if (isToday) return 'var(--text-primary)';
         if (day.isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -2287,26 +2519,30 @@
               onClick={(e) => handleAddItem(e, false)}
               style={{
                 padding: '8px 12px',
-                minHeight: '60px',
+                minHeight: '44px',
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}>
-              <div style={{
-                fontSize: '0.5rem',
-                color: getHeaderColor(),
-                fontWeight: '500',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                marginBottom: '2px',
-              }}>
-                {formatDayNumber(day.date)} {getShortMonthName(day.date)} {day.date.getFullYear()}
-              </div>
               <div style={{
                 fontSize: '0.875rem',
-                fontWeight: '600',
                 color: getHeaderColor(),
               }}>
-                {formatDayNameFull(day.date)}
+                <span style={{ fontWeight: '700' }}>{formatDayNumber(day.date)}</span>
+                {' '}
+                <span style={{ fontWeight: '400' }}>{formatDayNameFull(day.date)}</span>
               </div>
+              {isToday && (
+                <span style={{
+                  fontSize: '0.5rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  background: 'var(--accent-blue)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                }}>HOY</span>
+              )}
             </div>
 
             {/* Items list */}
@@ -2322,7 +2558,7 @@
                   style={{ marginBottom: '2px' }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
                   <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
                 </div>
               ))}
@@ -2935,7 +3171,7 @@
     };
 
     // ============ SIMPLIFIED CATEGORY COLUMN (for two-row layout) ============
-    const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onSidebarGroupDrop, justDroppedItemId }) => {
+    const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onToggleImportant, onSidebarGroupDrop, justDroppedItemId }) => {
       const categoryItems = items.filter(i => i.category === category.id);
 
       // Get only backlog items (no scheduledDate, not completed, not recurring)
@@ -2944,18 +3180,11 @@
       ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
       const [dropIndex, setDropIndex] = useState(-1);
-      const [editCatRect, setEditCatRect] = useState(null);
       const [isDraggingColumn, setIsDraggingColumn] = useState(false);
       const [removeDatePopover, setRemoveDatePopover] = useState(null);
       const columnRef = useRef(null);
 
       const isCategoryDraggable = !category.isFixed;
-
-      const handleCategoryClick = (e) => {
-        if (category.isFixed) return;
-        e.stopPropagation();
-        setEditCatRect(e.currentTarget.getBoundingClientRect());
-      };
 
       const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
 
@@ -3047,7 +3276,7 @@
             height: '100%',
             background: 'var(--bg-primary)',
           }}>
-          {/* Category header - clickable to edit */}
+          {/* Category header - clickable to add item */}
           <div
             draggable={isCategoryDraggable}
             onDragStart={(e) => {
@@ -3056,18 +3285,18 @@
               setIsDraggingColumn(true);
             }}
             onDragEnd={() => setIsDraggingColumn(false)}
-            onClick={handleCategoryClick}
+            onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
             style={{
               padding: '8px 12px',
-              minHeight: '60px',
-              cursor: isCategoryDraggable ? 'pointer' : 'default',
+              minHeight: '44px',
+              cursor: 'pointer',
               opacity: isDraggingColumn ? 0.5 : 1,
+              display: 'flex',
+              alignItems: 'center',
             }}>
-            <div style={{ fontSize: '0.5rem', color: category.color, fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
-              {backlogItems.length} items
-            </div>
-            <div style={{ fontSize: '0.875rem', fontWeight: '600', color: category.color }}>
-              {category.name}
+            <div style={{ fontSize: '0.875rem', color: category.color }}>
+              <span style={{ fontWeight: '700' }}>{category.name}</span>
+              <span style={{ fontWeight: '400', opacity: 0.7 }}> ({backlogItems.length})</span>
             </div>
           </div>
 
@@ -3082,7 +3311,7 @@
                 onDragOver={(e) => handleItemDragOver(e, index)}
                 style={{ marginBottom: '2px' }}
               >
-                <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} justDroppedItemId={justDroppedItemId} />
+                <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} />
                 <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
               </div>
             ))}
@@ -3107,16 +3336,6 @@
               }}
               onCancel={() => setRemoveDatePopover(null)}
               targetRect={removeDatePopover.rect}
-            />
-          )}
-          {editCatRect && (
-            <EditCategoryPopover
-              category={category}
-              itemCount={categoryItems.length}
-              onSave={onEditCategory}
-              onDelete={() => {}}
-              onClose={() => setEditCatRect(null)}
-              targetRect={editCatRect}
             />
           )}
         </div>
@@ -3302,19 +3521,6 @@
               )}
             </div>
 
-            {(scheduledDate || repeatType !== 'none') && (
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Prioridad</div>
-                <select value={scheduledSlot} onChange={(e) => setScheduledSlot(e.target.value)} style={{
-                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
-                }}>
-                  <option value="important">Importante</option>
-                  <option value="todo">Pendiente</option>
-                </select>
-              </div>
-            )}
-
             {hadRepeat && userClearedDate && (
               <div style={{ marginBottom: '10px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
                 Al guardar se eliminará la recurrencia
@@ -3349,15 +3555,6 @@
             {/* Bottom actions */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
-              {/* Mark as done button - only for editing non-completed items */}
-              {isEditing && !item.completed && onComplete && (
-                <button type="button" onClick={() => { onComplete(item.id); onClose(); }} style={{
-                  flex: 1, padding: '12px', border: 'none', borderRadius: '8px',
-                  background: 'var(--accent-green)', color: 'white', fontWeight: '600', fontSize: '0.8125rem', cursor: 'pointer'
-                }}>
-                  Marcar como hecho
-                </button>
-              )}
             </div>
           </div>
           {showDiscardDialog && <DiscardConfirmDialog onDiscard={() => { if (isNewUntitledItem) onDelete(item.id); lastPopoverCloseTime = Date.now(); onClose(); }} onContinue={() => setShowDiscardDialog(false)} />}
@@ -3513,6 +3710,7 @@
       const [recurringSavePopover, setRecurringSavePopover] = useState(null); // For edit property confirmation
       const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
       const [toast, setToast] = useState(null);
+      const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
       const [justShimmeredItemId, setJustShimmeredItemId] = useState(null); // For reverse shimmer animation on scheduled item click
       const [draggingUnscheduledItem, setDraggingUnscheduledItem] = useState(false); // Track when dragging unscheduled item
@@ -3555,7 +3753,6 @@
       }, []);
 
       const scrollRef = useRef(null);
-      const [sticky, setSticky] = useState(false);
       const days = getDaysArray(viewBase);
 
       const minDate = useMemo(() => {
@@ -3686,14 +3883,6 @@
         return () => window.removeEventListener('resize', handleResize);
       }, []);
 
-      useEffect(() => {
-        const el = scrollRef.current;
-        if (!el) return;
-        const h = () => setSticky(el.scrollLeft > DAY_WIDTH);
-        el.addEventListener('scroll', h);
-        return () => el.removeEventListener('scroll', h);
-      }, []);
-
       // Auto-scroll during drag near edges
       const handleCalendarDragOver = useCallback((e) => {
         const el = scrollRef.current;
@@ -3775,8 +3964,13 @@
             }
 
             // For regular non-recurring items
-            const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
-            return { ...i, completed: !i.completed, completedDate };
+            // Category items (no scheduledDate) stay in place when completed
+            const completedDate = !i.completed
+              ? (i.scheduledDate ? i.scheduledDate : null) // No date for category items
+              : null;
+            // For category items, use hiddenFromSidebar instead of moving to calendar
+            const hiddenFromSidebar = !i.scheduledDate && !i.completed;
+            return { ...i, completed: !i.completed, completedDate, hiddenFromSidebar: !i.completed && !i.scheduledDate ? true : undefined };
           }));
         }
       };
@@ -3927,6 +4121,31 @@
         setToast(null);
       };
 
+      // Toggle important status - marks item as important (red, moves to top)
+      const handleToggleImportant = (id) => {
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
+        setItems(p => {
+          const item = p.find(i => i.id === numId);
+          if (!item) return p;
+          const newIsImportant = !item.isImportant;
+
+          // If marking as important, move to top (lowest sortOrder)
+          if (newIsImportant) {
+            // Get all items in the same context (same day or same category)
+            const sameContext = item.scheduledDate
+              ? p.filter(i => i.scheduledDate === item.scheduledDate && !i.completed)
+              : p.filter(i => i.category === item.category && !i.scheduledDate && !i.completed);
+            const minSortOrder = Math.min(...sameContext.map(i => i.sortOrder || 0));
+            return p.map(i => i.id === numId
+              ? { ...i, isImportant: true, sortOrder: minSortOrder - 1 }
+              : i
+            );
+          }
+          // If unmarking, just toggle the flag (keep current position)
+          return p.map(i => i.id === numId ? { ...i, isImportant: false } : i);
+        });
+      };
+
       const handleDrop = (data, date, slot, dropIndex, coords) => {
         console.log('handleDrop called', { data, date, slot, dropIndex, coords });
         const { id, isRecurring, exceptionDate, visualDate, originalSlot, title } = data;
@@ -4015,11 +4234,11 @@
       };
 
       const performDrop = (numId, date, slot, dropIndex) => {
-        // Get visual items in target slot (includes recurring instances)
+        // Get visual items for this date (includes recurring instances)
+        // In the simplified layout, all items for a day go together (no separate slots)
         const visualSlotItems = allItemsWithRecurring.filter(i =>
-          i.scheduledDate === date &&
-          i.scheduledSlot === slot &&
-          (slot === 'done' ? i.completed : !i.completed)
+          (i.scheduledDate === date && !i.completed) ||
+          (i.completedDate === date && i.completed)
         ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
         // Find original index of dragged item in visual list (if it's already in this slot)
@@ -4077,14 +4296,14 @@
               }
             }
 
-            // Update other items in the same slot
+            // Update other items on the same date
             if (sortInfo !== undefined) {
               if (i.repeat) {
                 // Recurring item: update dateOverrides
                 const newDateOverrides = { ...(i.dateOverrides || {}), [date]: { sortOrder: sortInfo.sortOrder } };
                 return { ...i, dateOverrides: newDateOverrides };
-              } else if (i.scheduledDate === date && i.scheduledSlot === slot) {
-                // Non-recurring item in same slot: update sortOrder
+              } else if (i.scheduledDate === date || (i.completedDate === date && i.completed)) {
+                // Non-recurring item on same date: update sortOrder
                 return { ...i, sortOrder: sortInfo.sortOrder };
               }
             }
@@ -4535,6 +4754,29 @@
         setCurrentMobileDay(REAL_TODAY);
       };
 
+      // Check if today is visible in the current view
+      const isTodayVisible = useMemo(() => {
+        const todayStr = formatDate(REAL_TODAY);
+        return days.some(d => formatDate(d.date) === todayStr);
+      }, [days]);
+
+      // Clear completed items from categories (hiddenFromSidebar)
+      const clearCategoryDone = useCallback(() => {
+        const categoryItems = items.filter(item =>
+          item.category &&
+          !item.scheduledDate &&
+          item.hiddenFromSidebar
+        );
+        if (categoryItems.length === 0) {
+          setToast({ message: 'No hay items completados en categorías', type: 'info' });
+          return;
+        }
+        setItems(prev => prev.filter(item =>
+          !(item.category && !item.scheduledDate && item.hiddenFromSidebar)
+        ));
+        setToast({ message: `${categoryItems.length} items eliminados`, type: 'success' });
+      }, [items]);
+
       // ===== Mobile Functions =====
       const handleMobileScroll = useCallback(() => {
         if (!mobileScrollRef.current || isScrollingRef.current) return;
@@ -4827,14 +5069,24 @@
                     onClick={() => setMobileViewMode('calendar')}
                     style={{ paddingLeft: '40px' }}
                   >
-                    📅
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
                   </button>
                   <button
                     className={`mobile-tab-btn ${mobileViewMode === 'categories' ? 'active' : ''}`}
                     onClick={() => setMobileViewMode('categories')}
                     style={{ paddingRight: '40px' }}
                   >
-                    📁
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"/>
+                      <rect x="14" y="3" width="7" height="7"/>
+                      <rect x="14" y="14" width="7" height="7"/>
+                      <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
                   </button>
                 </div>
 
@@ -4877,8 +5129,8 @@
           {/* Row 1: Calendar with header */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
             {/* Calendar header */}
-            <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
-              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ padding: '8px 10px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
+              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-button)' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -4888,24 +5140,26 @@
                 {getShortMonthName(viewBase)} {viewBase.getFullYear()}
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <button onClick={() => navigateDays(-12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
-                <button onClick={() => navigateDays(-1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
+                <button onClick={() => navigateDays(-12)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
+                <button onClick={() => navigateDays(-1)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
               </div>
               <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <button onClick={() => navigateDays(1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
-                <button onClick={() => navigateDays(12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
+                <button onClick={() => navigateDays(1)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
+                <button onClick={() => navigateDays(12)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
               </div>
-              <button onClick={goToToday} className="btn">Hoy</button>
+              {!isTodayVisible && <button onClick={goToToday} className="btn btn-primary">Hoy</button>}
               <div style={{ flex: 1 }} />
+              <button onClick={clearCategoryDone} className="btn" style={{ background: 'var(--bg-button)' }}>Borrar hechos</button>
+              <button onClick={() => setCategoriesModalOpen(true)} className="btn" style={{ background: 'var(--bg-button)' }}>Editar categorías</button>
             </div>
             <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', background: 'var(--bg-primary)' }}>
-              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
+              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} />)}
             </div>
           </div>
 
           {/* Row 2: Categories - horizontal scroll */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-categories)' }}>
             <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
               {categories.map(cat => (
                 <div key={cat.id}
@@ -4913,7 +5167,7 @@
                   onDragLeave={() => setDragOverCat(null)}
                   onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}
                   style={{ outline: dragOverCat === cat.id ? '2px dashed var(--accent-blue)' : 'none' }}>
-                  <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} />
+                  <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} />
                 </div>
               ))}
               {/* Add category button */}
@@ -4926,6 +5180,7 @@
           {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
           {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onClose={() => setEditPopover(null)} targetRect={editPopover.rect} />}
           {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
+          {categoriesModalOpen && <CategoriesModal categories={categories} items={items} onSave={handleEditCategory} onDelete={(id) => setCategories(prev => prev.filter(c => c.id !== id))} onReorder={(order) => setCategories(prev => { const fixed = prev.filter(c => c.isFixed); const nonFixed = order.map(id => prev.find(c => c.id === id)).filter(Boolean); return [...fixed, ...nonFixed]; })} onClose={() => setCategoriesModalOpen(false)} />}
           {recurringEditPopover && <RecurringActionPopover
             item={recurringEditPopover.item}
             originalDate={recurringEditPopover.originalDate}
