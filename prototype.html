@@ -1089,7 +1089,7 @@
       const dateButtonRef = useRef(null);
       const inputRef = useRef(null);
 
-      const isEditing = !!editItem;
+      const isEditing = !!editItem?.id && !editItem._isNewItem;
       const hadRepeat = !!editItem?.repeat;
       const originalTitle = editItem?.title || '';
       const originalDescription = editItem?.description || '';
@@ -2347,6 +2347,12 @@
       const contentRef = useRef(null);
       const expandTimeoutRef = useRef(null);
 
+      const handleCategoryDoubleClick = (e) => {
+        if (category.isFixed) return;
+        e.stopPropagation();
+        setEditCatRect(e.currentTarget.getBoundingClientRect());
+      };
+
       // Create item in backlog - addAtEnd determines position
       const handleBacklogAddItem = (addAtEnd) => {
         // Don't create if a popover was just closed
@@ -2493,16 +2499,8 @@
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('categoryId', category.id); setDragging(true); }}
             onDragEnd={() => setDragging(false)}
             onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '44px', background: expanded ? `${category.color}12` : 'transparent' }}>
-            <button
-              onClick={(e) => { e.stopPropagation(); if (!category.isFixed) setEditCatRect(e.currentTarget.getBoundingClientRect()); }}
-              style={{ background: 'none', border: 'none', padding: '8px', marginLeft: '-8px', marginRight: '2px', cursor: category.isFixed ? 'default' : 'pointer', opacity: category.isFixed ? 0.4 : 1 }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={category.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
-            <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
+            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
             <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '0.625rem', padding: '4px' }}>▼</span>
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`}>
@@ -2635,7 +2633,6 @@
 
       const [isDraggingItem, setIsDraggingItem] = useState(false);
       const [removeDatePopover, setRemoveDatePopover] = useState(null);
-      const [editCatRect, setEditCatRect] = useState(null);
       const dragCountRef = useRef(0);
 
       const handleGroupDrop = (data, targetGroup, e, dropIdx) => {
@@ -2687,18 +2684,9 @@
           onDrop={handleColumnDrop}
           style={{ flex: '0 0 300px', width: '300px', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)', height: '100%' }}>
           <div style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12` }}>
-            <button
-              onClick={(e) => { e.stopPropagation(); if (!category.isFixed) setEditCatRect(e.currentTarget.getBoundingClientRect()); }}
-              style={{ background: 'none', border: 'none', padding: '8px', marginLeft: '-8px', marginRight: '2px', cursor: category.isFixed ? 'default' : 'pointer', opacity: category.isFixed ? 0.4 : 1 }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={category.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
+            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
             <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
           </div>
-          {editCatRect && <EditCategoryPopover category={category} itemCount={categoryItems.length} onSave={onEditCategory} onDelete={() => {}} onClose={() => setEditCatRect(null)} targetRect={editCatRect} />}
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px 8px' }}>
             <SidebarGroup label="Backlog" count={backlogItems.length} items={backlogItems} expanded={backlogExp} onToggle={() => onGroupToggle?.('backlog')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)} showDropIndicator={isDraggingItem} isBacklog={true} justDroppedItemId={justDroppedItemId} />
             <div style={{ marginBottom: '4px' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
