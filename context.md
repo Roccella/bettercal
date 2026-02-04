@@ -45,12 +45,14 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
   - Al arrastrar recurrente: zona normal se pone mute (opacity 0.3)
   - Al arrastrar normal/importante: zona recurrente se pone mute
   - Indicador de drop (línea azul) solo aparece en zona válida
+  - **Items recurrentes NO se pueden mover a categorías**
 
 ### Items Recurrentes
 - **Texto azul** (color `--accent-blue`)
 - **Ícono SVG** de flechas de recurrencia (siempre visible a la derecha)
 - **No pueden ser marcados como importantes**
 - **Solo se pueden mover a otras zonas de recurrentes**
+- **No se pueden mover a categorías** (drag & drop bloqueado)
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
@@ -75,7 +77,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Click en header de categoría**: Crea item nuevo (sin fecha) y abre editor
 - **Click en área vacía de categoría**: Crea item al final
 - **Checkbox en hover**: Marca como completado
-- **Completar en categorías**: Item se queda en lugar (hiddenFromSidebar), no va al calendario
+- **Completar en categorías**: Item se queda en lugar visible (no desaparece)
+- **Hotkey Command+E**: Eliminar item (desktop)
 
 ## Modelo de Datos
 
@@ -148,7 +151,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 
 ### CategoryColumnSimple
 - Header: "Música (2)" - click abre BottomSheet (mobile) o Popover (desktop)
-- Solo muestra items backlog (sin fecha, no completados)
+- Muestra items backlog (sin fecha, incluyendo completados en su lugar)
+- Items completados se quedan visibles en su posición original
 - Click en área vacía = agregar al final
 
 ### CategoriesModal
@@ -159,9 +163,11 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 
 ### Popovers
 - `AddEditItemPopover` (desktop): Editor de items
+  - **Select de recurrencia solo visible si hay fecha**
 - `BottomSheet` (mobile): Editor fullscreen con botones Importante y Hecho
   - Botón Importante: toggle sin cerrar el popover
   - Botón Hecho: guarda y cierra el popover
+  - **Select de recurrencia solo visible si hay fecha**
 
 ## Funciones Clave
 
@@ -190,7 +196,9 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
-- **Footer**: selector mes + tabs (iconos SVG 2D) + botón "Agregar" (btn-primary)
+- **Header de día**: Incluye botones "Hoy" (si no es hoy) + "Feb" (mes) arriba a la derecha
+- **FAB flotante**: Botón "Agregar" como floating action button (abajo derecha)
+- **Footer**: Solo tabs (Calendario / Categorías) centrados
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
 - **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
@@ -202,7 +210,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Interacciones Mobile
 - **Tocar item**: Abre BottomSheet (pero no si el calendario está abierto)
 - **Tocar heading categoría**: Crea item y abre BottomSheet
-- **Calendario popover**: Se cierra al tocar fuera antes de abrir otro elemento
+- **Calendario popover**: Se cierra al tocar fuera sin hacer shimmer al siguiente item
+- **FAB Agregar**: Crea nuevo item y abre BottomSheet
 
 ### Safe Area (iPhone)
 - `viewport-fit=cover` + `env(safe-area-inset-*)` para notch y home indicator
@@ -215,3 +224,4 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - Emoji 🔄 para recurrentes
 - Click en categoría para editar (ahora crea item)
 - Reordenamiento automático al marcar importante
+- hiddenFromSidebar al completar items en categorías (ahora se quedan visibles)

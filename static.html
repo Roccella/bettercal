@@ -334,13 +334,13 @@
       background: var(--bg-header);
       border-top: 1px solid var(--border-color);
       padding: 0 20px;
-      padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      display: flex;
       align-items: center;
+      justify-content: center;
     }
     .mobile-footer-section {
       display: flex;
@@ -1252,11 +1252,11 @@
 
       useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
 
-      // Hotkey: Command+D to delete item (desktop only)
+      // Hotkey: Command+E to delete item (desktop only)
       useEffect(() => {
         if (!isEditing) return;
         const handleKeyDown = (e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
             e.preventDefault();
             onDelete(editItem.id);
             lastPopoverCloseTime = Date.now();
@@ -1341,26 +1341,29 @@
                 </div>
               )}
 
-              <div style={{ marginBottom: '10px' }}>
-                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
-                  <option value="none">No repetir</option>
-                  <option value="days">Cada X días</option>
-                  <option value="weeks">Cada X semanas</option>
-                  <option value="weekdays">Días de semana</option>
-                </select>
-                {repeatType !== 'none' && repeatType !== 'weekdays' && (
-                  <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                    style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
-                  />
-                )}
-                {repeatType === 'weekdays' && (
-                  <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
-                    {DAYS.map((d, i) => (
-                      <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '4px 2px', fontSize: '0.5625rem' }}>{d.charAt(0)}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* Only show repeat options if there's a date */}
+              {scheduledDate && (
+                <div style={{ marginBottom: '10px' }}>
+                  <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                    <option value="none">No repetir</option>
+                    <option value="days">Cada X días</option>
+                    <option value="weeks">Cada X semanas</option>
+                    <option value="weekdays">Días de semana</option>
+                  </select>
+                  {repeatType !== 'none' && repeatType !== 'weekdays' && (
+                    <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
+                      style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                    />
+                  )}
+                  {repeatType === 'weekdays' && (
+                    <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
+                      {DAYS.map((d, i) => (
+                        <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '4px 2px', fontSize: '0.5625rem' }}>{d.charAt(0)}</button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
@@ -2964,11 +2967,12 @@
       });
 
       const ongoing = uniqueItems.filter(i => !i.completed && !i.isArchived);
-      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar)
+      // Items without date (completed or not) stay in backlog in place
+      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar && i.scheduledDate)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-      // Backlog = archived items + items without scheduled date (excluding recurring items)
-      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.completed && !i.repeat)
+      // Backlog = archived items + items without scheduled date (including completed, excluding recurring items)
+      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.repeat)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       // Scheduled = items with scheduledDate OR recurring items
       const scheduled = ongoing.filter(i => i.scheduledDate || i.repeat);
@@ -3075,15 +3079,18 @@
 
         if (!item) return;
 
-        // If item has a scheduled date OR is recurring, and dropping to backlog, show confirmation popover
-        if ((item.scheduledDate || item.repeat) && targetGroup === 'backlog') {
+        // Don't allow recurring items to be moved to categories at all
+        if (item.repeat) return;
+
+        // If item has a scheduled date and dropping to backlog, show confirmation popover
+        if (item.scheduledDate && targetGroup === 'backlog') {
           const rect = {
             top: e?.clientY || window.innerHeight / 2,
             bottom: (e?.clientY || window.innerHeight / 2) + 10,
             left: (e?.clientX || window.innerWidth / 2) - 140,
             right: (e?.clientX || window.innerWidth / 2) + 140,
           };
-          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: !!item.repeat });
+          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: false });
           return;
         }
 
@@ -3137,8 +3144,11 @@
         setIsDraggingItem(false);
         const data = e.dataTransfer.getData('itemData');
         if (data) {
+          const parsed = JSON.parse(data);
+          // Don't allow recurring items to be moved to categories
+          if (parsed.isRecurring) return;
           // Drop on category goes to "anyday" by default
-          handleGroupDrop(JSON.parse(data), 'anyday', e);
+          handleGroupDrop(parsed, 'anyday', e);
         }
       };
 
@@ -3252,10 +3262,12 @@
       });
 
       const ongoing = uniqueItems.filter(i => !i.completed && !i.isArchived);
-      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar)
+      // Items without date (completed or not) stay in backlog in place
+      const doneItems = uniqueItems.filter(i => i.completed && !i.hiddenFromSidebar && i.scheduledDate)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.completed && !i.repeat)
+      // Backlog = archived items + items without scheduled date (including completed, excluding recurring items)
+      const backlogItems = uniqueItems.filter(i => (i.isArchived || !i.scheduledDate) && !i.repeat)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       const scheduled = ongoing.filter(i => i.scheduledDate || i.repeat);
       const recurringItems = scheduled.filter(i => i.repeat && !i.scheduledDate);
@@ -3293,14 +3305,17 @@
         const item = allItems.find(i => i.id === numId);
         if (!item) return;
 
-        if ((item.scheduledDate || item.repeat) && targetGroup === 'backlog') {
+        // Don't allow recurring items to be moved to categories at all
+        if (item.repeat) return;
+
+        if (item.scheduledDate && targetGroup === 'backlog') {
           const rect = {
             top: e?.clientY || window.innerHeight / 2,
             bottom: (e?.clientY || window.innerHeight / 2) + 10,
             left: (e?.clientX || window.innerWidth / 2) - 140,
             right: (e?.clientX || window.innerWidth / 2) + 140,
           };
-          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: !!item.repeat });
+          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: false });
           return;
         }
         onSidebarGroupDrop?.(numId, targetGroup, category.id, dropIdx);
@@ -3341,7 +3356,12 @@
         setIsDraggingItem(false);
         setIsDraggingUnscheduledItem(false);
         const data = e.dataTransfer.getData('itemData');
-        if (data) handleGroupDrop(JSON.parse(data), 'anyday', e);
+        if (data) {
+          const parsed = JSON.parse(data);
+          // Don't allow recurring items to be moved to categories
+          if (parsed.isRecurring) return;
+          handleGroupDrop(parsed, 'anyday', e);
+        }
       };
 
       return (
@@ -3791,30 +3811,33 @@
               </div>
             )}
 
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
-              <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{
-                width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
-              }}>
-                <option value="none">No repetir</option>
-                <option value="days">Cada X días</option>
-                <option value="weeks">Cada X semanas</option>
-                <option value="weekdays">Días de semana</option>
-              </select>
-              {repeatType !== 'none' && repeatType !== 'weekdays' && (
-                <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                  style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '0.75rem', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
-                />
-              )}
-              {repeatType === 'weekdays' && (
-                <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
-                  {DAYS.map((d, i) => (
-                    <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '8px 4px', fontSize: '0.625rem' }}>{d.charAt(0)}</button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Only show repeat options if there's a date */}
+            {scheduledDate && (
+              <div style={{ marginBottom: '10px' }}>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
+                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{
+                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
+                  fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
+                }}>
+                  <option value="none">No repetir</option>
+                  <option value="days">Cada X días</option>
+                  <option value="weeks">Cada X semanas</option>
+                  <option value="weekdays">Días de semana</option>
+                </select>
+                {repeatType !== 'none' && repeatType !== 'weekdays' && (
+                  <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
+                    style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '0.75rem', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+                  />
+                )}
+                {repeatType === 'weekdays' && (
+                  <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                    {DAYS.map((d, i) => (
+                      <button key={i} type="button" onClick={() => toggleDay(i)} className={repeatDays.includes(i) ? 'btn btn-primary' : 'btn'} style={{ flex: 1, padding: '8px 4px', fontSize: '0.625rem' }}>{d.charAt(0)}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Bottom actions - mobile only: important and complete buttons */}
             {isEditing && (
@@ -3884,7 +3907,7 @@
     };
 
     // Mobile Day Column Component for scroll-snap
-    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId }) => {
+    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId, onGoToToday, onOpenCalendar, monthName }) => {
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
@@ -3971,6 +3994,9 @@
             touchAction: 'none',
             borderBottom: isScrolled ? '1px solid var(--border-color)' : '1px solid transparent',
             transition: 'border-color 0.15s',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
           }}>
             <div style={{
               fontSize: '1.375rem',
@@ -3978,6 +4004,11 @@
             }}>
               <span style={{ fontWeight: '700' }}>{formatDayNumber(day.date)}</span>
               <span style={{ fontWeight: '400' }}> {formatDayNameFull(day.date)}</span>
+            </div>
+            {/* Hoy + Month buttons */}
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {!isToday && <button onClick={onGoToToday} className="btn btn-primary" style={{ fontSize: '0.75rem' }}>Hoy</button>}
+              <button onClick={onOpenCalendar} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem' }}>{monthName}</button>
             </div>
           </div>
 
@@ -4289,9 +4320,7 @@
             const completedDate = !i.completed
               ? (i.scheduledDate ? i.scheduledDate : null) // No date for category items
               : null;
-            // For category items, use hiddenFromSidebar instead of moving to calendar
-            const hiddenFromSidebar = !i.scheduledDate && !i.completed;
-            // When uncompleting, move to end of normal items
+            // When uncompleting, move to end of normal items (only for calendar items)
             let newSortOrder = i.sortOrder;
             if (i.completed && i.scheduledDate) {
               // Find max sortOrder of non-recurring, non-important items on same date
@@ -4300,7 +4329,8 @@
                 .reduce((max, it) => Math.max(max, it.sortOrder || 0), 0);
               newSortOrder = maxSortOrder + 1;
             }
-            return { ...i, completed: !i.completed, completedDate, hiddenFromSidebar: !i.completed && !i.scheduledDate ? true : undefined, sortOrder: newSortOrder, isImportant: i.completed ? false : i.isImportant };
+            // Category items stay in place (no hiddenFromSidebar)
+            return { ...i, completed: !i.completed, completedDate, sortOrder: newSortOrder, isImportant: i.completed ? false : i.isImportant };
           }));
         }
       };
@@ -5133,8 +5163,9 @@
       };
 
       const goToToday = () => {
-        setViewBase(REAL_TODAY);
-        setCurrentMobileDay(REAL_TODAY);
+        const today = new Date(REAL_TODAY);
+        setViewBase(today);
+        setCurrentMobileDay(today);
       };
 
       // Check if today is visible in the current view
@@ -5259,6 +5290,7 @@
         // Don't open item if calendar popover is open - close calendar first
         if (calendarRect) {
           setCalendarRect(null);
+          lastPopoverCloseTime = Date.now(); // Prevent shimmer on next item tap
           return; // Don't open bottom sheet, just close calendar
         }
         setBottomSheetItem({ item, visualDate });
@@ -5388,6 +5420,9 @@
                         onAdd={handleSave}
                         onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))}
                         justDroppedItemId={justDroppedItemId}
+                        onGoToToday={goToToday}
+                        onOpenCalendar={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())}
+                        monthName={getShortMonthName(day.date)}
                       />
                     ))}
                   </div>
@@ -5495,23 +5530,32 @@
               </div>
             </div>
 
+            {/* Mobile FAB - floating add button */}
+            <button
+              className="btn btn-primary mobile-only"
+              onClick={handleMobileAddClick}
+              style={{
+                position: 'fixed',
+                bottom: `calc(80px + env(safe-area-inset-bottom, 0px))`,
+                right: '20px',
+                fontSize: '0.75rem',
+                padding: '12px 20px',
+                borderRadius: '24px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                zIndex: 100,
+              }}
+            >
+              Agregar
+            </button>
+
             {/* Mobile Footer */}
             <div className="mobile-footer">
-              <div className="mobile-footer-inner">
-                {/* Left: Month selector */}
-                <div className="mobile-footer-section">
-                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem' }}>
-                    {getShortMonthName(currentMobileDay)}
-                  </button>
-                  {mobileViewMode === 'calendar' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.75rem' }}>Hoy</button>}
-                </div>
-
-                {/* Center: View tabs */}
+              <div className="mobile-footer-inner" style={{ justifyContent: 'center' }}>
+                {/* Center: View tabs only */}
                 <div className="mobile-footer-section center">
                   <button
                     className={`mobile-tab-btn ${mobileViewMode === 'calendar' ? 'active' : ''}`}
                     onClick={() => setMobileViewMode('calendar')}
-                    style={{ paddingLeft: '40px' }}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -5523,7 +5567,6 @@
                   <button
                     className={`mobile-tab-btn ${mobileViewMode === 'categories' ? 'active' : ''}`}
                     onClick={() => setMobileViewMode('categories')}
-                    style={{ paddingRight: '40px' }}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7"/>
@@ -5532,11 +5575,6 @@
                       <rect x="3" y="14" width="7" height="7"/>
                     </svg>
                   </button>
-                </div>
-
-                {/* Right: Add button */}
-                <div className="mobile-footer-section right">
-                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.75rem' }}>Agregar</button>
                 </div>
               </div>
             </div>
