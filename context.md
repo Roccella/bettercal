@@ -24,45 +24,55 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ## Estructura de la UI (Estilo TeuxDeux)
 
 ### Layout Principal - Dos Filas
-- **Fila 1 (50%)**: Calendario con scroll horizontal (columnas de 200px)
+- **Fila 1 (50%)**: Calendario con scroll horizontal (32 columnas de 240px)
 - **Fila 2 (50%)**: Categorías con scroll horizontal (columnas de 200px)
 - **Header**: Fondo `--bg-header`, botones de navegación, "Hoy" condicional, "Borrar hechos", "Editar categorías"
 
 ### Características Visuales
 - **Solo dark mode** (sin light mode)
 - **Items sin cards**: Texto plano con checkbox en hover
-- **Columnas**: días 200px, categorías 240px, Temp 320px
+- **Columnas**: días 240px, categorías 200px
 - **Padding horizontal**: 12px en celdas de días y categorías
 - **Headings de días**: "2 Lunes" (número en bold, día normal), badge "HOY" azul para día actual
 - **Headings de categorías**: "Música (2)" (nombre en bold, contador entre paréntesis)
-- **Borde de domingo**: Línea vertical de 20px que suma al ancho de la columna (no comprime items)
+- **Borde de domingo**: Línea vertical de 12px que suma al ancho de la columna (no comprime items)
+
+### Sistema de Zonas en Días
+- **Zona Recurrentes**: items recurrentes + recurrentes completados (arriba)
+- **Zona Normal**: items normales + importantes + completados (abajo)
+- **Items completados se quedan en su posición** (no se mueven al final)
+- **Drag & Drop con mute**:
+  - Al arrastrar recurrente: zona normal se pone mute (opacity 0.3)
+  - Al arrastrar normal/importante: zona recurrente se pone mute
+  - Indicador de drop (línea azul) solo aparece en zona válida
 
 ### Items Recurrentes
 - **Texto azul** (color `--accent-blue`)
-- **Ícono SVG** de flechas de recurrencia después del título (no texto "(R)")
+- **Ícono SVG** de flechas de recurrencia (siempre visible a la derecha)
 - **No pueden ser marcados como importantes**
+- **Solo se pueden mover a otras zonas de recurrentes**
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
-- **Se mueven arriba** al marcar como importante
-- **Al desmarcar**: se mueven a la primera posición de los items normales
+- **Se quedan en su posición** al marcar/desmarcar (no se reordenan)
+- **Ícono**: círculo amarillo con ! blanco dentro cuando está marcado
 - **Campo `isImportant`** en el modelo de datos
+
+### Íconos en Items (Desktop)
+- **Posición**: a la derecha del título, siempre visibles
+- **Checkbox**: aparece en hover, desplazando los íconos a la izquierda
+- **Borde checkbox**: 1px
 
 ### CalendarPopover
 - **Día de hoy**: Estilo btn-primary (fondo azul, texto blanco)
-- **12 días visibles**: Fondo azulado con contraste (rgba azul 15%)
+- **32 días visibles**: Fondo azulado con contraste (rgba azul 15%)
 - **Desktop**: Ancho 280px
 - **Mobile**: Ancho 100% - 32px, max 360px, celdas 44px, sin mostrar días visibles
-
-### Botones Hover en Items (Desktop)
-- **Borrar** (trash icon) - a la izquierda del botón importante
-- **Importante** (círculo con !) - a la derecha extrema
-- Visibles solo en hover (opacity 0 → 1)
 
 ### Interacciones
 - **Click en header de día**: Crea item nuevo al principio
 - **Click en área vacía del día**: Crea item nuevo al final
-- **Click en header de categoría**: Crea item nuevo (sin fecha)
+- **Click en header de categoría**: Crea item nuevo (sin fecha) y abre editor
 - **Click en área vacía de categoría**: Crea item al final
 - **Checkbox en hover**: Marca como completado
 - **Completar en categorías**: Item se queda en lugar (hiddenFromSidebar), no va al calendario
@@ -84,7 +94,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
   completedDate: string | null,
   isArchived: boolean,
   hiddenFromSidebar: boolean,
-  isImportant: boolean, // NUEVO: marca item como importante (texto rojo, sube arriba)
+  isImportant: boolean,
   repeat: RepeatConfig | null,
   exceptions: { [date]: Exception } | null,
   dateOverrides: { [date]: { sortOrder: number } } | null
@@ -117,25 +127,27 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
   --accent-blue: #3B82F6;
   --accent-green: #22C55E;
   --accent-red: #EF4444;
+  --accent-yellow: #EAB308;
 }
 ```
 
 ## Componentes Principales
 
 ### ItemCard
-- Checkbox en hover (a la izquierda)
 - Título con color según estado (normal/completado/recurrente/importante/pasado)
-- Botones hover: borrar y importante (derecha)
-- Props: `item`, `categories`, `onComplete`, `onEdit`, `onDelete`, `onToggleImportant`, etc.
+- Íconos a la derecha: recurrente/importante siempre visibles si aplica
+- Checkbox aparece en hover (desktop) o solo si completado (mobile)
+- Props: `item`, `categories`, `onComplete`, `onEdit`, `onDelete`, `onToggleImportant`, `draggingItemType`, `onDragTypeChange`
 
 ### DayColumn
 - Header: "2 Lunes" + badge HOY
-- Lista de items
+- Dos zonas: recurrentes (arriba) y normales (abajo)
+- Indicador de drop condicional según zona válida
 - Click en header = agregar al principio
 - Click en área vacía = agregar al final
 
 ### CategoryColumnSimple
-- Header: "Música (2)" - click abre AddEditItemPopover (no edita categoría)
+- Header: "Música (2)" - click abre BottomSheet (mobile) o Popover (desktop)
 - Solo muestra items backlog (sin fecha, no completados)
 - Click en área vacía = agregar al final
 
@@ -145,16 +157,22 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - Cada fila: drag handle + color swatch + input nombre + botón borrar
 - Botones: Nueva categoría, Guardar
 
-### Popovers (Simplificados)
-- `AddEditItemPopover`: Sin selector de prioridad, sin "Marcar como hecho"
-- `BottomSheet` (mobile): Mismo formato simplificado
+### Popovers
+- `AddEditItemPopover` (desktop): Editor de items
+- `BottomSheet` (mobile): Editor fullscreen con botones Importante y Hecho
+  - Botón Importante: toggle sin cerrar el popover
+  - Botón Hecho: guarda y cierra el popover
 
 ## Funciones Clave
 
 ### handleToggleImportant(id)
 - Toggle `isImportant` en item
-- Si marca como importante: mueve arriba (sortOrder mínimo - 1)
-- Si desmarca: mantiene posición actual
+- Item se queda en su posición (sin reordenamiento)
+
+### draggingItemType
+- Estado global que trackea el tipo de item siendo arrastrado
+- Valores: 'recurring' | 'important' | 'normal' | null
+- Se usa para mute visual de zonas y validación de drop
 
 ### clearCategoryDone()
 - Elimina items completados de categorías (hiddenFromSidebar)
@@ -173,10 +191,18 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Footer**: selector mes + tabs (iconos SVG 2D) + botón "Agregar" (btn-primary)
-- **BottomSheet**: Editor sin prioridad ni "Marcar como hecho"
+- **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
-- **Items**: fontSize 1rem, padding 8px 4px, gap 8px, lineHeight 1.3
+- **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
+- **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
+- **Toast**: Posición más arriba (120px + safe-area) para no tapar footer
 - **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
+- **Heading de día**: Muestra borde inferior al hacer scroll
+
+### Interacciones Mobile
+- **Tocar item**: Abre BottomSheet (pero no si el calendario está abierto)
+- **Tocar heading categoría**: Crea item y abre BottomSheet
+- **Calendario popover**: Se cierra al tocar fuera antes de abrir otro elemento
 
 ### Safe Area (iPhone)
 - `viewport-fit=cover` + `env(safe-area-inset-*)` para notch y home indicator
@@ -184,7 +210,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ## Sin Usar (Removido)
 - Light mode (solo dark)
 - Sistema de prioridad (Important/Pendiente select)
-- Botón "Marcar como hecho" en popovers
+- Botón "Marcar como hecho" en popovers desktop
 - Sticky del día de hoy
 - Emoji 🔄 para recurrentes
 - Click en categoría para editar (ahora crea item)
+- Reordenamiento automático al marcar importante
