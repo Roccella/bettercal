@@ -31,20 +31,28 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Visuales
 - **Solo dark mode** (sin light mode)
 - **Items sin cards**: Texto plano con checkbox en hover
-- **Columnas de 200px** para días y categorías
+- **Columnas**: días 200px, categorías 240px, Temp 320px
+- **Padding horizontal**: 12px en celdas de días y categorías
 - **Headings de días**: "2 Lunes" (número en bold, día normal), badge "HOY" azul para día actual
 - **Headings de categorías**: "Música (2)" (nombre en bold, contador entre paréntesis)
-- **Borde de domingo**: Línea vertical de 10px gris para separar semanas
+- **Borde de domingo**: Línea vertical de 20px que suma al ancho de la columna (no comprime items)
 
 ### Items Recurrentes
-- **Texto verde** (color `--accent-green`)
-- **Sufijo "(R)"** después del título
-- **Sin emoji 🔄**
+- **Texto azul** (color `--accent-blue`)
+- **Ícono SVG** de flechas de recurrencia después del título (no texto "(R)")
+- **No pueden ser marcados como importantes**
 
 ### Items Importantes
-- **Texto rojo** (color `--accent-red`)
+- **Texto amarillo** (color `--accent-yellow`)
 - **Se mueven arriba** al marcar como importante
+- **Al desmarcar**: se mueven a la primera posición de los items normales
 - **Campo `isImportant`** en el modelo de datos
+
+### CalendarPopover
+- **Día de hoy**: Estilo btn-primary (fondo azul, texto blanco)
+- **12 días visibles**: Fondo azulado con contraste (rgba azul 15%)
+- **Desktop**: Ancho 280px
+- **Mobile**: Ancho 100% - 32px, max 360px, celdas 44px, sin mostrar días visibles
 
 ### Botones Hover en Items (Desktop)
 - **Borrar** (trash icon) - a la izquierda del botón importante
@@ -164,9 +172,11 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
-- **Footer**: selector mes + tabs (iconos SVG 2D) + botón "+"
+- **Footer**: selector mes + tabs (iconos SVG 2D) + botón "Agregar" (btn-primary)
 - **BottomSheet**: Editor sin prioridad ni "Marcar como hecho"
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
+- **Items**: fontSize 1rem, padding 8px 4px, gap 8px, lineHeight 1.3
+- **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
 
 ### Safe Area (iPhone)
 - `viewport-fit=cover` + `env(safe-area-inset-*)` para notch y home indicator

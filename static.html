@@ -403,6 +403,9 @@
       .btn { padding: 8px 12px; font-size: 0.6875rem; }
       .item-card { padding: 8px 10px; }
 
+      /* Wider popover for calendar in mobile */
+      .popover { width: calc(100vw - 32px); max-width: 360px; }
+
       /* Mobile calendar alignment - slots get padding */
       .mobile-day-column .slot-row,
       .mobile-day-column .slot-row-done { padding-left: 12px; padding-right: 12px; }
@@ -1658,7 +1661,7 @@
       );
     };
 
-    const CalendarPopover = ({ baseDate, onSelectDate, onClose, targetRect, visibleDates }) => {
+    const CalendarPopover = ({ baseDate, onSelectDate, onClose, targetRect, visibleDates, isMobile = false }) => {
       const [viewMonth, setViewMonth] = useState(baseDate.getMonth());
       const [viewYear, setViewYear] = useState(baseDate.getFullYear());
       const firstDay = new Date(viewYear, viewMonth, 1);
@@ -1667,7 +1670,8 @@
       for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
       for (let i = 1; i <= lastDay.getDate(); i++) days.push(new Date(viewYear, viewMonth, i));
 
-      const isVisible = (d) => visibleDates.some(v => formatDate(v) === formatDate(d));
+      // In mobile, don't show the 12 visible days highlight
+      const isVisible = (d) => !isMobile && visibleDates.some(v => formatDate(v) === formatDate(d));
       const isToday = (d) => formatDate(d) === formatDate(REAL_TODAY);
 
       const minDate = new Date(REAL_TODAY);
@@ -1678,26 +1682,37 @@
       const canGoBack = viewYear > minDate.getFullYear() || (viewYear === minDate.getFullYear() && viewMonth > minDate.getMonth());
       const canGoForward = viewYear < maxDate.getFullYear() || (viewYear === maxDate.getFullYear() && viewMonth < maxDate.getMonth());
 
+      const cellSize = isMobile ? 44 : 28;
+      const fontSize = isMobile ? '1rem' : '0.625rem';
+      const headerFontSize = isMobile ? '1rem' : '0.75rem';
+      const dayLabelFontSize = isMobile ? '0.75rem' : '0.5625rem';
+
       return (
         <Popover onClose={onClose} targetRect={targetRect}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <button onClick={() => canGoBack && (viewMonth === 0 ? (setViewMonth(11), setViewYear(y => y-1)) : setViewMonth(m => m-1))} className="btn" disabled={!canGoBack}>←</button>
-            <span style={{ fontWeight: '600', fontSize: '0.75rem' }}>{getMonthName(new Date(viewYear, viewMonth))} {viewYear}</span>
-            <button onClick={() => canGoForward && (viewMonth === 11 ? (setViewMonth(0), setViewYear(y => y+1)) : setViewMonth(m => m+1))} className="btn" disabled={!canGoForward}>→</button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '0.5625rem', textAlign: 'center', color: 'var(--text-muted)', marginBottom: '4px' }}>
-            {DAYS.map((d,i) => <div key={i}>{d.charAt(0)}</div>)}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
-            {days.map((d, i) => (
-              <button key={i} onClick={() => d && onSelectDate(d)} disabled={!d} style={{
-                width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: '4px', fontSize: '0.625rem', border: 'none', cursor: d ? 'pointer' : 'default',
-                background: d && isToday(d) ? 'var(--today-header)' : d && isVisible(d) ? 'var(--done-bg)' : 'transparent',
-                color: d ? (isToday(d) ? 'var(--accent-blue)' : 'var(--text-primary)') : 'transparent',
-                fontWeight: d && isToday(d) ? '700' : '400',
-              }}>{d?.getDate()}</button>
-            ))}
+          <div style={{ width: isMobile ? '100%' : 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '12px' : '8px' }}>
+              <button onClick={() => canGoBack && (viewMonth === 0 ? (setViewMonth(11), setViewYear(y => y-1)) : setViewMonth(m => m-1))} className="btn" style={{ padding: isMobile ? '10px 14px' : undefined }} disabled={!canGoBack}>←</button>
+              <span style={{ fontWeight: '600', fontSize: headerFontSize }}>{getMonthName(new Date(viewYear, viewMonth))} {viewYear}</span>
+              <button onClick={() => canGoForward && (viewMonth === 11 ? (setViewMonth(0), setViewYear(y => y+1)) : setViewMonth(m => m+1))} className="btn" style={{ padding: isMobile ? '10px 14px' : undefined }} disabled={!canGoForward}>→</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: isMobile ? '4px' : '2px', fontSize: dayLabelFontSize, textAlign: 'center', color: 'var(--text-muted)', marginBottom: isMobile ? '8px' : '4px' }}>
+              {DAYS.map((d,i) => <div key={i}>{d.charAt(0)}</div>)}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: isMobile ? '4px' : '2px' }}>
+              {days.map((d, i) => {
+                const today = d && isToday(d);
+                const visible = d && isVisible(d);
+                return (
+                  <button key={i} onClick={() => d && onSelectDate(d)} disabled={!d} style={{
+                    width: cellSize, height: cellSize, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: '4px', fontSize, border: 'none', cursor: d ? 'pointer' : 'default',
+                    background: today ? 'var(--accent-blue)' : visible ? 'rgba(59, 125, 216, 0.15)' : 'transparent',
+                    color: d ? (today ? '#FFFFFF' : visible ? 'var(--accent-blue)' : 'var(--text-primary)') : 'transparent',
+                    fontWeight: today ? '700' : visible ? '500' : '400',
+                  }}>{d?.getDate()}</button>
+                );
+              })}
+            </div>
           </div>
         </Popover>
       );
@@ -2171,8 +2186,8 @@
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: isMobileDevice ? '12px' : '6px',
-            padding: isMobileDevice ? '14px 6px' : '4px 2px',
+            gap: isMobileDevice ? '8px' : '6px',
+            padding: isMobileDevice ? '8px 4px' : '4px 2px',
             background: 'transparent',
             borderRadius: '3px',
             opacity: item.completed ? 0.5 : (item._isPending ? 0.7 : 1),
@@ -2182,18 +2197,18 @@
           {/* Title */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              fontSize: isMobileDevice ? '1.25rem' : '0.625rem',
+              fontSize: isMobileDevice ? '1rem' : '0.625rem',
               fontWeight: '400',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               color: getTextColor(),
               textDecoration: item.completed ? 'line-through' : 'none',
-              lineHeight: isMobileDevice ? '1.5' : '1.2',
+              lineHeight: isMobileDevice ? '1.3' : '1.2',
             }}>
               {item.title}
               {item.repeat && (
-                <svg width={isMobileDevice ? "18" : "10"} height={isMobileDevice ? "18" : "10"} viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" style={{ marginLeft: '6px', verticalAlign: 'middle' }}>
+                <svg width={isMobileDevice ? "14" : "10"} height={isMobileDevice ? "14" : "10"} viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" style={{ marginLeft: '4px', verticalAlign: 'middle' }}>
                   <path d="M17 1l4 4-4 4"/>
                   <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
                   <path d="M7 23l-4-4 4-4"/>
@@ -2637,7 +2652,7 @@
             <div
               onClick={(e) => handleAddItem(e, false)}
               style={{
-                padding: '6px 8px 2px',
+                padding: '6px 12px 2px',
                 minHeight: '28px',
                 cursor: 'pointer',
                 display: 'flex',
@@ -2662,7 +2677,7 @@
             </div>
 
             {/* Items list - flex column to allow click area to expand */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
               {/* Drop indicator at top */}
               <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -3426,7 +3441,7 @@
             onDragEnd={() => setIsDraggingColumn(false)}
             onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
             style={{
-              padding: '6px 8px 2px',
+              padding: '6px 12px 2px',
               minHeight: '28px',
               cursor: 'pointer',
               opacity: isDraggingColumn ? 0.5 : 1,
@@ -3440,7 +3455,7 @@
           </div>
 
           {/* Items list - flex column to allow click area to expand */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => {
@@ -5286,26 +5301,18 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '0 16px',
+                      padding: '0 12px',
                     }}
                   >
-                    {categories.map(cat => {
+                    {categories.map((cat, catIndex) => {
                       const categoryItems = allItemsWithRecurring.filter(i => i.category === cat.id);
                       const backlogItems = categoryItems.filter(i =>
                         !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat
                       ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
                       return (
-                        <div
-                          key={cat.id}
-                          style={{
-                            marginBottom: '16px',
-                            background: 'var(--bg-primary)',
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {/* Category header - same style as desktop */}
+                        <div key={cat.id}>
+                          {/* Category header - same style as day headers */}
                           <div
                             onClick={() => {
                               const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
@@ -5324,7 +5331,7 @@
                               });
                             }}
                             style={{
-                              padding: '12px 16px',
+                              padding: catIndex === 0 ? '12px 4px 6px' : '20px 4px 6px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -5336,10 +5343,10 @@
                             </div>
                           </div>
 
-                          {/* Items list */}
-                          <div style={{ padding: '0 16px 12px' }}>
+                          {/* Items list - directly on background */}
+                          <div style={{ padding: '0 4px' }}>
                             {backlogItems.map((item) => (
-                              <div key={item.id} style={{ marginBottom: '4px' }}>
+                              <div key={item.id}>
                                 <ItemCard
                                   item={item}
                                   categories={categories}
@@ -5353,7 +5360,7 @@
                               </div>
                             ))}
                             {backlogItems.length === 0 && (
-                              <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', padding: '8px 0' }}>
+                              <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', padding: '8px 4px' }}>
                                 Sin items
                               </div>
                             )}
@@ -5441,7 +5448,7 @@
             )}
 
             {/* Calendar Popover */}
-            {calendarRect && <CalendarPopover baseDate={currentMobileDay} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setCurrentMobileDay(d); setCalendarRect(null); }} />}
+            {calendarRect && <CalendarPopover baseDate={currentMobileDay} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setCurrentMobileDay(d); setCalendarRect(null); }} isMobile={true} />}
 
             {/* New Category Popover */}
             {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
@@ -5502,10 +5509,9 @@
               {/* Add category button - entire cell is clickable */}
               <div
                 onClick={(e) => {
-                  if (!editPopover) {
+                  if (!editPopover && !newCatRect) {
                     const rect = e.currentTarget.getBoundingClientRect();
-                    // Adjust rect to position popover lower (at category row level)
-                    setNewCatRect({ ...rect, top: rect.top + 100, bottom: rect.bottom + 100 });
+                    setNewCatRect(rect);
                   }
                 }}
                 style={{
