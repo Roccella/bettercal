@@ -1789,6 +1789,7 @@
           draggable={!isMobileDevice || canDrag}
           onDragStart={(e) => {
             if (isMobileDevice && !canDrag) { e.preventDefault(); return; }
+            e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('itemData', dragData);
             setDragging(true);
             mouseDownPos.current = null;
@@ -2882,7 +2883,7 @@
     };
 
     // Mobile Day Column Component for scroll-snap
-    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, justDroppedItemId }) => {
+    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId }) => {
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
@@ -2920,8 +2921,8 @@
 
           {/* Slots */}
           <div style={{ flex: 1, overflow: 'auto' }} className="hide-scrollbar">
-            <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+            <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+            <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} allowClickToAdd={true} />
 
             {getDoneItems().length > 0 && (
               <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-light)' }}>
@@ -4018,6 +4019,9 @@
                         dayEnergy={dayEnergy}
                         onComplete={handleComplete}
                         onEdit={handleMobileEdit}
+                        onDelete={handleDelete}
+                        onDrop={handleDrop}
+                        onAdd={handleSave}
                         onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))}
                         justDroppedItemId={justDroppedItemId}
                       />
@@ -4074,7 +4078,7 @@
                   <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.625rem' }}>
                     {getShortMonthName(currentMobileDay)}
                   </button>
-                  {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
+                  {mobileViewMode === 'categories' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
                 </div>
 
                 {/* Center: View tabs */}
