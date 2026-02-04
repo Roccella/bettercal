@@ -432,11 +432,12 @@
     const TEMP_COLOR = '#9CA3AF';
     const COLORS = ['#DC2626','#EA580C','#D97706','#65A30D','#059669','#0D9488','#2563EB','#7C3AED','#DB2777'];
     const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const DAYS_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-    // Day width is base unit, sidebar is 1.2x
-    const DAY_WIDTH = 220;
-    const SIDEBAR_WIDTH = 300;
+    // Column widths - both calendar and category columns are same width
+    const DAY_WIDTH = 240;
+    const CATEGORY_WIDTH = 240;
 
     const initialCategories = [
       { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
@@ -541,6 +542,7 @@
 
     const formatDate = (d) => d.toISOString().split('T')[0];
     const formatDayName = (d) => DAYS[d.getDay()];
+    const formatDayNameFull = (d) => DAYS_FULL[d.getDay()];
     const formatDayNumber = (d) => d.getDate();
     const getMonthName = (d) => ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][d.getMonth()];
     const getShortMonthName = (d) => MONTHS[d.getMonth()];
@@ -1302,19 +1304,6 @@
                 )}
               </div>
 
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  {[0,1,2,3].map(e => (
-                    <button key={e} type="button" onClick={() => setEffort(e)} style={{
-                      flex: 1, padding: '6px', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                      background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
-                      color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '0.6875rem',
-                    }}>{e}</button>
-                  ))}
-                </div>
-              </div>
-
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
                 <button type="button" onClick={handleRequestClose} className="btn" style={{ padding: '6px 10px', fontSize: '0.75rem' }}>✕</button>
@@ -1854,6 +1843,14 @@
       const isJustDropped = justDroppedItemId && itemBaseId === justDroppedItemId;
       const isJustShimmered = justShimmeredItemId && itemBaseId === justShimmeredItemId;
 
+      const [isHovered, setIsHovered] = useState(false);
+
+      // Handle complete via checkbox
+      const handleCheckboxClick = (e) => {
+        e.stopPropagation();
+        onComplete(completeId);
+      };
+
       return (
         <div
           ref={cardRef}
@@ -1877,25 +1874,60 @@
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', padding: '5px 6px', background: getCardBackground(), borderRadius: '5px', opacity: item.completed ? 0.6 : (item._isPending ? 0.7 : 1), touchAction: 'manipulation' }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 2px',
+            background: 'transparent',
+            borderRadius: '3px',
+            opacity: item.completed ? 0.5 : (item._isPending ? 0.7 : 1),
+            touchAction: 'manipulation',
+          }}
         >
-          {/* Left: Title + metadata */}
-          <div style={{ flex: 1, minWidth: 0, marginTop: '1px' }}>
+          {/* Checkbox - visible on hover */}
+          <div
+            data-checkbox="true"
+            onClick={handleCheckboxClick}
+            style={{
+              width: '14px',
+              height: '14px',
+              borderRadius: '3px',
+              border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
+              background: item.completed ? 'var(--accent-green)' : 'transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: isHovered || item.completed ? 1 : 0,
+              transition: 'opacity 0.1s',
+              flexShrink: 0,
+            }}
+          >
+            {item.completed && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            )}
+          </div>
+          {/* Title */}
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              fontSize: '0.625rem', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              fontSize: '0.625rem',
+              fontWeight: '400',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
               color: getTextColor(),
+              textDecoration: item.completed ? 'line-through' : 'none',
             }}>{item.title}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-              {!inSidebar && cat && <span style={{ fontSize: '0.5rem', color: cat.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>}
-              {showDate && item.scheduledDate && !item.repeat && <span style={{ fontSize: '0.5rem', color: 'var(--text-muted)' }}>{formatDateLabel(item.scheduledDate)}</span>}
-              {inSidebar && item.repeat && <span style={{ fontSize: '0.5rem', color: 'var(--accent-blue)' }}>Recurrente</span>}
-              {!inSidebar && item.repeat && <span style={{ fontSize: '0.4375rem', color: 'var(--accent-blue)', flexShrink: 0 }}>🔄</span>}
-            </div>
           </div>
-          {/* Right: Effort bar */}
-          <div style={{ flexShrink: 0, marginTop: '8px' }}>
-            <EffortBar effort={item.effort} isToday={isToday} />
-          </div>
+          {/* Recurring indicator */}
+          {item.repeat && (
+            <span style={{ fontSize: '0.4375rem', color: 'var(--accent-blue)', flexShrink: 0, opacity: 0.7 }}>🔄</span>
+          )}
         </div>
       );
     };
@@ -2119,44 +2151,205 @@
 
     const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId }) => {
       const dateStr = formatDate(day.date);
-      const energy = dayEnergy[dateStr] || 2;
-      const getSlotItems = (slot) => items.filter(i => i.scheduledDate === dateStr && i.scheduledSlot === slot && !i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      const completedItems = items.filter(i => i.completedDate === dateStr && i.completed).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      const dayEffort = ['important','todo'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isSunday = day.date.getDay() === 0;
+
+      // Get all items for this day (both pending and completed, all slots merged)
+      const dayItems = items.filter(i =>
+        (i.scheduledDate === dateStr && !i.completed) ||
+        (i.completedDate === dateStr && i.completed)
+      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      const [dropIndex, setDropIndex] = useState(-1);
+      const [newItemId, setNewItemId] = useState(null);
+      const [editRect, setEditRect] = useState(null);
+      const newItemRef = useRef(null);
+      const columnRef = useRef(null);
 
       // Sunday line color - desaturated blue/gray
       const sundayLineColor = 'rgba(100, 116, 139, 0.5)';
 
+      const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
+
+      const handleItemDragOver = (e, index) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const y = e.clientY - rect.top;
+          const isTopHalf = y < rect.height / 2;
+          setDropIndex(isTopHalf ? index : index + 1);
+        }
+      };
+
+      const handleColumnDragOver = (e) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          if (!e.target.closest('[data-day-item]')) {
+            setDropIndex(dayItems.length);
+          }
+        }
+      };
+
+      const handleDragLeave = (e) => {
+        if (columnRef.current && !columnRef.current.contains(e.relatedTarget)) {
+          setDropIndex(-1);
+        }
+      };
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        const currentDropIndex = dropIndex;
+        setDropIndex(-1);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) {
+          onDrop(JSON.parse(data), dateStr, 'todo', currentDropIndex, { x: e.clientX, y: e.clientY });
+        }
+      };
+
+      // Add item - addAtEnd: true = bottom (click area), false = top (header click)
+      const handleAddItem = (e, addAtEnd = true) => {
+        e.stopPropagation();
+        if (Date.now() - lastPopoverCloseTime < 200) return;
+        const minSortOrder = dayItems.length > 0 ? Math.min(...dayItems.map(i => i.sortOrder || 0)) : 0;
+        const maxSortOrder = dayItems.length > 0 ? Math.max(...dayItems.map(i => i.sortOrder || 0)) : 0;
+        const sortOrder = addAtEnd ? maxSortOrder + 1 : minSortOrder - 1;
+        onAdd({
+          title: '',
+          description: '',
+          category: 'temp',
+          effort: 1,
+          repeat: null,
+          scheduledDate: dateStr,
+          scheduledSlot: 'todo',
+          completed: false,
+          completedDate: null,
+          sortOrder,
+          _isNewItem: true,
+          _addAtEnd: addAtEnd,
+        });
+        setNewItemId('pending');
+      };
+
+      // Show edit popover once new item is rendered
+      useEffect(() => {
+        if (newItemId === 'pending') {
+          const newestItem = dayItems.find(i => i._isNewItem);
+          if (newestItem) {
+            const timer = setTimeout(() => {
+              if (newItemRef.current) {
+                const rect = newItemRef.current.getBoundingClientRect();
+                setEditRect({ itemId: newestItem.id, rect });
+                setNewItemId(null);
+              }
+            }, 10);
+            return () => clearTimeout(timer);
+          }
+        }
+      }, [newItemId, dayItems]);
+
+      const handleClosePopover = () => {
+        setEditRect(null);
+      };
+
+      const editingItem = editRect ? dayItems.find(i => i.id === editRect.itemId) : null;
+
+      // Header text color based on day type
+      const getHeaderColor = () => {
+        if (isToday) return 'var(--accent-blue)';
+        if (day.isPast) return 'var(--text-past)';
+        return 'var(--text-primary)';
+      };
+
       return (
-        <div style={{
-          flex: `0 0 ${DAY_WIDTH}px`, minWidth: `${DAY_WIDTH}px`, display: 'flex', flexDirection: 'column',
-          borderRight: '1px solid var(--border-color)',
-          borderLeft: (isSunday && !isSticky) ? `10px solid ${sundayLineColor}` : 'none',
-          marginLeft: (isSunday && !isSticky) ? '-1px' : 0,
-          background: isToday ? 'var(--today-bg)' : day.isPast ? 'var(--bg-secondary)' : 'var(--bg-primary)',
-          position: isSticky ? 'sticky' : 'relative', left: isSticky ? 0 : 'auto',
-          zIndex: isSticky ? 10 : 1, boxShadow: isSticky ? '4px 0 10px rgba(0,0,0,0.1)' : 'none',
-        }}>
-          <div style={{ padding: '8px 12px', minHeight: '44px', borderBottom: '1px solid var(--border-color)', background: isToday ? 'var(--today-header)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ fontSize: '0.8125rem', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
-              <span style={{ fontSize: '0.8125rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
+        <>
+          <div
+            ref={columnRef}
+            onDragOver={handleColumnDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            style={{
+              flex: `0 0 ${DAY_WIDTH}px`,
+              minWidth: `${DAY_WIDTH}px`,
+              display: 'flex',
+              flexDirection: 'column',
+              borderRight: '1px solid var(--border-color)',
+              borderLeft: (isSunday && !isSticky) ? `10px solid ${sundayLineColor}` : 'none',
+              marginLeft: (isSunday && !isSticky) ? '-1px' : 0,
+              background: 'var(--bg-primary)',
+              position: isSticky ? 'sticky' : 'relative',
+              left: isSticky ? 0 : 'auto',
+              zIndex: isSticky ? 10 : 1,
+              boxShadow: isSticky ? '4px 0 10px rgba(0,0,0,0.1)' : 'none',
+            }}>
+            {/* Header - clickable to add at top */}
+            <div
+              onClick={(e) => handleAddItem(e, false)}
+              style={{
+                padding: '8px 12px',
+                minHeight: '60px',
+                cursor: 'pointer',
+              }}>
+              <div style={{
+                fontSize: '0.5rem',
+                color: getHeaderColor(),
+                fontWeight: '500',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                marginBottom: '2px',
+              }}>
+                {formatDayNumber(day.date)} {getShortMonthName(day.date)} {day.date.getFullYear()}
+              </div>
+              <div style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: getHeaderColor(),
+              }}>
+                {formatDayNameFull(day.date)}
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <EnergySelector energy={energy} onChange={(e) => onSetEnergy(dateStr, e)} />
-              <div style={{ marginTop: '-1px' }}><EffortBarSlot effort={dayEffort} energy={energy} /></div>
+
+            {/* Items list */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px' }}>
+              {/* Drop indicator at top */}
+              <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
+              {dayItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  ref={item._isNewItem ? newItemRef : null}
+                  data-day-item="true"
+                  onDragOver={(e) => handleItemDragOver(e, index)}
+                  style={{ marginBottom: '2px' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+                  <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
+                </div>
+              ))}
+              {/* Click area to add at end */}
+              <div
+                onClick={(e) => handleAddItem(e, true)}
+                style={{
+                  minHeight: '40px',
+                  flex: 1,
+                  cursor: 'pointer',
+                }}
+              />
             </div>
           </div>
-          <div className="slot-container">
-            <div className="slots-scrollable">
-              <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
-              <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} allowClickToAdd={true} />
-            </div>
-            <SlotSection slot="done" label="Hecho" items={completedItems} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isDone={true} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
-          </div>
-        </div>
+          {editRect && editingItem && ReactDOM.createPortal(
+            <AddEditItemPopover
+              categories={categories}
+              onSave={onAdd}
+              onDelete={onDelete}
+              onComplete={onComplete}
+              onClose={handleClosePopover}
+              targetRect={editRect.rect}
+              editItem={editingItem}
+            />,
+            document.body
+          )}
+        </>
       );
     };
 
@@ -2741,6 +2934,195 @@
       );
     };
 
+    // ============ SIMPLIFIED CATEGORY COLUMN (for two-row layout) ============
+    const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onSidebarGroupDrop, justDroppedItemId }) => {
+      const categoryItems = items.filter(i => i.category === category.id);
+
+      // Get only backlog items (no scheduledDate, not completed, not recurring)
+      const backlogItems = categoryItems.filter(i =>
+        !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat
+      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      const [dropIndex, setDropIndex] = useState(-1);
+      const [editCatRect, setEditCatRect] = useState(null);
+      const [isDraggingColumn, setIsDraggingColumn] = useState(false);
+      const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const columnRef = useRef(null);
+
+      const isCategoryDraggable = !category.isFixed;
+
+      const handleCategoryClick = (e) => {
+        if (category.isFixed) return;
+        e.stopPropagation();
+        setEditCatRect(e.currentTarget.getBoundingClientRect());
+      };
+
+      const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
+
+      const handleItemDragOver = (e, index) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const y = e.clientY - rect.top;
+          const isTopHalf = y < rect.height / 2;
+          setDropIndex(isTopHalf ? index : index + 1);
+        }
+      };
+
+      const handleColumnDragOver = (e) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          if (!e.target.closest('[data-backlog-item]')) {
+            setDropIndex(backlogItems.length);
+          }
+        }
+      };
+
+      const handleDragLeave = (e) => {
+        if (columnRef.current && !columnRef.current.contains(e.relatedTarget)) {
+          setDropIndex(-1);
+        }
+      };
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        const currentDropIndex = dropIndex;
+        setDropIndex(-1);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) {
+          const parsed = JSON.parse(data);
+          const { id } = parsed;
+          const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : parseInt(id);
+          const item = allItems.find(i => i.id === numId);
+
+          // If item has a date or is recurring, show confirmation popover
+          if (item && (item.scheduledDate || item.repeat)) {
+            const rect = {
+              top: e.clientY,
+              bottom: e.clientY + 10,
+              left: e.clientX - 140,
+              right: e.clientX + 140,
+            };
+            setRemoveDatePopover({ item, rect, dropIdx: currentDropIndex, isRecurring: !!item.repeat });
+            return;
+          }
+
+          onSidebarGroupDrop?.(numId, 'backlog', category.id, currentDropIndex);
+        }
+      };
+
+      // Add item to backlog
+      const handleAddItem = (addAtEnd = true) => {
+        const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+        const maxSortOrder = backlogItems.length > 0 ? Math.max(...backlogItems.map(i => i.sortOrder || 0)) : 0;
+        const sortOrder = addAtEnd ? maxSortOrder + 1 : minSortOrder - 1;
+        onAdd({
+          title: '',
+          description: '',
+          category: category.id,
+          effort: 1,
+          repeat: null,
+          scheduledDate: null,
+          scheduledSlot: null,
+          completed: false,
+          completedDate: null,
+          sortOrder,
+          _isNewItem: true,
+        });
+      };
+
+      return (
+        <div
+          ref={columnRef}
+          onDragOver={handleColumnDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          style={{
+            flex: `0 0 ${CATEGORY_WIDTH}px`,
+            width: `${CATEGORY_WIDTH}px`,
+            display: 'flex',
+            flexDirection: 'column',
+            borderRight: '1px solid var(--border-color)',
+            height: '100%',
+            background: 'var(--bg-primary)',
+          }}>
+          {/* Category header - clickable to edit */}
+          <div
+            draggable={isCategoryDraggable}
+            onDragStart={(e) => {
+              if (!isCategoryDraggable) { e.preventDefault(); return; }
+              e.dataTransfer.setData('categoryId', category.id);
+              setIsDraggingColumn(true);
+            }}
+            onDragEnd={() => setIsDraggingColumn(false)}
+            onClick={handleCategoryClick}
+            style={{
+              padding: '8px 12px',
+              minHeight: '60px',
+              cursor: isCategoryDraggable ? 'pointer' : 'default',
+              opacity: isDraggingColumn ? 0.5 : 1,
+            }}>
+            <div style={{ fontSize: '0.5rem', color: category.color, fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
+              {backlogItems.length} items
+            </div>
+            <div style={{ fontSize: '0.875rem', fontWeight: '600', color: category.color }}>
+              {category.name}
+            </div>
+          </div>
+
+          {/* Items list */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px' }}>
+            {/* Drop indicator at top */}
+            <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
+            {backlogItems.map((item, index) => (
+              <div
+                key={item.id}
+                data-backlog-item="true"
+                onDragOver={(e) => handleItemDragOver(e, index)}
+                style={{ marginBottom: '2px' }}
+              >
+                <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} justDroppedItemId={justDroppedItemId} />
+                <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
+              </div>
+            ))}
+            {/* Click area to add at end */}
+            <div
+              onClick={() => handleAddItem(true)}
+              style={{
+                minHeight: '40px',
+                flex: 1,
+                cursor: 'pointer',
+              }}
+            />
+          </div>
+
+          {removeDatePopover && (
+            <RemoveDatePopover
+              itemTitle={removeDatePopover.item.title}
+              isRecurring={removeDatePopover.isRecurring}
+              onConfirm={() => {
+                onSidebarGroupDrop?.(removeDatePopover.item.id, 'backlog', category.id, removeDatePopover.dropIdx);
+                setRemoveDatePopover(null);
+              }}
+              onCancel={() => setRemoveDatePopover(null)}
+              targetRect={removeDatePopover.rect}
+            />
+          )}
+          {editCatRect && (
+            <EditCategoryPopover
+              category={category}
+              itemCount={categoryItems.length}
+              onSave={onEditCategory}
+              onDelete={() => {}}
+              onClose={() => setEditCatRect(null)}
+              targetRect={editCatRect}
+            />
+          )}
+        </div>
+      );
+    };
+
     // ============ MOBILE COMPONENTS ============
 
     // BottomSheet for mobile item editing
@@ -2964,19 +3346,6 @@
               )}
             </div>
 
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Esfuerzo</div>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {[0,1,2,3].map(e => (
-                  <button key={e} type="button" onClick={() => setEffort(e)} style={{
-                    flex: 1, padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    background: effort === e ? getEffortColor(e) : 'var(--bg-tertiary)',
-                    color: effort === e ? '#FFF' : 'var(--text-secondary)', fontWeight: '600', fontSize: '0.75rem',
-                  }}>{e}</button>
-                ))}
-              </div>
-            </div>
-
             {/* Bottom actions */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
               {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
@@ -3001,52 +3370,108 @@
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
-      const energy = dayEnergy[dateStr] || 2;
 
-      const getSlotItems = (slot) => items.filter(i => i.scheduledDate === dateStr && i.scheduledSlot === slot && !i.completed)
-        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      const getDoneItems = () => items.filter(i => i.completedDate === dateStr && i.completed)
-        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      // Get all items for this day (both pending and completed, all slots merged)
+      const dayItems = items.filter(i =>
+        (i.scheduledDate === dateStr && !i.completed) ||
+        (i.completedDate === dateStr && i.completed)
+      ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-      const dayEffort = ['important','todo'].reduce((s, slot) => s + getSlotItems(slot).reduce((a, i) => a + i.effort, 0), 0);
-      const maxEffort = energy * 3;
+      const [dropIndex, setDropIndex] = useState(-1);
+      const columnRef = useRef(null);
+
+      const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
+
+      const handleItemDragOver = (e, index) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const y = e.clientY - rect.top;
+          const isTopHalf = y < rect.height / 2;
+          setDropIndex(isTopHalf ? index : index + 1);
+        }
+      };
+
+      const handleColumnDragOver = (e) => {
+        if (hasItemData(e)) {
+          e.preventDefault();
+          if (!e.target.closest('[data-mobile-item]')) {
+            setDropIndex(dayItems.length);
+          }
+        }
+      };
+
+      const handleDragLeave = (e) => {
+        if (columnRef.current && !columnRef.current.contains(e.relatedTarget)) {
+          setDropIndex(-1);
+        }
+      };
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        const currentDropIndex = dropIndex;
+        setDropIndex(-1);
+        const data = e.dataTransfer.getData('itemData');
+        if (data) {
+          onDrop(JSON.parse(data), dateStr, 'todo', currentDropIndex, { x: e.clientX, y: e.clientY });
+        }
+      };
+
+      // Header text color based on day type
+      const getHeaderColor = () => {
+        if (isToday) return 'var(--accent-blue)';
+        if (isPast) return 'var(--text-past)';
+        return 'var(--text-primary)';
+      };
 
       return (
-        <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
+        <div
+          ref={columnRef}
+          className="mobile-day-column"
+          onDragOver={handleColumnDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}
+        >
           {/* Day header */}
-          <div style={{ padding: '14px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
-                {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
-              </div>
+          <div style={{ padding: '14px', touchAction: 'none' }}>
+            <div style={{
+              fontSize: '0.625rem',
+              color: getHeaderColor(),
+              fontWeight: '500',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              marginBottom: '2px',
+            }}>
+              {formatDayNumber(day.date)} {getShortMonthName(day.date)} {day.date.getFullYear()}
             </div>
-            <div style={{ display: 'flex', gap: '0' }}>
-              {['❤️‍🩹', '❤️', '❤️‍🔥'].map((emoji, i) => (
-                <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
-                  style={{ background: 'none', border: 'none', fontSize: '1rem', padding: '8px 6px', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer', touchAction: 'manipulation' }}>
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            <div style={{ width: '50px', height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ width: `${Math.min(100, (dayEffort / maxEffort) * 100)}%`, height: '100%', background: dayEffort > maxEffort ? '#EF4444' : dayEffort >= maxEffort * 0.8 ? '#F59E0B' : '#22C55E', borderRadius: '4px' }} />
+            <div style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: getHeaderColor(),
+            }}>
+              {formatDayNameFull(day.date)}
             </div>
           </div>
 
-          {/* Slots */}
-          <div style={{ flex: 1, overflow: 'auto' }} className="hide-scrollbar">
-            <SlotSection slot="important" label="Importante" items={getSlotItems('important')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-            <SlotSection slot="todo" label="Pendiente" items={getSlotItems('todo')} energy={energy} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onDrop={(data, slot, dropIdx, coords) => onDrop(data, dateStr, slot, dropIdx, coords)} onAdd={onAdd} dateStr={dateStr} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} allowClickToAdd={true} />
-
-            {getDoneItems().length > 0 && (
-              <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-light)' }}>
-                <div style={{ fontSize: '0.5625rem', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '6px', textTransform: 'uppercase' }}>Hecho ({getDoneItems().length})</div>
-                {getDoneItems().slice(0, 3).map(item => (
-                  <ItemCard key={item.id} item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
-                ))}
-                {getDoneItems().length > 3 && <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', padding: '4px' }}>+{getDoneItems().length - 3} más</div>}
+          {/* Items list */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 8px' }} className="hide-scrollbar">
+            {/* Drop indicator at top */}
+            <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
+            {dayItems.map((item, index) => (
+              <div
+                key={item.id}
+                data-mobile-item="true"
+                onDragOver={(e) => handleItemDragOver(e, index)}
+                style={{ marginBottom: '2px' }}
+              >
+                <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} isToday={isToday} isPast={isPast} justDroppedItemId={justDroppedItemId} />
+                <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
               </div>
-            )}
+            ))}
+            {/* Empty space for adding items */}
+            <div style={{ minHeight: '100px', flex: 1 }} />
           </div>
         </div>
       );
@@ -3064,7 +3489,7 @@
     };
 
     const App = () => {
-      const [theme, setTheme] = useState('dark');
+      const theme = 'dark'; // Dark mode only
       const [categories, setCategories] = useState(initialCategories);
       const [items, setItems] = useState(initialItems);
       const [dayEnergy, setDayEnergy] = useState(initialDayEnergy);
@@ -3128,9 +3553,6 @@
         }
         lastScrollY.current = currentY;
       }, []);
-
-      // Expanded categories mode (desktop only)
-      const [expandedCategoriesMode, setExpandedCategoriesMode] = useState(false);
 
       const scrollRef = useRef(null);
       const [sticky, setSticky] = useState(false);
@@ -4267,11 +4689,6 @@
           return;
         }
 
-        // Desktop: close expanded view if open
-        if (expandedCategoriesMode) {
-          setExpandedCategoriesMode(false);
-        }
-
         // Navigate calendar to show the target date
         const targetDateObj = new Date(targetDate + 'T00:00:00');
         setViewBase(targetDateObj);
@@ -4302,7 +4719,7 @@
             }, 100);
           }
         }, 100);
-      }, [expandedCategoriesMode, allItemsWithRecurring, items, isMobile, days]);
+      }, [allItemsWithRecurring, items, isMobile, days]);
 
       // Mobile helper: get items for current mobile day
       const mobileIsToday = formatDate(currentMobileDay) === formatDate(REAL_TODAY);
@@ -4454,86 +4871,56 @@
         );
       }
 
-      // ===== DESKTOP LAYOUT (original) =====
+      // ===== DESKTOP LAYOUT - Two rows: Calendar top, Categories bottom =====
       return (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
-          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-            {/* Calendar section - hidden in expanded categories mode */}
-            {!expandedCategoriesMode && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                {/* Calendar header */}
-                <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
-                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem' }}>{getShortMonthName(viewBase)} {viewBase.getFullYear()}</button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <button onClick={() => navigateDays(-12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
-                    <button onClick={() => navigateDays(-1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
-                  </div>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <button onClick={() => navigateDays(1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
-                    <button onClick={() => navigateDays(12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
-                  </div>
-                  <button onClick={goToToday} className="btn">Hoy</button>
-                  <div style={{ flex: 1 }} />
-                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} style={{ background: 'none', border: 'none', padding: '0', fontSize: '0.75rem', cursor: 'pointer' }}>{theme === 'light' ? '🌙' : '☀️'}</button>
-                </div>
-                <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
-                  {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
-                </div>
+          {/* Row 1: Calendar with header */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
+            {/* Calendar header */}
+            <div style={{ padding: '8px 10px', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
+              <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                {getShortMonthName(viewBase)} {viewBase.getFullYear()}
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => navigateDays(-12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
+                <button onClick={() => navigateDays(-1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
               </div>
-            )}
+              <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => navigateDays(1)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
+                <button onClick={() => navigateDays(12)} className="btn"><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
+              </div>
+              <button onClick={goToToday} className="btn">Hoy</button>
+              <div style={{ flex: 1 }} />
+            </div>
+            <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', background: 'var(--bg-primary)' }}>
+              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
+            </div>
+          </div>
 
-            {/* Expanded Categories Mode - full width with horizontal scroll */}
-            {expandedCategoriesMode ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
-                <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                  <div style={{ flex: 1 }} />
-                  <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}>Agregar categoría</button>
-                  <button onClick={clearDone} className="btn">Limpiar hechos</button>
-                  <button onClick={() => setExpandedCategoriesMode(false)} className="btn btn-primary">Calendario</button>
+          {/* Row 2: Categories - horizontal scroll */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
+            <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
+              {categories.map(cat => (
+                <div key={cat.id}
+                  onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
+                  onDragLeave={() => setDragOverCat(null)}
+                  onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}
+                  style={{ outline: dragOverCat === cat.id ? '2px dashed var(--accent-blue)' : 'none' }}>
+                  <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} />
                 </div>
-                <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
-                  {categories.map(cat => (
-                    <div key={cat.id}
-                      onDragOver={(e) => { if (e.dataTransfer.types.includes('expandedcategoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
-                      onDragLeave={() => setDragOverCat(null)}
-                      onDrop={(e) => { const id = e.dataTransfer.getData('expandedCategoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}
-                      style={{ outline: dragOverCat === cat.id ? '2px dashed var(--accent-blue)' : 'none' }}>
-                      <ExpandedCategoryColumn category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }} onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} draggingUnscheduledItem={draggingUnscheduledItem} onScheduledItemClick={handleScheduledItemClick} />
-                    </div>
-                  ))}
-                </div>
+              ))}
+              {/* Add category button */}
+              <div style={{ flex: '0 0 60px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '12px' }}>
+                <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>+</button>
               </div>
-            ) : (
-              /* Sidebar - normal mode */
-              <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <div style={{ borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
-                    <div style={{ flex: 1 }} />
-                    <button onClick={() => setExpandedCategoriesMode(true)} className="btn">Ampliar</button>
-                  </div>
-                  <div style={{ padding: '0 10px 8px', display: 'flex', gap: '4px' }}>
-                    <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ flex: 1, fontSize: '0.5rem', opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}>Agregar categoría</button>
-                    <button onClick={clearDone} className="btn" style={{ flex: 1, fontSize: '0.5rem' }}>Limpiar hechos</button>
-                  </div>
-                </div>
-                <div style={{ flex: 1, overflowY: 'auto' }}>
-                  {categories.map(cat => (
-                    <div key={cat.id}
-                      onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
-                      onDragLeave={() => setDragOverCat(null)}
-                      onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}>
-                      <CategorySection category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} expanded={expanded[cat.id] || false} dragOverCat={dragOverCat}
-                        onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} groupsExpandedState={groupsExpandedState} justDroppedItemId={justDroppedItemId}
-                        groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
-                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} draggingUnscheduledItem={draggingUnscheduledItem} onScheduledItemClick={handleScheduledItemClick} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
