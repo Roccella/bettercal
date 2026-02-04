@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Better Cal - Prototype v23</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
@@ -244,7 +244,7 @@
       flex: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column;
     }
     .slot-row {
-      padding: 10px 10px 8px 10px;
+      padding: 10px;
       min-height: 50px;
     }
     .slot-row:last-child {
@@ -252,7 +252,7 @@
     }
     .slot-row-done {
       height: 145px; min-height: 145px; max-height: 145px;
-      overflow-y: auto; padding: 6px 10px 8px 10px;
+      overflow-y: auto; padding: 8px 10px;
       border-top: 1px solid var(--border-light);
     }
 
@@ -3014,7 +3014,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '40px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
+          <div style={{ padding: '14px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
@@ -4311,7 +4311,7 @@
       if (isMobile) {
         // MOBILE LAYOUT
         return (
-          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
+          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
             {/* Mobile Content - Both views side by side with slide animation */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <div className={`mobile-views-container view-${mobileViewMode}`}>
@@ -4353,7 +4353,7 @@
                     transition: 'max-height 0.2s ease-out',
                     opacity: catHeaderVisible ? 1 : 0
                   }}>
-                    <div style={{ padding: '34px 12px 8px', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ padding: '14px 12px', display: 'flex', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                     </div>
                     <div style={{ padding: '0 12px 10px', display: 'flex', gap: '6px' }}>
