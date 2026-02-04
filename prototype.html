@@ -9,7 +9,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 
     :root {
       --bg-primary: #FFFFFF;
@@ -1682,7 +1682,7 @@
             setCanDrag(true);
             // Vibrate if supported to indicate drag is enabled
             if (navigator.vibrate) navigator.vibrate(50);
-          }, 100); // 100ms long press
+          }, 50); // 50ms long press
         }
       };
 
