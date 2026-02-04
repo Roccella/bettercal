@@ -328,7 +328,7 @@
       background: var(--bg-primary);
       border-top: 1px solid var(--border-color);
       padding: 0 12px;
-      padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
