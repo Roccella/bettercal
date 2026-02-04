@@ -325,8 +325,8 @@
       display: none;
       background: var(--bg-primary);
       border-top: 1px solid var(--border-color);
-      padding: 0 12px;
-      padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      padding: 0 12px 12px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
@@ -1387,7 +1387,7 @@
             </div>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
               {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
-              <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>{isNew ? 'Crear' : 'Guardar'}</button>
+              <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>Guardar</button>
             </div>
             {!isNew && !canDelete && <div style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
           </Popover>
@@ -1744,7 +1744,7 @@
             setJustGrabbed(true);
             // Clear grab animation after it plays
             setTimeout(() => setJustGrabbed(false), 300);
-          }, 350); // 350ms long press for drag activation
+          }, 400); // 400ms long press for drag activation
         }
       };
 
@@ -2347,12 +2347,6 @@
       const contentRef = useRef(null);
       const expandTimeoutRef = useRef(null);
 
-      const handleCategoryDoubleClick = (e) => {
-        if (category.isFixed) return;
-        e.stopPropagation();
-        setEditCatRect(e.currentTarget.getBoundingClientRect());
-      };
-
       // Create item in backlog - addAtEnd determines position
       const handleBacklogAddItem = (addAtEnd) => {
         // Don't create if a popover was just closed
@@ -2499,8 +2493,16 @@
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('categoryId', category.id); setDragging(true); }}
             onDragEnd={() => setDragging(false)}
             onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '44px', background: expanded ? `${category.color}12` : 'transparent' }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
-            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); if (!category.isFixed) setEditCatRect(e.currentTarget.getBoundingClientRect()); }}
+              style={{ background: 'none', border: 'none', padding: '8px', marginLeft: '-8px', marginRight: '2px', cursor: category.isFixed ? 'default' : 'pointer', opacity: category.isFixed ? 0.4 : 1 }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={category.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
             <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '0.625rem', padding: '4px' }}>▼</span>
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`}>
@@ -2633,6 +2635,7 @@
 
       const [isDraggingItem, setIsDraggingItem] = useState(false);
       const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const [editCatRect, setEditCatRect] = useState(null);
       const dragCountRef = useRef(0);
 
       const handleGroupDrop = (data, targetGroup, e, dropIdx) => {
@@ -2684,9 +2687,18 @@
           onDrop={handleColumnDrop}
           style={{ flex: '0 0 300px', width: '300px', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)', height: '100%' }}>
           <div style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12` }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
+            <button
+              onClick={(e) => { e.stopPropagation(); if (!category.isFixed) setEditCatRect(e.currentTarget.getBoundingClientRect()); }}
+              style={{ background: 'none', border: 'none', padding: '8px', marginLeft: '-8px', marginRight: '2px', cursor: category.isFixed ? 'default' : 'pointer', opacity: category.isFixed ? 0.4 : 1 }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={category.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
             <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
           </div>
+          {editCatRect && <EditCategoryPopover category={category} itemCount={categoryItems.length} onSave={onEditCategory} onDelete={() => {}} onClose={() => setEditCatRect(null)} targetRect={editCatRect} />}
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px 8px' }}>
             <SidebarGroup label="Backlog" count={backlogItems.length} items={backlogItems} expanded={backlogExp} onToggle={() => onGroupToggle?.('backlog')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)} showDropIndicator={isDraggingItem} isBacklog={true} justDroppedItemId={justDroppedItemId} />
             <div style={{ marginBottom: '4px' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
@@ -2979,7 +2991,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
+          <div style={{ padding: '20px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
