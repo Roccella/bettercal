@@ -431,7 +431,7 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Day width is base unit, sidebar is 1.2x
-    const DAY_WIDTH = 210;
+    const DAY_WIDTH = 220;
     const SIDEBAR_WIDTH = 300;
 
     const initialCategories = [
@@ -1744,9 +1744,7 @@
             setJustGrabbed(true);
             // Clear grab animation after it plays
             setTimeout(() => setJustGrabbed(false), 300);
-            // Vibrate if supported to indicate drag is enabled
-            if (navigator.vibrate) navigator.vibrate(50);
-          }, 200); // 200ms long press - needs to match Safari's drag activation time
+          }, 250); // 250ms long press for drag activation
         }
       };
 
