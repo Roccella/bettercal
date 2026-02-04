@@ -379,6 +379,9 @@
 
       .mobile-footer { display: block; }
 
+      /* Toast wider in mobile */
+      .toast { width: calc(100vw - 40px); max-width: 400px; }
+
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
 
@@ -445,7 +448,7 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Column widths - both calendar and category columns are same width
-    const DAY_WIDTH = 200;
+    const DAY_WIDTH = 220;
     const CATEGORY_WIDTH = 240;
 
     const initialCategories = [
@@ -2187,7 +2190,7 @@
             display: 'flex',
             alignItems: 'center',
             gap: isMobileDevice ? '8px' : '6px',
-            padding: isMobileDevice ? '8px 4px' : '4px 2px',
+            padding: isMobileDevice ? '8px 0' : '4px 0',
             background: 'transparent',
             borderRadius: '3px',
             opacity: item.completed ? 0.5 : (item._isPending ? 0.7 : 1),
@@ -2197,7 +2200,7 @@
           {/* Title */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              fontSize: isMobileDevice ? '1rem' : '0.625rem',
+              fontSize: isMobileDevice ? '0.875rem' : '0.625rem',
               fontWeight: '400',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -2207,23 +2210,35 @@
               lineHeight: isMobileDevice ? '1.3' : '1.2',
             }}>
               {item.title}
-              {item.repeat && (
-                <svg width={isMobileDevice ? "14" : "10"} height={isMobileDevice ? "14" : "10"} viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" style={{ marginLeft: '4px', verticalAlign: 'middle' }}>
-                  <path d="M17 1l4 4-4 4"/>
-                  <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                  <path d="M7 23l-4-4 4-4"/>
-                  <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                </svg>
-              )}
             </div>
           </div>
-          {/* Hover buttons: Important and Checkbox */}
+          {/* Hover buttons: Recurrence icon, Important and Checkbox */}
           {!isMobileDevice && (
             <div style={{
               display: 'flex',
               gap: '0',
               alignItems: 'center',
             }}>
+              {/* Recurrence icon - replaces important button for recurring items */}
+              {item.repeat && (
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
+                    <path d="M17 1l4 4-4 4"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <path d="M7 23l-4-4 4-4"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
+                </div>
+              )}
               {/* Important button - visible on hover, hidden for recurring items */}
               {onToggleImportant && !item.repeat && (
                 <div
@@ -2270,7 +2285,7 @@
                   width: '14px',
                   height: '14px',
                   borderRadius: '3px',
-                  border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
+                  border: `2px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
                   background: item.completed ? 'var(--accent-green)' : 'transparent',
                   display: 'flex',
                   alignItems: 'center',
@@ -2636,12 +2651,12 @@
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             style={{
-              flex: (isSunday && !isSticky) ? `0 0 ${DAY_WIDTH + 20}px` : `0 0 ${DAY_WIDTH}px`,
-              minWidth: (isSunday && !isSticky) ? `${DAY_WIDTH + 20}px` : `${DAY_WIDTH}px`,
+              flex: (isSunday && !isSticky) ? `0 0 ${DAY_WIDTH + 16}px` : `0 0 ${DAY_WIDTH}px`,
+              minWidth: (isSunday && !isSticky) ? `${DAY_WIDTH + 16}px` : `${DAY_WIDTH}px`,
               display: 'flex',
               flexDirection: 'column',
               borderRight: '1px solid var(--border-color)',
-              borderLeft: (isSunday && !isSticky) ? `20px solid ${sundayLineColor}` : 'none',
+              borderLeft: (isSunday && !isSticky) ? `16px solid ${sundayLineColor}` : 'none',
               background: 'var(--bg-primary)',
               position: isSticky ? 'sticky' : 'relative',
               left: isSticky ? 0 : 'auto',
@@ -3422,8 +3437,8 @@
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            flex: `0 0 ${category.id === 'temp' ? 320 : CATEGORY_WIDTH}px`,
-            width: `${category.id === 'temp' ? 320 : CATEGORY_WIDTH}px`,
+            flex: `0 0 ${CATEGORY_WIDTH}px`,
+            width: `${CATEGORY_WIDTH}px`,
             display: 'flex',
             flexDirection: 'column',
             borderRight: '1px solid var(--border-color)',
@@ -3629,7 +3644,7 @@
                 onClick={handleRequestClose}
                 style={{
                   background: 'none', border: 'none',
-                  color: 'var(--text-secondary)', fontSize: '0.875rem', cursor: 'pointer',
+                  color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer',
                   padding: '8px 0'
                 }}
               >
@@ -3639,7 +3654,7 @@
                 onClick={handleSave}
                 disabled={!title.trim()}
                 className="btn btn-primary"
-                style={{ padding: '8px 16px', fontSize: '0.875rem', opacity: title.trim() ? 1 : 0.5 }}
+                style={{ padding: '8px 16px', fontSize: '0.75rem', opacity: title.trim() ? 1 : 0.5 }}
               >
                 {isEditing ? 'Guardar' : 'Agregar'}
               </button>
@@ -3811,7 +3826,9 @@
       });
 
       const [dropIndex, setDropIndex] = useState(-1);
+      const [isScrolled, setIsScrolled] = useState(false);
       const columnRef = useRef(null);
+      const scrollContainerRef = useRef(null);
 
       const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
 
@@ -3858,6 +3875,11 @@
         return 'var(--text-primary)';
       };
 
+      // Handle scroll to show/hide header border
+      const handleScroll = (e) => {
+        setIsScrolled(e.target.scrollTop > 0);
+      };
+
       return (
         <div
           ref={columnRef}
@@ -3868,9 +3890,14 @@
           style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}
         >
           {/* Day header - desktop style with 150% size */}
-          <div style={{ padding: '16px 20px 8px', touchAction: 'none' }}>
+          <div style={{
+            padding: '20px 20px 10px',
+            touchAction: 'none',
+            borderBottom: isScrolled ? '1px solid var(--border-color)' : '1px solid transparent',
+            transition: 'border-color 0.15s',
+          }}>
             <div style={{
-              fontSize: '1.25rem',
+              fontSize: '1.375rem',
               color: getHeaderColor(),
             }}>
               <span style={{ fontWeight: '700' }}>{formatDayNumber(day.date)}</span>
@@ -3879,7 +3906,7 @@
           </div>
 
           {/* Items list - 150% scale with more padding */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '0 20px 16px' }} className="hide-scrollbar">
+          <div ref={scrollContainerRef} onScroll={handleScroll} style={{ flex: 1, overflow: 'auto', padding: '0 20px 16px' }} className="hide-scrollbar">
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {dayItems.map((item, index) => (
@@ -5301,7 +5328,7 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '0 12px',
+                      padding: '12px 12px 0',
                     }}
                   >
                     {categories.map((cat, catIndex) => {
@@ -5331,13 +5358,13 @@
                               });
                             }}
                             style={{
-                              padding: catIndex === 0 ? '12px 4px 6px' : '20px 4px 6px',
+                              padding: catIndex === 0 ? '8px 4px 6px' : '24px 4px 6px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
                             }}
                           >
-                            <div style={{ fontSize: '1rem', color: cat.color }}>
+                            <div style={{ fontSize: '1.125rem', color: cat.color }}>
                               <span style={{ fontWeight: '700' }}>{cat.name}</span>
                               <span style={{ fontWeight: '400', opacity: 0.7 }}> ({backlogItems.length})</span>
                             </div>
@@ -5391,10 +5418,10 @@
               <div className="mobile-footer-inner">
                 {/* Left: Month selector */}
                 <div className="mobile-footer-section">
-                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem' }}>
                     {getShortMonthName(currentMobileDay)}
                   </button>
-                  {mobileViewMode === 'calendar' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.875rem' }}>Hoy</button>}
+                  {mobileViewMode === 'calendar' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.75rem' }}>Hoy</button>}
                 </div>
 
                 {/* Center: View tabs */}
@@ -5427,7 +5454,7 @@
 
                 {/* Right: Add button */}
                 <div className="mobile-footer-section right">
-                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.875rem' }}>Agregar</button>
+                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.75rem' }}>Agregar</button>
                 </div>
               </div>
             </div>
