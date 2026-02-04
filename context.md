@@ -18,8 +18,11 @@ Better Cal es una aplicación de gestión de tareas y atención, implementada co
 
 ## Arquitectura Técnica
 - **Stack**: HTML + React 18 + Babel standalone (sin build process)
-- **Archivo principal**: `prototype.html` (responsive: desktop + mobile)
-- **Backup**: `prototype-bkp1.html` (versión solo desktop)
+- **Archivo principal**: `static.html` (responsive: desktop + mobile)
+- **Backups**:
+  - `static-bkp1.html` (versión con horarios)
+  - `static-bkp2.html` (versión pre-experimento 2 filas)
+- **Archivo de experimentos**: `plan.html` (para probar diseños nuevos)
 - **Estado**: Manejado con React hooks (useState, useMemo, useEffect, useCallback)
 - **Fecha simulada**: `REAL_TODAY = new Date('2026-02-03')` (Martes 3 de febrero de 2026)
 
