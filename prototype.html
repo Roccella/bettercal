@@ -325,8 +325,8 @@
       display: none;
       background: var(--bg-primary);
       border-top: 1px solid var(--border-color);
-      padding: 0 12px 12px;
-      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      padding: 0 12px;
+      padding-bottom: env(safe-area-inset-bottom, 0px) !important;
       touch-action: none;
     }
     .mobile-footer-inner {
@@ -426,7 +426,7 @@
     const { useState, useRef, useEffect, useMemo, useCallback } = React;
 
     const TEMP_COLOR = '#9CA3AF';
-    const COLORS = ['#2563EB','#059669','#DC2626','#7C3AED','#D97706','#DB2777','#4F46E5','#0D9488','#EA580C','#65A30D'];
+    const COLORS = ['#DC2626','#EA580C','#D97706','#65A30D','#059669','#0D9488','#2563EB','#7C3AED','#DB2777'];
     const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
@@ -792,12 +792,12 @@
 
     // ============ COMPONENTS ============
     const EffortBar = ({ effort, maxEffort = 3, isToday = false }) => {
-      // Darker colors for today's items to contrast with lighter background
-      const color = effort === 0 ? 'var(--border-color)'
-        : effort === 1 ? (isToday ? '#2563EB' : '#3B82F6')
-        : effort === 2 ? (isToday ? '#16A34A' : '#22C55E')
-        : (isToday ? '#D97706' : '#F59E0B');
-      const width = effort === 0 ? 0 : effort === 1 ? 33 : effort === 2 ? 50 : 100;
+      // Colors match effort selector: 0=gray, 1=green, 2=orange, 3=red
+      const color = effort === 0 ? '#94A3B8'
+        : effort === 1 ? (isToday ? '#16A34A' : '#22C55E')
+        : effort === 2 ? (isToday ? '#D97706' : '#F59E0B')
+        : (isToday ? '#DC2626' : '#EF4444');
+      const width = effort === 0 ? 0 : effort === 1 ? 33 : effort === 2 ? 66 : 100;
       // Darker background for today - more visible against white/light card
       const bgColor = isToday ? 'var(--effort-bg-today)' : 'var(--border-color)';
 
@@ -1744,7 +1744,7 @@
             setJustGrabbed(true);
             // Clear grab animation after it plays
             setTimeout(() => setJustGrabbed(false), 300);
-          }, 400); // 400ms long press for drag activation
+          }, 500); // 500ms long press for drag activation
         }
       };
 
@@ -2979,7 +2979,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '20px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
+          <div style={{ padding: '28px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
