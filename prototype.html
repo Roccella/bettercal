@@ -1178,11 +1178,11 @@
 
       useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
 
-      // Hotkey: Command+Backspace to delete item (desktop only)
+      // Hotkey: Command+D to delete item (desktop only)
       useEffect(() => {
         if (!isEditing) return;
         const handleKeyDown = (e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
             e.preventDefault();
             onDelete(editItem.id);
             lastPopoverCloseTime = Date.now();
