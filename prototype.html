@@ -78,6 +78,10 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+    /* Hide scrollbar when popover is open (body level) */
+    body.popover-open ::-webkit-scrollbar { display: none; }
+    body.popover-open * { scrollbar-width: none; -ms-overflow-style: none; }
+
     .collapsible { overflow: hidden; max-height: 0; transition: max-height 0.2s ease-out; }
     .collapsible.expanded { max-height: 3000px; transition: max-height 0.25s ease-in; }
 
@@ -118,7 +122,16 @@
         background-position: 200% 0;
       }
     }
-    .just-dropped {
+    /* Grab feedback shimmer effect (reversed direction) */
+    @keyframes grabShimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -100% 0;
+      }
+    }
+    .just-dropped, .just-grabbed {
       position: relative;
       overflow: hidden;
     }
@@ -141,6 +154,25 @@
       pointer-events: none;
       border-radius: inherit;
     }
+    .just-grabbed::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: grabShimmer 0.3s ease-out;
+      pointer-events: none;
+      border-radius: inherit;
+    }
     [data-theme="dark"] .just-dropped::after {
       background: linear-gradient(
         90deg,
@@ -151,6 +183,17 @@
       background-size: 50% 100%;
       background-repeat: no-repeat;
       animation: dropShimmer 0.5s ease-out;
+    }
+    [data-theme="dark"] .just-grabbed::after {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: grabShimmer 0.3s ease-out;
     }
 
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -284,6 +327,7 @@
       border-top: 1px solid var(--border-color);
       padding: 8px 12px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      touch-action: none;
     }
     .mobile-footer-inner {
       display: grid;
@@ -1641,6 +1685,7 @@
     const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId }) => {
       const [dragging, setDragging] = useState(false);
       const [canDrag, setCanDrag] = useState(true); // For mobile long-press
+      const [justGrabbed, setJustGrabbed] = useState(false); // For grab animation
       const mouseDownPos = useRef(null);
       const touchStartPos = useRef(null);
       const longPressTimer = useRef(null);
@@ -1696,9 +1741,12 @@
           setCanDrag(false);
           longPressTimer.current = setTimeout(() => {
             setCanDrag(true);
+            setJustGrabbed(true);
+            // Clear grab animation after it plays
+            setTimeout(() => setJustGrabbed(false), 300);
             // Vibrate if supported to indicate drag is enabled
             if (navigator.vibrate) navigator.vibrate(50);
-          }, 10); // 10ms long press
+          }, 5); // 5ms long press
         }
       };
 
@@ -1815,7 +1863,7 @@
             mouseDownPos.current = null;
           }}
           onDragEnd={() => setDragging(false)}
-          className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''}`}
+          className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''} ${justGrabbed ? 'just-grabbed' : ''}`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onTouchStart={handleTouchStart}
@@ -2932,7 +2980,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '14px 12px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)' }}>
+          <div style={{ padding: '34px 12px 14px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
@@ -3015,9 +3063,35 @@
       const [bottomSheetItem, setBottomSheetItem] = useState(null);
       const [bottomSheetClosing, setBottomSheetClosing] = useState(false);
 
+      // Hide scrollbar when bottom sheet is open (but not when keyboard is shown)
+      useEffect(() => {
+        if (bottomSheetItem) {
+          document.body.classList.add('popover-open');
+        } else {
+          document.body.classList.remove('popover-open');
+        }
+        return () => document.body.classList.remove('popover-open');
+      }, [bottomSheetItem]);
+
       // Mobile scroll ref
       const mobileScrollRef = useRef(null);
       const isScrollingRef = useRef(false);
+      const categoriesScrollRef = useRef(null);
+      const lastScrollY = useRef(0);
+      const [catHeaderVisible, setCatHeaderVisible] = useState(true);
+
+      // Handle categories scroll to show/hide header
+      const handleCategoriesScroll = useCallback((e) => {
+        const currentY = e.target.scrollTop;
+        const isScrollingDown = currentY > lastScrollY.current;
+        // Only hide header after scrolling down a bit (threshold 10px)
+        if (isScrollingDown && currentY > 10) {
+          setCatHeaderVisible(false);
+        } else if (!isScrollingDown) {
+          setCatHeaderVisible(true);
+        }
+        lastScrollY.current = currentY;
+      }, []);
 
       // Expanded categories mode (desktop only)
       const [expandedCategoriesMode, setExpandedCategoriesMode] = useState(false);
@@ -4063,9 +4137,16 @@
 
                 {/* Mobile Categories */}
                 <div className="mobile-view-panel" style={{ background: 'var(--bg-primary)' }}>
-                  {/* Categories Header - inside the panel */}
-                  <div style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-                    <div style={{ padding: '14px 12px 8px', display: 'flex', alignItems: 'center' }}>
+                  {/* Categories Header - inside the panel, collapsible on scroll */}
+                  <div style={{
+                    background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)',
+                    display: 'flex', flexDirection: 'column', flexShrink: 0, touchAction: 'none',
+                    maxHeight: catHeaderVisible ? '200px' : '0px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.2s ease-out',
+                    opacity: catHeaderVisible ? 1 : 0
+                  }}>
+                    <div style={{ padding: '34px 12px 8px', display: 'flex', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                     </div>
                     <div style={{ padding: '0 12px 10px', display: 'flex', gap: '6px' }}>
@@ -4073,7 +4154,7 @@
                       <button onClick={clearDone} className="btn" style={{ flex: 1, fontSize: '0.5625rem' }}>Limpiar hechos</button>
                     </div>
                   </div>
-                  <div style={{ flex: 1, overflowY: 'auto' }}>
+                  <div ref={categoriesScrollRef} onScroll={handleCategoriesScroll} style={{ flex: 1, overflowY: 'auto' }}>
                     {categories.map(cat => (
                       <CategorySection
                         key={cat.id}
