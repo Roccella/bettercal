@@ -342,12 +342,18 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 ### CSS Mobile
 - `.mobile-day-scroll`: Container horizontal con `scroll-snap-type: x mandatory` y `scroll-snap-stop: always`
 - `.mobile-day-column`: Cada día ocupa 100% del ancho con `scroll-snap-align: start`
-- `.mobile-footer`: Footer fijo con grid de 3 columnas (1fr auto 1fr) para centrar tabs
+- `.mobile-footer`: Footer fijo con grid de 3 columnas (1fr auto 1fr) para centrar tabs, padding-bottom con safe-area
 - `.mobile-tab-btn`: Botones de tabs con estilo similar a energía (activo=opacidad 100%, inactivo=35% + grayscale)
 - `.bottom-sheet`: Panel a pantalla completa con flexbox column y safe-area-inset
 - `.mobile-views-container`: Container 200% ancho con ambas vistas lado a lado, transición con transform
 - `.mobile-view-panel`: Cada panel (calendario/categorías) ocupa 50% del container
 - Slots en mobile tienen padding lateral 12px via CSS específico
+
+### Safe Area (iPhone)
+- **Viewport**: `viewport-fit=cover` en meta tag para habilitar safe-area-inset
+- **Contenedor principal**: `paddingTop: env(safe-area-inset-top)` para evitar el notch
+- **Footer**: `padding-bottom: calc(40px + env(safe-area-inset-bottom))` para evitar barra de Safari y home indicator
+- Los 40px fijos son necesarios porque `safe-area-inset-bottom` no cubre la barra de herramientas de Safari
 
 ### Tipografía Responsive
 - Todos los `font-size` usan `rem` (no `px`) para escalar con el tamaño base
