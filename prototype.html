@@ -835,7 +835,7 @@
             cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
-          }}>{l === 1 ? '🪦' : l === 2 ? '😎' : '🔥'}</button>
+          }}>{l === 1 ? '❤️‍🩹' : l === 2 ? '❤️' : '❤️‍🔥'}</button>
         ))}
       </div>
     );
@@ -3021,7 +3021,7 @@
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0' }}>
-              {['🪦', '😎', '🔥'].map((emoji, i) => (
+              {['❤️‍🩹', '❤️', '❤️‍🔥'].map((emoji, i) => (
                 <button key={i} onClick={() => onSetEnergy(dateStr, i + 1)}
                   style={{ background: 'none', border: 'none', fontSize: '1rem', padding: '8px 6px', opacity: energy === i + 1 ? 1 : 0.3, filter: energy === i + 1 ? 'none' : 'grayscale(100%)', cursor: 'pointer', touchAction: 'manipulation' }}>
                   {emoji}

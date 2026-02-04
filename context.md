@@ -58,7 +58,7 @@ Cada día tiene 3 slots:
 - `done` (Hecho) - altura fija de 145px
 
 ### Sistema de Energía
-- 3 niveles por día: 1 (baja 🪦), 2 (media 😎), 3 (alta 🔥)
+- 3 niveles por día: 1 (baja ❤️‍🩹), 2 (media ❤️), 3 (alta ❤️‍🔥)
 - Default: 2 (media) para todos los días
 - Capacidad máxima por energía: baja=4, media=7, alta=10 (para barra de esfuerzo del día)
 - Botones de energía sin fondo, solo emoji con opacidad (activo=100%, inactivo=30% + grayscale)
@@ -376,7 +376,7 @@ Clases CSS para mantener consistencia visual:
   - Requiere `<span>` interno para centrado vertical (el CSS aplica `top: -1px`)
   - Ejemplo: `<button className="btn btn-icon"><span>+</span></button>`
 
-- **Botones de emoji** (ej: energía 🪦😎🔥, tema 🌙☀️):
+- **Botones de emoji** (ej: energía ❤️‍🩹❤️❤️‍🔥, tema 🌙☀️):
   - Sin fondo (`background: none`), solo emoji
   - `font-size: 0.875rem`, `opacity` y `filter: grayscale` para estado inactivo
 
