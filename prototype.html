@@ -113,134 +113,91 @@
       opacity: 1;
     }
 
-    /* Drop feedback shimmer effect - 200ms left to right */
+    /* ===========================================
+       SHIMMER ANIMATIONS
+       ===========================================
+       1. dropShimmer: Izquierda→Derecha, 300ms - cuando suelto un item
+       2. grabShimmer: Derecha→Izquierda, 600ms ease-in - cuando arrastro en mobile
+       3. navigateShimmer: Derecha→Izquierda, 300ms - click en item agendado
+       =========================================== */
+
+    /* 1. Drop shimmer - 300ms izquierda a derecha */
     @keyframes dropShimmer {
-      0% {
-        background-position: -100% 0;
-      }
-      100% {
-        background-position: 200% 0;
-      }
+      0% { background-position: -100% 0; }
+      100% { background-position: 200% 0; }
     }
-    /* Grab feedback shimmer effect - 600ms right to left, then fade to white 20ms, fade out 80ms */
+
+    /* 2. Grab shimmer (mobile drag) - 600ms derecha a izquierda con ease-in */
     @keyframes grabShimmer {
-      0% {
-        background-position: 200% 0;
-        opacity: 1;
-      }
-      85.7% { /* 600ms of 700ms total */
-        background-position: -100% 0;
-        opacity: 1;
-      }
-      88.6% { /* +20ms fade to white */
-        background: rgba(255, 255, 255, 0.5);
-        background-size: 100% 100%;
-        opacity: 1;
-      }
-      100% { /* +80ms fade out */
-        background: rgba(255, 255, 255, 0.5);
-        background-size: 100% 100%;
-        opacity: 0;
-      }
+      0% { background-position: 200% 0; }
+      100% { background-position: -100% 0; }
     }
-    .just-dropped, .just-grabbed {
+
+    /* 3. Navigate shimmer (click en agendado) - 300ms derecha a izquierda */
+    @keyframes navigateShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    .just-dropped, .just-grabbed, .just-shimmered {
       position: relative;
       overflow: hidden;
     }
+
+    /* Drop: 300ms L→R */
     .just-dropped::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%
-      );
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.2s linear;
+      animation: dropShimmer 0.3s linear;
       pointer-events: none;
       border-radius: inherit;
     }
+
+    /* Grab (mobile): 600ms R→L ease-in */
     .just-grabbed::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%
-      );
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.7s linear forwards;
+      animation: grabShimmer 0.6s ease-in;
       pointer-events: none;
       border-radius: inherit;
     }
-    [data-theme="dark"] .just-dropped::after {
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.15) 50%,
-        transparent 100%
-      );
-      background-size: 50% 100%;
-      background-repeat: no-repeat;
-      animation: dropShimmer 0.2s linear;
-    }
-    [data-theme="dark"] .just-grabbed::after {
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.15) 50%,
-        transparent 100%
-      );
-      background-size: 50% 100%;
-      background-repeat: no-repeat;
-      animation: grabShimmer 0.7s linear forwards;
-    }
-    /* Shimmer for navigating to scheduled items - same as drop, 200ms L-to-R */
-    .just-shimmered {
-      position: relative;
-      overflow: hidden;
-    }
+
+    /* Navigate (click en agendado): 300ms R→L */
     .just-shimmered::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%
-      );
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.2s linear;
+      animation: navigateShimmer 0.3s linear;
       pointer-events: none;
       border-radius: inherit;
     }
-    [data-theme="dark"] .just-shimmered::after {
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.15) 50%,
-        transparent 100%
-      );
+
+    /* Dark theme variants */
+    [data-theme="dark"] .just-dropped::after {
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.2s linear;
+    }
+    [data-theme="dark"] .just-grabbed::after {
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+    }
+    [data-theme="dark"] .just-shimmered::after {
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
     }
 
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -1790,7 +1747,7 @@
             setCanDrag(true);
             setJustGrabbed(true);
             // Clear grab animation after it plays
-            setTimeout(() => setJustGrabbed(false), 700);
+            setTimeout(() => setJustGrabbed(false), 600);
           }, 0); // Shimmer starts immediately, animation shows slow-then-fast effect
         }
       };
@@ -1859,12 +1816,17 @@
         return item.scheduledDate;
       };
 
+      // originalSlot should reflect the visual slot - if completed, it's 'done'
+      const visualSlot = item.completed ? 'done' : item.scheduledSlot;
+      // visualDate for completed items should be the completedDate
+      const visualDate = item.completed ? item.completedDate : item.scheduledDate;
+
       const dragData = JSON.stringify({
         id: baseId,
         isRecurring: !!item.repeat,
         exceptionDate: getExceptionDate(),
-        visualDate: item.scheduledDate,
-        originalSlot: item.scheduledSlot,
+        visualDate: visualDate,
+        originalSlot: visualSlot,
         title: item.title
       });
 
@@ -3248,11 +3210,15 @@
           });
 
           // Get items in target slot (excluding the original we're moving)
-          const targetSlotItems = result.filter(i =>
-            i.scheduledDate === targetDate &&
-            i.scheduledSlot === targetSlot &&
-            !i.completed
-          ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+          // For 'done' slot, filter by completed items with completedDate
+          const targetSlotItems = result.filter(i => {
+            if (targetSlot === 'done') {
+              return i.completedDate === targetDate && i.completed;
+            }
+            return i.scheduledDate === targetDate &&
+              i.scheduledSlot === targetSlot &&
+              !i.completed;
+          }).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
           // Insert pending item at correct position
           const safeDropIndex = Math.max(0, Math.min(dropIndex || 0, targetSlotItems.length));
@@ -3579,10 +3545,13 @@
           // Calculate proper sortOrder for the pending item
           const slotItems = allItemsWithRecurring.filter(i => {
             const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+            if (baseId === numId) return false;
+            if (slot === 'done') {
+              return i.completedDate === date && i.completed;
+            }
             return i.scheduledDate === date &&
               i.scheduledSlot === slot &&
-              !i.completed &&
-              baseId !== numId;
+              !i.completed;
           }).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
           const safeDropIndex = Math.max(0, Math.min(dropIndex || 0, slotItems.length));
@@ -3597,6 +3566,9 @@
             _originalVisualDate: effectiveVisualDate,
             _originalSlot: originalSlot,
             _dropIndex: safeDropIndex,
+            // If moving to done, mark as completed for correct filtering
+            completed: slot === 'done' ? true : false,
+            completedDate: slot === 'done' ? date : null,
           };
 
           setPendingRecurringDrop(pendingItem);
@@ -3701,7 +3673,7 @@
 
         // Trigger drop feedback animation
         setJustDroppedItemId(numId);
-        setTimeout(() => setJustDroppedItemId(null), 200);
+        setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
       const handleDropCategory = (data, cat, archived) => {
@@ -3770,7 +3742,7 @@
 
         // Trigger drop feedback animation
         setJustDroppedItemId(itemId);
-        setTimeout(() => setJustDroppedItemId(null), 200);
+        setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
       const handleEditCategory = (u) => {
@@ -3886,7 +3858,7 @@
       // Si sale de done: quitar completed de exception
       // Si va entre important/todo: marcar movedTo en exception
       const handleRecurringSameDaySlotChange = (item, originalDate, targetDate, targetSlot, dropIndex) => {
-        console.log('handleRecurringSameDaySlotChange called', { itemId: item.id, originalDate, targetDate, targetSlot });
+        console.log('handleRecurringSameDaySlotChange called', { itemId: item.id, originalDate, targetDate, targetSlot, itemSlot: item.scheduledSlot });
 
         setItems(p => {
           return p.map(i => {
@@ -3905,8 +3877,21 @@
               // Remove movedTo if it was set
               delete newExceptions[originalDate].movedTo;
               delete newExceptions[originalDate].deleted;
+            } else if (targetSlot === i.scheduledSlot && !existingException.movedTo) {
+              // Moving back to original slot (e.g., from done back to original important/todo)
+              // Just remove completed state, no need to set movedTo
+              const cleanException = { ...existingException };
+              delete cleanException.completed;
+              delete cleanException.completedDate;
+              delete cleanException.deleted;
+              // If exception is now empty, remove it entirely
+              if (Object.keys(cleanException).length === 0) {
+                delete newExceptions[originalDate];
+              } else {
+                newExceptions[originalDate] = cleanException;
+              }
             } else {
-              // Moving to important/todo - remove completed, set movedTo
+              // Moving to different slot (important<->todo) - set movedTo
               newExceptions[originalDate] = {
                 ...existingException,
                 movedTo: { date: targetDate, slot: targetSlot },
@@ -3916,13 +3901,13 @@
               delete newExceptions[originalDate].deleted;
             }
 
-            return { ...i, exceptions: newExceptions };
+            return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
           });
         });
 
         // Trigger drop feedback animation
         setJustDroppedItemId(item.id);
-        setTimeout(() => setJustDroppedItemId(null), 200);
+        setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
       // Solo este evento: marcar instancia como deleted y crear nuevo item independiente
@@ -3982,7 +3967,7 @@
           // Trigger drop feedback animation for the new item
           setTimeout(() => {
             setJustDroppedItemId(newItemId);
-            setTimeout(() => setJustDroppedItemId(null), 200);
+            setTimeout(() => setJustDroppedItemId(null), 300);
           }, 0);
 
           return [...updated, newItem];
@@ -4070,7 +4055,7 @@
           // Trigger drop feedback animation for the new item
           setTimeout(() => {
             setJustDroppedItemId(newItemId);
-            setTimeout(() => setJustDroppedItemId(null), 200);
+            setTimeout(() => setJustDroppedItemId(null), 300);
           }, 0);
 
           return [...updated, newItem];
@@ -4112,7 +4097,7 @@
 
         // Trigger drop feedback animation for the moved item
         setJustDroppedItemId(item.id);
-        setTimeout(() => setJustDroppedItemId(null), 200);
+        setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
       const navigateDays = (numDays) => {
@@ -4294,7 +4279,7 @@
             // Show shimmer on the item
             const itemId = item.repeat ? `${item.id}-${targetDate}` : item.id;
             setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
-            setTimeout(() => setJustShimmeredItemId(null), 200);
+            setTimeout(() => setJustShimmeredItemId(null), 300);
 
             // Open bottom sheet for editing
             setTimeout(() => {
@@ -4325,7 +4310,7 @@
 
             // Trigger reverse shimmer animation
             setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
-            setTimeout(() => setJustShimmeredItemId(null), 200);
+            setTimeout(() => setJustShimmeredItemId(null), 300);
 
             // Show edit popover after shimmer starts
             setTimeout(() => {
