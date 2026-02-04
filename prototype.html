@@ -113,10 +113,13 @@
       opacity: 1;
     }
 
-    /* Drop feedback shimmer effect */
+    /* Drop feedback shimmer effect - starts slow, accelerates after 50% */
     @keyframes dropShimmer {
       0% {
         background-position: -100% 0;
+      }
+      50% {
+        background-position: -20% 0;
       }
       100% {
         background-position: 200% 0;
@@ -126,6 +129,9 @@
     @keyframes grabShimmer {
       0% {
         background-position: 200% 0;
+      }
+      50% {
+        background-position: 20% 0;
       }
       100% {
         background-position: -100% 0;
@@ -150,7 +156,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.5s ease-out;
+      animation: dropShimmer 0.6s linear;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -169,7 +175,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.3s ease-out;
+      animation: grabShimmer 0.6s linear;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -240,12 +246,10 @@
       flex: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column;
     }
     .slot-row {
-      padding: 6px 10px 8px 10px;
-      border-bottom: 1px solid var(--border-light);
+      padding: 10px 10px 8px 10px;
       min-height: 50px;
     }
     .slot-row:last-child {
-      border-bottom: none;
       flex: 1;
     }
     .slot-row-done {
@@ -398,6 +402,8 @@
       /* Mobile calendar alignment - slots get padding */
       .mobile-day-column .slot-row,
       .mobile-day-column .slot-row-done { padding-left: 12px; padding-right: 12px; }
+      /* Mobile: no border on done slot, extra padding top */
+      .mobile-day-column .slot-row-done { border-top: none; padding-top: 10px; }
 
       /* Mobile view transition between calendar and categories */
       .mobile-views-container {
@@ -1743,8 +1749,8 @@
             setCanDrag(true);
             setJustGrabbed(true);
             // Clear grab animation after it plays
-            setTimeout(() => setJustGrabbed(false), 300);
-          }, 500); // 500ms long press for drag activation
+            setTimeout(() => setJustGrabbed(false), 600);
+          }, 0); // Shimmer starts immediately, animation shows slow-then-fast effect
         }
       };
 
@@ -2979,7 +2985,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '28px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
+          <div style={{ padding: '32px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>

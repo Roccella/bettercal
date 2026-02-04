@@ -300,7 +300,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - **Transición entre vistas**: Animación slide horizontal (0.3s ease-out) entre calendario y categorías usando CSS transform
 
 ### Interacción Touch en Items (Mobile)
-- **Long-press para drag**: Los items requieren mantener presionado ~500ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
+- **Long-press para drag**: El shimmer de feedback aparece inmediatamente (0ms) y dura 600ms con efecto de aceleración (lento al inicio, rápido después de 300ms).
 - **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
 - **touch-action: manipulation**: Los items permiten scroll en ambas direcciones (vertical y horizontal).
 - **Drag ghost oculto**: Se usa `setDragImage` con imagen transparente para ocultar la copia fantasma durante el drag.
