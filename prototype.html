@@ -133,8 +133,15 @@
       50% {
         background-position: 20% 0;
       }
-      100% {
+      83% {
         background-position: -100% 0;
+      }
+      84%, 92% {
+        background: rgba(255, 255, 255, 0.5);
+        background-size: 100% 100%;
+      }
+      100% {
+        background: transparent;
       }
     }
     .just-dropped, .just-grabbed {
@@ -199,7 +206,53 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.3s ease-out;
+      animation: grabShimmer 0.6s linear;
+    }
+    /* Reverse shimmer for navigating to scheduled items */
+    @keyframes reverseShimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      50% {
+        background-position: 20% 0;
+      }
+      100% {
+        background-position: -100% 0;
+      }
+    }
+    .just-shimmered {
+      position: relative;
+      overflow: hidden;
+    }
+    .just-shimmered::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: reverseShimmer 0.6s linear;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    [data-theme="dark"] .just-shimmered::after {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%
+      );
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+      animation: reverseShimmer 0.6s linear;
     }
 
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -1688,7 +1741,7 @@
       );
     };
 
-    const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId }) => {
+    const ItemCard = ({ item, categories, onComplete, onEdit, inSidebar, isToday, isPast, showDate, justDroppedItemId, justShimmeredItemId }) => {
       const [dragging, setDragging] = useState(false);
       const [canDrag, setCanDrag] = useState(true); // For mobile long-press
       const [justGrabbed, setJustGrabbed] = useState(false); // For grab animation
@@ -1849,6 +1902,7 @@
       // Check if this item was just dropped (for feedback animation)
       const itemBaseId = typeof item.id === 'string' ? parseInt(item.id.split('-')[0]) : item.id;
       const isJustDropped = justDroppedItemId && itemBaseId === justDroppedItemId;
+      const isJustShimmered = justShimmeredItemId && itemBaseId === justShimmeredItemId;
 
       return (
         <div
@@ -1867,7 +1921,7 @@
             mouseDownPos.current = null;
           }}
           onDragEnd={() => setDragging(false)}
-          className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''} ${justGrabbed ? 'just-grabbed' : ''}`}
+          className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''} ${justGrabbed ? 'just-grabbed' : ''} ${isJustShimmered ? 'just-shimmered' : ''}`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onTouchStart={handleTouchStart}
@@ -2296,7 +2350,7 @@
       );
     };
 
-    const CategorySection = ({ category, items, allItems, categories, expanded, onToggle, onComplete, onEdit, onAdd, onDrop, onEditCategory, dragOverCat, onDelete, onSidebarGroupDrop, groupsExpandedState, justDroppedItemId, groupsExp, onGroupToggle }) => {
+    const CategorySection = ({ category, items, allItems, categories, expanded, onToggle, onComplete, onEdit, onAdd, onDrop, onEditCategory, dragOverCat, onDelete, onSidebarGroupDrop, groupsExpandedState, justDroppedItemId, groupsExp, onGroupToggle, draggingUnscheduledItem, onScheduledItemClick }) => {
       const categoryItems = items.filter(i => i.category === category.id);
 
       // Get unique items (for repeating items, show only once based on repeatBaseId)
@@ -2531,7 +2585,7 @@
 
               {/* Scheduled - Agendado - cursor not-allowed on drag over */}
               <div
-                style={{ marginBottom: '4px', cursor: 'inherit' }}
+                style={{ marginBottom: '4px', cursor: 'inherit', opacity: draggingUnscheduledItem ? 0.4 : 1, pointerEvents: draggingUnscheduledItem ? 'none' : 'auto', transition: 'opacity 0.15s' }}
                 onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}
                 onDragEnter={(e) => { e.currentTarget.style.cursor = 'not-allowed'; }}
                 onDragLeave={(e) => { e.currentTarget.style.cursor = 'inherit'; }}
@@ -2542,32 +2596,18 @@
                 </div>
                 <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
                   {recurringItems.map(item => (
-                    <div key={item.id} style={{ marginBottom: '6px' }}>
-                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                    <div key={item.id} style={{ marginBottom: '6px', cursor: 'pointer' }} onClick={() => onScheduledItemClick?.(allItems.find(i => i.id === item.id) || item)}>
+                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={() => {}} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
                     </div>
                   ))}
                   {sortedDates.flatMap(date => byDate[date]).map(item => (
-                    <div key={item.id} style={{ marginBottom: '6px' }}>
-                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                    <div key={item.id} style={{ marginBottom: '6px', cursor: 'pointer' }} onClick={() => onScheduledItemClick?.(allItems.find(i => i.id === (item.originalId || item.id)) || item)}>
+                      <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={() => {}} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Hecho section - always visible for drop target */}
-              <SidebarGroup
-                label="Hecho"
-                count={doneItems.length}
-                items={doneItems}
-                expanded={doneExp}
-                onToggle={() => onGroupToggle?.('done')}
-                categories={categories}
-                onComplete={onComplete}
-                onEdit={onEdit}
-                onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'done', e, dropIdx)}
-                labelColor="var(--accent-green)"
-                justDroppedItemId={justDroppedItemId}
-              />
             </div>
           </div>
           {backlogEditRect && backlogEditingItem && ReactDOM.createPortal(
@@ -2599,7 +2639,7 @@
 
     // ============ EXPANDED CATEGORIES COLUMN ============
 
-    const ExpandedCategoryColumn = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onSidebarGroupDrop, justDroppedItemId, groupsExp, onGroupToggle }) => {
+    const ExpandedCategoryColumn = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onSidebarGroupDrop, justDroppedItemId, groupsExp, onGroupToggle, draggingUnscheduledItem, onScheduledItemClick }) => {
       const categoryItems = items.filter(i => i.category === category.id);
 
       const seenRepeatBaseIds = new Set();
@@ -2638,8 +2678,19 @@
       const doneExp = groupsExp?.done ?? true;
 
       const [isDraggingItem, setIsDraggingItem] = useState(false);
+      const [isDraggingUnscheduledItem, setIsDraggingUnscheduledItem] = useState(false);
       const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const [editCatRect, setEditCatRect] = useState(null);
+      const [isDraggingColumn, setIsDraggingColumn] = useState(false);
       const dragCountRef = useRef(0);
+
+      const handleCategoryDoubleClick = (e) => {
+        if (category.isFixed) return;
+        e.stopPropagation();
+        setEditCatRect(e.currentTarget.getBoundingClientRect());
+      };
+
+      const isCategoryDraggable = !category.isFixed;
 
       const handleGroupDrop = (data, targetGroup, e, dropIdx) => {
         const { id } = data;
@@ -2664,13 +2715,28 @@
         if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
           dragCountRef.current++;
           setIsDraggingItem(true);
+          // Check if dragged item is unscheduled (no date and no repeat)
+          try {
+            const data = e.dataTransfer.getData('itemData');
+            if (data) {
+              const parsed = JSON.parse(data);
+              if (!parsed.visualDate && !parsed.isRecurring) {
+                setIsDraggingUnscheduledItem(true);
+              }
+            }
+          } catch (err) {
+            // dataTransfer might not be available during dragenter in some browsers
+          }
         }
       };
 
       const handleColumnDragLeave = (e) => {
         if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
           dragCountRef.current--;
-          if (dragCountRef.current === 0) setIsDraggingItem(false);
+          if (dragCountRef.current === 0) {
+            setIsDraggingItem(false);
+            setIsDraggingUnscheduledItem(false);
+          }
         }
       };
 
@@ -2678,6 +2744,7 @@
         e.preventDefault();
         dragCountRef.current = 0;
         setIsDraggingItem(false);
+        setIsDraggingUnscheduledItem(false);
         const data = e.dataTransfer.getData('itemData');
         if (data) handleGroupDrop(JSON.parse(data), 'anyday', e);
       };
@@ -2689,25 +2756,37 @@
           onDragOver={(e) => { if (Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) e.preventDefault(); }}
           onDrop={handleColumnDrop}
           style={{ flex: '0 0 300px', width: '300px', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)', height: '100%' }}>
-          <div style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12` }}>
+          <div
+            draggable={isCategoryDraggable}
+            onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('expandedCategoryId', category.id); setIsDraggingColumn(true); }}
+            onDragEnd={() => setIsDraggingColumn(false)}
+            style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12`, cursor: isCategoryDraggable ? 'grab' : 'default', opacity: isDraggingColumn ? 0.5 : 1 }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
-            <span style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
           </div>
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px 8px' }}>
             <SidebarGroup label="Backlog" count={backlogItems.length} items={backlogItems} expanded={backlogExp} onToggle={() => onGroupToggle?.('backlog')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)} showDropIndicator={isDraggingItem} isBacklog={true} justDroppedItemId={justDroppedItemId} />
-            <div style={{ marginBottom: '4px' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
+            <div style={{ marginBottom: '4px', opacity: draggingUnscheduledItem ? 0.4 : 1, pointerEvents: draggingUnscheduledItem ? 'none' : 'auto', transition: 'opacity 0.15s' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
               <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
                 <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: 'var(--text-muted)' }}>▶</span>
-                <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Hacer ({scheduled.length})</span>
+                <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
               </div>
               <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
-                {recurringItems.map(item => <div key={item.id} style={{ marginBottom: '6px' }}><ItemCard item={item} categories={categories} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} /></div>)}
-                {sortedDates.flatMap(date => byDate[date]).map(item => <div key={item.id} style={{ marginBottom: '6px' }}><ItemCard item={item} categories={categories} onEdit={onEdit} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} /></div>)}
+                {recurringItems.map(item => (
+                  <div key={item.id} style={{ marginBottom: '6px', cursor: 'pointer' }} onClick={() => onScheduledItemClick?.(allItems.find(i => i.id === item.id) || item)}>
+                    <ItemCard item={item} categories={categories} onEdit={() => {}} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                  </div>
+                ))}
+                {sortedDates.flatMap(date => byDate[date]).map(item => (
+                  <div key={item.id} style={{ marginBottom: '6px', cursor: 'pointer' }} onClick={() => onScheduledItemClick?.(allItems.find(i => i.id === (item.originalId || item.id)) || item)}>
+                    <ItemCard item={item} categories={categories} onEdit={() => {}} inSidebar={true} showDate={true} justDroppedItemId={justDroppedItemId} />
+                  </div>
+                ))}
               </div>
             </div>
-            <SidebarGroup label="Hecho" count={doneItems.length} items={doneItems} expanded={doneExp} onToggle={() => onGroupToggle?.('done')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'done', e, dropIdx)} labelColor="var(--accent-green)" justDroppedItemId={justDroppedItemId} />
           </div>
           {removeDatePopover && <RemoveDatePopover itemTitle={removeDatePopover.item.title} isRecurring={removeDatePopover.isRecurring} onConfirm={() => { onSidebarGroupDrop?.(removeDatePopover.item.id, 'backlog', category.id, removeDatePopover.dropIdx); setRemoveDatePopover(null); }} onCancel={() => setRemoveDatePopover(null)} targetRect={removeDatePopover.rect} />}
+          {editCatRect && <EditCategoryPopover category={category} itemCount={items.filter(i => i.category === category.id).length} onSave={onEditCategory} onDelete={() => {}} onClose={() => setEditCatRect(null)} targetRect={editCatRect} />}
         </div>
       );
     };
@@ -2985,7 +3064,7 @@
       return (
         <div className="mobile-day-column" style={{ display: 'flex', flexDirection: 'column', background: isToday ? 'var(--today-bg)' : 'var(--bg-primary)' }}>
           {/* Day header */}
-          <div style={{ padding: '32px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
+          <div style={{ padding: '40px 14px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', background: isToday ? 'var(--today-header)' : 'var(--bg-secondary)', touchAction: 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '1rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : (isPast ? 'var(--text-past)' : 'var(--text-primary)') }}>
                 {DAYS[day.date.getDay()]} <span style={{ fontWeight: '400' }}>{day.date.getDate()}</span>
@@ -3060,6 +3139,8 @@
       const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
       const [toast, setToast] = useState(null);
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
+      const [justShimmeredItemId, setJustShimmeredItemId] = useState(null); // For reverse shimmer animation on scheduled item click
+      const [draggingUnscheduledItem, setDraggingUnscheduledItem] = useState(false); // Track when dragging unscheduled item
 
       // Mobile states
       const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 600);
@@ -3129,6 +3210,32 @@
           localStorage.setItem('bettercal_groups', JSON.stringify(categoryGroupsExp));
         } catch (e) {}
       }, [categoryGroupsExp]);
+
+      // Track when dragging an unscheduled item (for disabling Agendado section)
+      useEffect(() => {
+        const handleDragStart = (e) => {
+          const data = e.dataTransfer?.getData('itemData');
+          // dataTransfer.getData doesn't work during dragstart, so we check via a custom attribute
+          // or by checking the target element
+          if (e.target.hasAttribute('data-item-id')) {
+            const itemId = e.target.getAttribute('data-item-id');
+            const numId = typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : parseInt(itemId);
+            const item = items.find(i => i.id === numId);
+            if (item && !item.scheduledDate && !item.repeat) {
+              setDraggingUnscheduledItem(true);
+            }
+          }
+        };
+        const handleDragEnd = () => {
+          setDraggingUnscheduledItem(false);
+        };
+        document.addEventListener('dragstart', handleDragStart);
+        document.addEventListener('dragend', handleDragEnd);
+        return () => {
+          document.removeEventListener('dragstart', handleDragStart);
+          document.removeEventListener('dragend', handleDragEnd);
+        };
+      }, [items]);
 
       const allItemsWithRecurring = useMemo(() => {
         let result = generateRecurringInstances(items, minDate, maxDate);
@@ -3239,62 +3346,99 @@
           const instanceDate = `${parts[1]}-${parts[2]}-${parts[3]}`; // Always YYYY-MM-DD (original date for moved items)
           const isMoved = id.endsWith('-moved');
 
-          setItems(p => p.map(i => {
-            if (i.id !== numId) return i;
-            const newExceptions = { ...(i.exceptions || {}) };
-            const currentException = newExceptions[instanceDate] || {};
+          // Find the original recurring item
+          const originalItem = items.find(i => i.id === numId);
+          if (!originalItem) return;
 
-            // Determine the actual display date (for completedDate)
-            // For moved instances, use movedTo.date; otherwise use instanceDate
-            const displayDate = currentException.movedTo?.date || instanceDate;
+          const currentException = originalItem.exceptions?.[instanceDate] || {};
+          // Determine the actual display date (for completedDate)
+          // For moved instances, use movedTo.date; otherwise use instanceDate
+          const displayDate = currentException.movedTo?.date || instanceDate;
 
-            // Toggle completed state for this instance
-            if (currentException.completed) {
+          // For recurring items: mark as deleted and create independent completed item
+          // This allows the user to move the completed item freely without affecting other instances
+          setItems(p => {
+            // Mark this instance as deleted in the recurring item
+            const updated = p.map(i => {
+              if (i.id !== numId) return i;
+              const newExceptions = { ...(i.exceptions || {}) };
+              newExceptions[instanceDate] = { ...currentException, deleted: true };
+              delete newExceptions[instanceDate].movedTo;
               delete newExceptions[instanceDate].completed;
               delete newExceptions[instanceDate].completedDate;
-              // Clean up empty exception only if no other properties
-              if (Object.keys(newExceptions[instanceDate]).length === 0) {
-                delete newExceptions[instanceDate];
-              }
-            } else {
-              newExceptions[instanceDate] = {
-                ...currentException,
-                completed: true,
-                completedDate: displayDate
-              };
-            }
-            return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
-          }));
+              return { ...i, exceptions: newExceptions };
+            });
+
+            // Create new independent completed item
+            const newItemId = Date.now();
+            const newItem = {
+              id: newItemId,
+              title: currentException.title ?? originalItem.title,
+              description: currentException.description ?? originalItem.description ?? '',
+              category: originalItem.category,
+              effort: currentException.effort ?? originalItem.effort,
+              scheduledDate: displayDate,
+              scheduledSlot: originalItem.scheduledSlot || 'todo',
+              sortOrder: 0,
+              completed: true,
+              completedDate: displayDate,
+              createdAt: formatDate(REAL_TODAY),
+              isArchived: false,
+              repeat: null, // Independent item - no recurrence
+            };
+
+            return [...updated, newItem];
+          });
         } else {
           // For non-recurring items OR recurring items from sidebar (no date in ID)
-          setItems(p => p.map(i => {
-            if (i.id !== numId) return i;
+          setItems(p => {
+            const item = p.find(i => i.id === numId);
+            if (!item) return p;
 
-            // If it's a recurring item without date in ID (from sidebar), create exception for today
-            if (i.repeat) {
+            // If it's a recurring item without date in ID (from sidebar), use today's date
+            if (item.repeat) {
               const todayStr = formatDate(REAL_TODAY);
-              const newExceptions = { ...(i.exceptions || {}) };
-              const currentException = newExceptions[todayStr] || {};
-              if (currentException.completed) {
+              const currentException = item.exceptions?.[todayStr] || {};
+
+              // Mark this instance as deleted and create independent completed item
+              const updated = p.map(i => {
+                if (i.id !== numId) return i;
+                const newExceptions = { ...(i.exceptions || {}) };
+                newExceptions[todayStr] = { ...currentException, deleted: true };
+                delete newExceptions[todayStr].movedTo;
                 delete newExceptions[todayStr].completed;
                 delete newExceptions[todayStr].completedDate;
-                if (Object.keys(newExceptions[todayStr]).length === 0) {
-                  delete newExceptions[todayStr];
-                }
-              } else {
-                newExceptions[todayStr] = {
-                  ...currentException,
-                  completed: true,
-                  completedDate: todayStr
-                };
-              }
-              return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
+                return { ...i, exceptions: newExceptions };
+              });
+
+              // Create new independent completed item
+              const newItemId = Date.now();
+              const newItem = {
+                id: newItemId,
+                title: currentException.title ?? item.title,
+                description: currentException.description ?? item.description ?? '',
+                category: item.category,
+                effort: currentException.effort ?? item.effort,
+                scheduledDate: todayStr,
+                scheduledSlot: item.scheduledSlot || 'todo',
+                sortOrder: 0,
+                completed: true,
+                completedDate: todayStr,
+                createdAt: formatDate(REAL_TODAY),
+                isArchived: false,
+                repeat: null, // Independent item - no recurrence
+              };
+
+              return [...updated, newItem];
             }
 
             // For regular non-recurring items
-            const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
-            return { ...i, completed: !i.completed, completedDate };
-          }));
+            return p.map(i => {
+              if (i.id !== numId) return i;
+              const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
+              return { ...i, completed: !i.completed, completedDate };
+            });
+          });
         }
       };
 
@@ -4118,6 +4262,90 @@
         });
       };
 
+      // Navigate to a scheduled item in the calendar and open its edit popover
+      const handleScheduledItemClick = useCallback((item) => {
+        // Find the target date - for recurring items, find next occurrence (including today)
+        let targetDate = item.scheduledDate;
+        if (item.repeat && !targetDate) {
+          // Find next occurrence for recurring items
+          const todayStr = formatDate(REAL_TODAY);
+          // Look for the next visible instance in allItemsWithRecurring
+          const instances = allItemsWithRecurring.filter(i => {
+            const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+            return (baseId === item.id || i.originalId === item.id) && i.scheduledDate >= todayStr;
+          }).sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
+          if (instances.length > 0) {
+            targetDate = instances[0].scheduledDate;
+          }
+        }
+
+        if (!targetDate) return;
+
+        // For mobile: switch to calendar view and navigate to the day
+        if (isMobile) {
+          setMobileViewMode('calendar');
+          const targetDateObj = new Date(targetDate + 'T00:00:00');
+          setCurrentMobileDay(targetDateObj);
+
+          // After a short delay, scroll to the day and show edit popover
+          setTimeout(() => {
+            // Find the day index and scroll to it
+            const dayIndex = days.findIndex(d => formatDate(d.date) === targetDate);
+            if (dayIndex !== -1 && mobileScrollRef.current) {
+              const dayWidth = mobileScrollRef.current.scrollWidth / days.length;
+              mobileScrollRef.current.scrollTo({ left: dayIndex * dayWidth, behavior: 'smooth' });
+            }
+
+            // Show shimmer on the item
+            const itemId = item.repeat ? `${item.id}-${targetDate}` : item.id;
+            setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
+            setTimeout(() => setJustShimmeredItemId(null), 600);
+
+            // Open bottom sheet for editing
+            setTimeout(() => {
+              setBottomSheetItem({ item: items.find(i => i.id === item.id) || item, visualDate: targetDate });
+            }, 200);
+          }, 300);
+          return;
+        }
+
+        // Desktop: close expanded view if open
+        if (expandedCategoriesMode) {
+          setExpandedCategoriesMode(false);
+        }
+
+        // Navigate calendar to show the target date
+        const targetDateObj = new Date(targetDate + 'T00:00:00');
+        setViewBase(targetDateObj);
+
+        // After a short delay (to allow render), find the item in calendar and show shimmer + popover
+        setTimeout(() => {
+          // Find the item element in the calendar
+          const itemId = item.repeat ? `${item.id}-${targetDate}` : item.id;
+          const itemEl = document.querySelector(`[data-item-id="${itemId}"]`);
+
+          if (itemEl) {
+            // Scroll to make it visible if needed
+            itemEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+            // Trigger reverse shimmer animation
+            setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
+            setTimeout(() => setJustShimmeredItemId(null), 600);
+
+            // Show edit popover after shimmer starts
+            setTimeout(() => {
+              const rect = itemEl.getBoundingClientRect();
+              // For recurring items, find the instance to edit
+              const instanceItem = allItemsWithRecurring.find(i =>
+                String(i.id) === String(itemId) ||
+                (i.originalId === item.id && i.scheduledDate === targetDate)
+              ) || item;
+              setEditPopover({ item: items.find(i => i.id === item.id) || item, rect, visualDate: targetDate });
+            }, 100);
+          }
+        }, 100);
+      }, [expandedCategoriesMode, allItemsWithRecurring, items, isMobile, days]);
+
       // Mobile helper: get items for current mobile day
       const mobileIsToday = formatDate(currentMobileDay) === formatDate(REAL_TODAY);
 
@@ -4197,6 +4425,8 @@
                         justDroppedItemId={justDroppedItemId}
                         groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
                         onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))}
+                        draggingUnscheduledItem={draggingUnscheduledItem}
+                        onScheduledItemClick={handleScheduledItemClick}
                       />
                     ))}
                   </div>
@@ -4307,7 +4537,13 @@
                 </div>
                 <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
                   {categories.map(cat => (
-                    <ExpandedCategoryColumn key={cat.id} category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }} onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+                    <div key={cat.id}
+                      onDragOver={(e) => { if (e.dataTransfer.types.includes('expandedcategoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
+                      onDragLeave={() => setDragOverCat(null)}
+                      onDrop={(e) => { const id = e.dataTransfer.getData('expandedCategoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}
+                      style={{ outline: dragOverCat === cat.id ? '2px dashed var(--accent-blue)' : 'none' }}>
+                      <ExpandedCategoryColumn category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }} onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} draggingUnscheduledItem={draggingUnscheduledItem} onScheduledItemClick={handleScheduledItemClick} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -4334,7 +4570,7 @@
                       <CategorySection category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} expanded={expanded[cat.id] || false} dragOverCat={dragOverCat}
                         onToggle={() => setExpanded(p => ({ ...p, [cat.id]: !p[cat.id] }))} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onSidebarGroupDrop={handleSidebarGroupDrop} groupsExpandedState={groupsExpandedState} justDroppedItemId={justDroppedItemId}
                         groupsExp={categoryGroupsExp[cat.id] || { backlog: true, scheduled: true, done: true }}
-                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} />
+                        onGroupToggle={(group) => setCategoryGroupsExp(p => ({ ...p, [cat.id]: { ...p[cat.id], [group]: !p[cat.id]?.[group] } }))} draggingUnscheduledItem={draggingUnscheduledItem} onScheduledItemClick={handleScheduledItemClick} />
                     </div>
                   ))}
                 </div>
