@@ -581,6 +581,18 @@
       { id: 507, title: 'Planificar comidas', category: 'health', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-27', isArchived: false, repeat: null, description: '' },
       { id: 508, title: 'Revisar suscripciones', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-26', isArchived: false, repeat: null, description: '' },
       { id: 509, title: 'Descargar podcast', category: 'entertainment', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-26', isArchived: false, repeat: null, description: '' },
+
+      // Lunes 2026-02-02 - 10 items más
+      { id: 510, title: 'Leer artículo productividad', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 511, title: 'Organizar archivos nube', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-25', isArchived: false, repeat: null, description: '' },
+      { id: 512, title: 'Reservar restaurante', category: 'social', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-24', isArchived: false, repeat: null, description: '' },
+      { id: 513, title: 'Limpiar inbox', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-24', isArchived: false, repeat: null, description: '' },
+      { id: 514, title: 'Actualizar apps', category: 'entertainment', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-23', isArchived: false, repeat: null, description: '' },
+      { id: 515, title: 'Comprar pan', category: 'home', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-23', isArchived: false, repeat: null, description: '' },
+      { id: 516, title: 'Revisar calendario', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-22', isArchived: false, repeat: null, description: '' },
+      { id: 517, title: 'Llamar electricista', category: 'home', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-22', isArchived: false, repeat: null, description: '' },
+      { id: 518, title: 'Ver tutorial', category: 'ai', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-21', isArchived: false, repeat: null, description: '' },
+      { id: 519, title: 'Enviar fotos', category: 'social', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-21', isArchived: false, repeat: null, description: '' },
     ];
 
     const initialDayEnergy = { '2026-02-02': 2, '2026-02-03': 3, '2026-02-04': 2, '2026-02-05': 1, '2026-02-06': 2, '2026-02-07': 3, '2026-02-08': 2, '2026-02-09': 2 };
@@ -1166,7 +1178,8 @@
       };
 
       // Check if this is a new item created with empty title (using _isNewItem marker)
-      const isNewUntitledItem = isEditing && (editItem?._isNewItem || originalTitle === '');
+      // Note: _isNewItem items are NOT considered "editing", so check separately
+      const isNewUntitledItem = !!editItem?._isNewItem || (!!editItem?.id && originalTitle === '');
 
       // For new untitled items, check if user has made ANY changes from default state
       const hasUserChanges = isNewUntitledItem ? (
@@ -2158,8 +2171,8 @@
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '4px 2px',
+            gap: isMobileDevice ? '12px' : '6px',
+            padding: isMobileDevice ? '14px 6px' : '4px 2px',
             background: 'transparent',
             borderRadius: '3px',
             opacity: item.completed ? 0.5 : (item._isPending ? 0.7 : 1),
@@ -2169,20 +2182,31 @@
           {/* Title */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              fontSize: '0.625rem',
+              fontSize: isMobileDevice ? '1.25rem' : '0.625rem',
               fontWeight: '400',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               color: getTextColor(),
               textDecoration: item.completed ? 'line-through' : 'none',
-            }}>{item.title}{item.repeat ? ' (R)' : ''}</div>
+              lineHeight: isMobileDevice ? '1.5' : '1.2',
+            }}>
+              {item.title}
+              {item.repeat && (
+                <svg width={isMobileDevice ? "18" : "10"} height={isMobileDevice ? "18" : "10"} viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" style={{ marginLeft: '6px', verticalAlign: 'middle' }}>
+                  <path d="M17 1l4 4-4 4"/>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                  <path d="M7 23l-4-4 4-4"/>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+              )}
+            </div>
           </div>
           {/* Hover buttons: Important and Checkbox */}
           {!isMobileDevice && (
             <div style={{
               display: 'flex',
-              gap: '4px',
+              gap: '0',
               alignItems: 'center',
             }}>
               {/* Important button - visible on hover, hidden for recurring items */}
@@ -2191,8 +2215,8 @@
                   data-important-btn="true"
                   onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
                   style={{
-                    width: '14px',
-                    height: '14px',
+                    width: '20px',
+                    height: '20px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -2216,11 +2240,8 @@
                 data-checkbox="true"
                 onClick={handleCheckboxClick}
                 style={{
-                  width: '14px',
-                  height: '14px',
-                  borderRadius: '3px',
-                  border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
-                  background: item.completed ? 'var(--accent-green)' : 'transparent',
+                  width: '20px',
+                  height: '20px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -2230,11 +2251,22 @@
                   flexShrink: 0,
                 }}
               >
-                {item.completed && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                )}
+                <div style={{
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '3px',
+                  border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
+                  background: item.completed ? 'var(--accent-green)' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  {item.completed && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -2589,13 +2621,12 @@
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             style={{
-              flex: `0 0 ${DAY_WIDTH}px`,
-              minWidth: `${DAY_WIDTH}px`,
+              flex: (isSunday && !isSticky) ? `0 0 ${DAY_WIDTH + 20}px` : `0 0 ${DAY_WIDTH}px`,
+              minWidth: (isSunday && !isSticky) ? `${DAY_WIDTH + 20}px` : `${DAY_WIDTH}px`,
               display: 'flex',
               flexDirection: 'column',
               borderRight: '1px solid var(--border-color)',
-              borderLeft: (isSunday && !isSticky) ? `10px solid ${sundayLineColor}` : 'none',
-              marginLeft: (isSunday && !isSticky) ? '-1px' : 0,
+              borderLeft: (isSunday && !isSticky) ? `20px solid ${sundayLineColor}` : 'none',
               background: 'var(--bg-primary)',
               position: isSticky ? 'sticky' : 'relative',
               left: isSticky ? 0 : 'auto',
@@ -2606,8 +2637,8 @@
             <div
               onClick={(e) => handleAddItem(e, false)}
               style={{
-                padding: '8px 8px',
-                minHeight: '36px',
+                padding: '6px 8px 2px',
+                minHeight: '28px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'baseline',
@@ -3267,9 +3298,29 @@
       const [dropIndex, setDropIndex] = useState(-1);
       const [isDraggingColumn, setIsDraggingColumn] = useState(false);
       const [removeDatePopover, setRemoveDatePopover] = useState(null);
+      const [newItemId, setNewItemId] = useState(null);
+      const [editRect, setEditRect] = useState(null);
       const columnRef = useRef(null);
+      const newItemRef = useRef(null);
 
       const isCategoryDraggable = !category.isFixed;
+
+      // Show edit popover once new item is rendered
+      useEffect(() => {
+        if (newItemId === 'pending') {
+          const newestItem = backlogItems.find(i => i._isNewItem);
+          if (newestItem) {
+            const timer = setTimeout(() => {
+              if (newItemRef.current) {
+                const rect = newItemRef.current.getBoundingClientRect();
+                setEditRect({ itemId: newestItem.id, rect });
+                setNewItemId(null);
+              }
+            }, 50);
+            return () => clearTimeout(timer);
+          }
+        }
+      }, [newItemId, backlogItems]);
 
       const hasItemData = (e) => Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata');
 
@@ -3328,6 +3379,7 @@
 
       // Add item to backlog
       const handleAddItem = (addAtEnd = true) => {
+        if (Date.now() - lastPopoverCloseTime < 200) return;
         const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
         const maxSortOrder = backlogItems.length > 0 ? Math.max(...backlogItems.map(i => i.sortOrder || 0)) : 0;
         const sortOrder = addAtEnd ? maxSortOrder + 1 : minSortOrder - 1;
@@ -3343,7 +3395,9 @@
           completedDate: null,
           sortOrder,
           _isNewItem: true,
+          _addAtEnd: addAtEnd,
         });
+        setNewItemId('pending');
       };
 
       return (
@@ -3353,8 +3407,8 @@
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            flex: `0 0 ${CATEGORY_WIDTH}px`,
-            width: `${CATEGORY_WIDTH}px`,
+            flex: `0 0 ${category.id === 'temp' ? 320 : CATEGORY_WIDTH}px`,
+            width: `${category.id === 'temp' ? 320 : CATEGORY_WIDTH}px`,
             display: 'flex',
             flexDirection: 'column',
             borderRight: '1px solid var(--border-color)',
@@ -3372,8 +3426,8 @@
             onDragEnd={() => setIsDraggingColumn(false)}
             onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
             style={{
-              padding: '8px 8px',
-              minHeight: '36px',
+              padding: '6px 8px 2px',
+              minHeight: '28px',
               cursor: 'pointer',
               opacity: isDraggingColumn ? 0.5 : 1,
               display: 'flex',
@@ -3389,17 +3443,22 @@
           <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
-            {backlogItems.map((item, index) => (
-              <div
-                key={item.id}
-                data-backlog-item="true"
-                onDragOver={(e) => handleItemDragOver(e, index)}
-                style={{ marginBottom: '0' }}
-              >
-                <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} />
-                <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
-              </div>
-            ))}
+            {backlogItems.map((item, index) => {
+              const isNewItem = item._isNewItem;
+              const editingItem = editRect?.itemId === item.id ? item : null;
+              return (
+                <div
+                  key={item.id}
+                  ref={isNewItem ? newItemRef : null}
+                  data-backlog-item="true"
+                  onDragOver={(e) => handleItemDragOver(e, index)}
+                  style={{ marginBottom: '0' }}
+                >
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} />
+                  <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
+                </div>
+              );
+            })}
             {/* Click area to add at end - takes all remaining space */}
             <div
               onClick={() => handleAddItem(true)}
@@ -3410,6 +3469,26 @@
               }}
             />
           </div>
+
+          {/* Edit popover for new items */}
+          {editRect && (
+            <AddEditItemPopover
+              categories={categories}
+              editItem={backlogItems.find(i => i.id === editRect.itemId)}
+              onSave={(data) => {
+                onAdd(data);
+                setEditRect(null);
+              }}
+              onDelete={(id) => {
+                onDelete(id);
+                setEditRect(null);
+              }}
+              onClose={() => {
+                setEditRect(null);
+              }}
+              targetRect={editRect.rect}
+            />
+          )}
 
           {removeDatePopover && (
             <RemoveDatePopover
@@ -4269,8 +4348,13 @@
               : i
             );
           }
-          // If unmarking, just toggle the flag (keep current position)
-          return p.map(i => i.id === numId ? { ...i, isImportant: false } : i);
+          // If unmarking, move to first position of normal items
+          // Get all non-important, non-recurring items in same context
+          const sameContext = item.scheduledDate
+            ? p.filter(i => i.scheduledDate === item.scheduledDate && !i.completed && !i.isImportant && !i.repeat && i.id !== numId)
+            : p.filter(i => i.category === item.category && !i.scheduledDate && !i.completed && !i.isImportant && !i.repeat && i.id !== numId);
+          const minNormalSortOrder = sameContext.length > 0 ? Math.min(...sameContext.map(i => i.sortOrder || 0)) : 0;
+          return p.map(i => i.id === numId ? { ...i, isImportant: false, sortOrder: minNormalSortOrder - 0.5 } : i);
         });
       };
 
@@ -5336,7 +5420,7 @@
 
                 {/* Right: Add button */}
                 <div className="mobile-footer-section right">
-                  <button className="btn" onClick={handleMobileAddClick} style={{ fontSize: '0.875rem', background: 'var(--bg-button)' }}>Agregar</button>
+                  <button className="btn btn-primary" onClick={handleMobileAddClick} style={{ fontSize: '0.875rem' }}>Agregar</button>
                 </div>
               </div>
             </div>
@@ -5417,7 +5501,13 @@
               ))}
               {/* Add category button - entire cell is clickable */}
               <div
-                onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }}
+                onClick={(e) => {
+                  if (!editPopover) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    // Adjust rect to position popover lower (at category row level)
+                    setNewCatRect({ ...rect, top: rect.top + 100, bottom: rect.bottom + 100 });
+                  }
+                }}
                 style={{
                   flex: '0 0 60px',
                   display: 'flex',
