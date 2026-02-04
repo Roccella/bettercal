@@ -1756,8 +1756,8 @@
         const dx = Math.abs(touch.clientX - touchStartPos.current.x);
         const dy = Math.abs(touch.clientY - touchStartPos.current.y);
 
-        // If moved more than 10px in any direction, cancel long press timer
-        if (dx > 10 || dy > 10) {
+        // If moved more than 25px in any direction, cancel long press timer
+        if (dx > 25 || dy > 25) {
           if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
             longPressTimer.current = null;
