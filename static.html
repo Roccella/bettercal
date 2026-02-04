@@ -379,8 +379,8 @@
 
       .mobile-footer { display: block; }
 
-      /* Toast wider in mobile */
-      .toast { width: calc(100vw - 40px); max-width: 400px; }
+      /* Toast wider and higher in mobile to not cover footer */
+      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -448,8 +448,8 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Column widths - both calendar and category columns are same width
-    const DAY_WIDTH = 220;
-    const CATEGORY_WIDTH = 240;
+    const DAY_WIDTH = 240;
+    const CATEGORY_WIDTH = 200;
 
     const initialCategories = [
       { id: 'temp', name: 'Temp', color: TEMP_COLOR, isFixed: true },
@@ -1983,7 +1983,7 @@
       );
     };
 
-    const ItemCard = ({ item, categories, onComplete, onEdit, onDelete, onToggleImportant, inSidebar, isToday, isPast, showDate, justDroppedItemId, justShimmeredItemId }) => {
+    const ItemCard = ({ item, categories, onComplete, onEdit, onDelete, onToggleImportant, inSidebar, isToday, isPast, showDate, justDroppedItemId, justShimmeredItemId, draggingItemType, onDragTypeChange }) => {
       const [dragging, setDragging] = useState(false);
       const [canDrag, setCanDrag] = useState(true); // For mobile long-press
       const [justGrabbed, setJustGrabbed] = useState(false); // For grab animation
@@ -2176,8 +2176,11 @@
             e.dataTransfer.setDragImage(emptyImg, 0, 0);
             setDragging(true);
             mouseDownPos.current = null;
+            // Set dragging item type for zone muting
+            const itemType = item.repeat ? 'recurring' : (item.isImportant ? 'important' : 'normal');
+            onDragTypeChange?.(itemType);
           }}
-          onDragEnd={() => setDragging(false)}
+          onDragEnd={() => { setDragging(false); onDragTypeChange?.(null); }}
           className={`draggable ${dragging ? 'dragging' : ''} ${item._isPending ? 'pending-drop' : ''} ${isJustDropped ? 'just-dropped' : ''} ${justGrabbed ? 'just-grabbed' : ''} ${isJustShimmered ? 'just-shimmered' : ''}`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
@@ -2190,10 +2193,17 @@
             display: 'flex',
             alignItems: 'center',
             gap: isMobileDevice ? '8px' : '6px',
-            padding: isMobileDevice ? '8px 0' : '4px 0',
+            padding: isMobileDevice ? '8px 0' : '2px 0',
             background: 'transparent',
             borderRadius: '3px',
-            opacity: item.completed ? 0.5 : (item._isPending ? 0.7 : 1),
+            // Mute logic: when dragging recurring, mute normal zone; when dragging important/normal, mute recurring zone
+            opacity: (() => {
+              if (item.completed) return 0.5;
+              if (item._isPending) return 0.7;
+              if (draggingItemType === 'recurring' && !item.repeat) return 0.3; // Mute normal zone
+              if ((draggingItemType === 'important' || draggingItemType === 'normal') && item.repeat) return 0.3; // Mute recurring zone
+              return 1;
+            })(),
             touchAction: 'manipulation',
           }}
         >
@@ -2212,94 +2222,138 @@
               {item.title}
             </div>
           </div>
-          {/* Hover buttons: Recurrence icon, Important and Checkbox */}
-          {!isMobileDevice && (
-            <div style={{
-              display: 'flex',
-              gap: '0',
-              alignItems: 'center',
-            }}>
-              {/* Recurrence icon - replaces important button for recurring items */}
-              {item.repeat && (
+          {/* Status icons container */}
+          <div style={{
+            display: 'flex',
+            gap: '0',
+            alignItems: 'center',
+          }}>
+            {/* DESKTOP: Icons always visible, checkbox on hover */}
+            {!isMobileDevice && (
+              <>
+                {/* Recurrence icon - always visible */}
+                {item.repeat && (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
+                      <path d="M17 1l4 4-4 4"/>
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                      <path d="M7 23l-4-4 4-4"/>
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
+                  </div>
+                )}
+                {/* Important icon - always visible for non-recurring items */}
+                {!item.repeat && (
+                  <div
+                    data-important-btn="true"
+                    onClick={(e) => { e.stopPropagation(); onToggleImportant?.(item.id); }}
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-muted)',
+                      opacity: isHovered || item.isImportant ? 1 : 0,
+                      transition: 'opacity 0.1s',
+                    }}
+                    title={item.isImportant ? "Quitar importante" : "Marcar importante"}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-yellow)' : 'none'} stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="7" x2="12" y2="13"/>
+                      <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                    </svg>
+                  </div>
+                )}
+                {/* Checkbox - appears on hover, shifts icons left */}
                 <div
+                  data-checkbox="true"
+                  onClick={handleCheckboxClick}
                   style={{
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
-                    <path d="M17 1l4 4-4 4"/>
-                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                    <path d="M7 23l-4-4 4-4"/>
-                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                  </svg>
-                </div>
-              )}
-              {/* Important button - visible on hover, hidden for recurring items */}
-              {onToggleImportant && !item.repeat && (
-                <div
-                  data-important-btn="true"
-                  onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
-                  style={{
-                    width: '20px',
+                    width: isHovered || item.completed ? '20px' : '0px',
                     height: '20px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    opacity: isHovered || item.isImportant ? 1 : 0,
-                    transition: 'opacity 0.1s',
+                    overflow: 'hidden',
+                    transition: 'width 0.1s',
                     flexShrink: 0,
-                    color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-muted)',
                   }}
-                  title={item.isImportant ? "Quitar importante" : "Marcar importante"}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-yellow)' : 'none'} stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="7" x2="12" y2="13"/>
-                    <circle cx="12" cy="17" r="1" fill="currentColor"/>
-                  </svg>
+                  <div style={{
+                    width: '14px',
+                    height: '14px',
+                    borderRadius: '3px',
+                    border: `1px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
+                    background: item.completed ? 'var(--accent-green)' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {item.completed && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
+                  </div>
                 </div>
-              )}
-              {/* Checkbox - visible on hover */}
-              <div
-                data-checkbox="true"
-                onClick={handleCheckboxClick}
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: isHovered || item.completed ? 1 : 0,
-                  transition: 'opacity 0.1s',
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{
-                  width: '14px',
-                  height: '14px',
-                  borderRadius: '3px',
-                  border: `2px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
-                  background: item.completed ? 'var(--accent-green)' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  {item.completed && (
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
+              </>
+            )}
+            {/* MOBILE: Only show icons if state is active */}
+            {isMobileDevice && (
+              <>
+                {/* Recurrence icon - always visible */}
+                {item.repeat && (
+                  <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
+                      <path d="M17 1l4 4-4 4"/>
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                      <path d="M7 23l-4-4 4-4"/>
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                     </svg>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+                  </div>
+                )}
+                {/* Important icon - only if important */}
+                {item.isImportant && !item.repeat && (
+                  <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--accent-yellow)' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-yellow)" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="7" x2="12" y2="13"/>
+                      <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                    </svg>
+                  </div>
+                )}
+                {/* Checkbox - only if completed */}
+                {item.completed && (
+                  <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <div style={{
+                      width: '16px', height: '16px', borderRadius: '3px',
+                      border: '1px solid var(--accent-green)', background: 'var(--accent-green)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       );
     };
@@ -2521,26 +2575,29 @@
       );
     };
 
-    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onToggleImportant, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId }) => {
+    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onToggleImportant, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId, draggingItemType, onDragTypeChange }) => {
       const dateStr = formatDate(day.date);
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isSunday = day.date.getDay() === 0;
 
-      // Get all items for this day (both pending and completed, all slots merged)
-      // Sort: recurring first (sorted by sortOrder), then important, then normal (both sorted by sortOrder)
+      // Get all items for this day (both pending and completed)
+      // NEW ZONE LOGIC:
+      // - Zone 1 (Recurring): recurring items + completed recurring items (sorted by sortOrder)
+      // - Zone 2 (Normal): normal + important + completed normal/important (sorted by sortOrder)
+      // Completed items stay in their original position (don't move to end)
       const dayItems = items.filter(i =>
         (i.scheduledDate === dateStr && !i.completed) ||
         (i.completedDate === dateStr && i.completed)
       ).sort((a, b) => {
-        // Completed items go last
-        if (a.completed !== b.completed) return a.completed ? 1 : -1;
-        // Recurring items go first
+        // Zone separation: recurring items first, then normal items
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
-        // Important items go before normal items (but after recurring)
-        if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
-        // Within same group, sort by sortOrder
+        // Within same zone, sort by sortOrder (completed items stay in place)
         return (a.sortOrder || 0) - (b.sortOrder || 0);
       });
+
+      // Separate items into zones for visual rendering
+      const recurringZone = dayItems.filter(i => i.repeat);
+      const normalZone = dayItems.filter(i => !i.repeat);
 
       const [dropIndex, setDropIndex] = useState(-1);
       const [newItemId, setNewItemId] = useState(null);
@@ -2651,12 +2708,12 @@
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             style={{
-              flex: (isSunday && !isSticky) ? `0 0 ${DAY_WIDTH + 16}px` : `0 0 ${DAY_WIDTH}px`,
-              minWidth: (isSunday && !isSticky) ? `${DAY_WIDTH + 16}px` : `${DAY_WIDTH}px`,
+              flex: (isSunday && !isSticky) ? `0 0 ${DAY_WIDTH + 12}px` : `0 0 ${DAY_WIDTH}px`,
+              minWidth: (isSunday && !isSticky) ? `${DAY_WIDTH + 12}px` : `${DAY_WIDTH}px`,
               display: 'flex',
               flexDirection: 'column',
               borderRight: '1px solid var(--border-color)',
-              borderLeft: (isSunday && !isSticky) ? `16px solid ${sundayLineColor}` : 'none',
+              borderLeft: (isSunday && !isSticky) ? `12px solid ${sundayLineColor}` : 'none',
               background: 'var(--bg-primary)',
               position: isSticky ? 'sticky' : 'relative',
               left: isSticky ? 0 : 'auto',
@@ -2704,7 +2761,7 @@
                   style={{ marginBottom: '0' }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} />
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} isToday={isToday} isPast={day.isPast} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={onDragTypeChange} />
                   <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
                 </div>
               ))}
@@ -3317,7 +3374,7 @@
     };
 
     // ============ SIMPLIFIED CATEGORY COLUMN (for two-row layout) ============
-    const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onToggleImportant, onSidebarGroupDrop, justDroppedItemId }) => {
+    const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onToggleImportant, onSidebarGroupDrop, justDroppedItemId, draggingItemType, onDragTypeChange }) => {
       const categoryItems = items.filter(i => i.category === category.id);
 
       // Get only backlog items (no scheduledDate, not completed, not recurring)
@@ -3484,7 +3541,7 @@
                   onDragOver={(e) => handleItemDragOver(e, index)}
                   style={{ marginBottom: '0' }}
                 >
-                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} />
+                  <ItemCard item={item} categories={categories} onComplete={onComplete} onEdit={onEdit} onDelete={onDelete} onToggleImportant={onToggleImportant} inSidebar={true} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={onDragTypeChange} />
                   <div className={`drop-indicator ${dropIndex === index + 1 ? 'visible' : ''}`} />
                 </div>
               );
@@ -3749,11 +3806,38 @@
             {/* Bottom actions - mobile only: important and complete buttons */}
             {isEditing && (
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '12px', marginBottom: '8px' }}>
-                {/* Important button */}
+                {/* Important button - doesn't close popover */}
+                {!item.repeat && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleImportant?.(item.id)}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      background: item.isImportant ? 'var(--accent-yellow)' : 'var(--bg-button)',
+                      color: item.isImportant ? 'white' : 'var(--text-secondary)',
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill={item.isImportant ? 'white' : 'none'} stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Importante
+                  </button>
+                )}
+                {/* Complete button - doesn't close popover */}
                 <button
                   type="button"
-                  onClick={() => { onToggleImportant?.(item.id); onClose(); }}
-                  className="btn"
+                  onClick={() => onComplete?.(item.id)}
                   style={{
                     flex: 1,
                     padding: '12px',
@@ -3761,35 +3845,18 @@
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-secondary)',
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-yellow)' : 'none'} stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                  </svg>
-                  {item.isImportant ? 'Quitar importante' : 'Importante'}
-                </button>
-                {/* Complete button */}
-                <button
-                  type="button"
-                  onClick={() => { onComplete?.(item.id); onClose(); }}
-                  className="btn"
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    color: item.completed ? 'var(--accent-green)' : 'var(--text-secondary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    background: item.completed ? 'var(--accent-green)' : 'var(--bg-button)',
+                    color: item.completed ? 'white' : 'var(--text-secondary)',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  {item.completed ? 'Desmarcar' : 'Completar'}
+                  Hecho
                 </button>
               </div>
             )}
@@ -3809,19 +3876,15 @@
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
 
-      // Get all items for this day (both pending and completed, all slots merged)
-      // Sort: recurring first (sorted by sortOrder), then important, then normal
+      // Get all items for this day (both pending and completed)
+      // NEW ZONE LOGIC: recurring zone first, then normal zone; completed items stay in place
       const dayItems = items.filter(i =>
         (i.scheduledDate === dateStr && !i.completed) ||
         (i.completedDate === dateStr && i.completed)
       ).sort((a, b) => {
-        // Completed items go last
-        if (a.completed !== b.completed) return a.completed ? 1 : -1;
-        // Recurring items go first
+        // Zone separation: recurring items first, then normal items
         if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
-        // Important items go before normal items (but after recurring)
-        if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
-        // Within same group, sort by sortOrder
+        // Within same zone, sort by sortOrder (completed items stay in place)
         return (a.sortOrder || 0) - (b.sortOrder || 0);
       });
 
@@ -3968,6 +4031,7 @@
       const [justDroppedItemId, setJustDroppedItemId] = useState(null); // For drop feedback animation
       const [justShimmeredItemId, setJustShimmeredItemId] = useState(null); // For reverse shimmer animation on scheduled item click
       const [draggingUnscheduledItem, setDraggingUnscheduledItem] = useState(false); // Track when dragging unscheduled item
+      const [draggingItemType, setDraggingItemType] = useState(null); // 'recurring' | 'important' | 'normal' | null - for zone muting
 
       // Mobile states
       const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 600);
@@ -4545,14 +4609,14 @@
         const { removeImportant, removeCompleted } = options;
 
         // Get visual items for this date (includes recurring instances)
-        // Use same sorting as DayColumn: completed last, recurring first, important second, then normal
+        // NEW ZONE LOGIC: recurring zone first, then normal zone; completed items stay in place
         const visualSlotItems = allItemsWithRecurring.filter(i =>
           (i.scheduledDate === date && !i.completed) ||
           (i.completedDate === date && i.completed)
         ).sort((a, b) => {
-          if (a.completed !== b.completed) return a.completed ? 1 : -1;
+          // Zone separation: recurring items first, then normal items
           if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
-          if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
+          // Within same zone, sort by sortOrder (completed items stay in place)
           return (a.sortOrder || 0) - (b.sortOrder || 0);
         });
 
@@ -5127,6 +5191,10 @@
       }, [currentMobileDay, isMobile, days]);
 
       const handleMobileAddClick = () => {
+        // Close calendar popover if open
+        if (calendarRect) {
+          setCalendarRect(null);
+        }
         if (mobileViewMode === 'calendar') {
           // In calendar view: create item without title as first item of todo slot
           const newItem = {
@@ -5188,6 +5256,10 @@
       };
 
       const handleMobileEdit = (item, rect, visualDate) => {
+        // Close calendar popover if open before opening bottom sheet
+        if (calendarRect) {
+          setCalendarRect(null);
+        }
         setBottomSheetItem({ item, visualDate });
       };
 
@@ -5342,20 +5414,29 @@
                           {/* Category header - same style as day headers */}
                           <div
                             onClick={() => {
+                              // Close calendar popover if open
+                              if (calendarRect) {
+                                setCalendarRect(null);
+                              }
                               const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
-                              handleSave({
+                              const newItem = {
+                                id: Date.now(),
                                 title: '',
                                 description: '',
                                 category: cat.id,
                                 effort: 1,
-                                repeat: null,
                                 scheduledDate: null,
                                 scheduledSlot: null,
                                 completed: false,
                                 completedDate: null,
+                                createdAt: formatDate(REAL_TODAY),
+                                isArchived: false,
+                                repeat: null,
                                 sortOrder: minSortOrder - 1,
                                 _isNewItem: true,
-                              });
+                              };
+                              setItems(p => [newItem, ...p]);
+                              setBottomSheetItem({ item: newItem, visualDate: null });
                             }}
                             style={{
                               padding: catIndex === 0 ? '8px 4px 6px' : '24px 4px 6px',
@@ -5462,7 +5543,7 @@
             {/* Bottom Sheet for mobile editing */}
             {bottomSheetItem && (
               <BottomSheet
-                item={bottomSheetItem.item}
+                item={items.find(i => i.id === bottomSheetItem.item.id) || bottomSheetItem.item}
                 visualDate={bottomSheetItem.visualDate}
                 categories={categories}
                 onSave={handleBottomSheetSave}
@@ -5517,7 +5598,7 @@
               <button onClick={() => setCategoriesModalOpen(true)} className="btn" style={{ background: 'var(--bg-button)' }}>Editar categorías</button>
             </div>
             <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', background: 'var(--bg-primary)' }}>
-              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} />)}
+              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={setDraggingItemType} />)}
             </div>
           </div>
 
@@ -5530,7 +5611,7 @@
                   onDragLeave={() => setDragOverCat(null)}
                   onDrop={(e) => { const id = e.dataTransfer.getData('categoryId'); if (id && !cat.isFixed) { handleReorderCategory(id, cat.id); setDragOverCat(null); }}}
                   style={{ outline: dragOverCat === cat.id ? '2px dashed var(--accent-blue)' : 'none' }}>
-                  <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} />
+                  <CategoryColumnSimple category={cat} items={allItemsWithRecurring} allItems={items} categories={categories} onComplete={handleComplete} onEdit={handleEdit} onAdd={handleSave} onDrop={handleDropCategory} onEditCategory={handleEditCategory} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onSidebarGroupDrop={handleSidebarGroupDrop} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={setDraggingItemType} />
                 </div>
               ))}
               {/* Add category button - entire cell is clickable */}
