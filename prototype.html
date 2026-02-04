@@ -113,35 +113,34 @@
       opacity: 1;
     }
 
-    /* Drop feedback shimmer effect - starts slow, accelerates after 50% */
+    /* Drop feedback shimmer effect - 200ms left to right */
     @keyframes dropShimmer {
       0% {
         background-position: -100% 0;
-      }
-      50% {
-        background-position: -20% 0;
       }
       100% {
         background-position: 200% 0;
       }
     }
-    /* Grab feedback shimmer effect (reversed direction) */
+    /* Grab feedback shimmer effect - 600ms right to left, then fade to white 20ms, fade out 80ms */
     @keyframes grabShimmer {
       0% {
         background-position: 200% 0;
+        opacity: 1;
       }
-      50% {
-        background-position: 20% 0;
-      }
-      83% {
+      85.7% { /* 600ms of 700ms total */
         background-position: -100% 0;
+        opacity: 1;
       }
-      84%, 92% {
+      88.6% { /* +20ms fade to white */
         background: rgba(255, 255, 255, 0.5);
         background-size: 100% 100%;
+        opacity: 1;
       }
-      100% {
-        background: transparent;
+      100% { /* +80ms fade out */
+        background: rgba(255, 255, 255, 0.5);
+        background-size: 100% 100%;
+        opacity: 0;
       }
     }
     .just-dropped, .just-grabbed {
@@ -163,7 +162,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.6s linear;
+      animation: dropShimmer 0.2s linear;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -182,7 +181,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.6s linear;
+      animation: grabShimmer 0.7s linear forwards;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -195,7 +194,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: dropShimmer 0.5s ease-out;
+      animation: dropShimmer 0.2s linear;
     }
     [data-theme="dark"] .just-grabbed::after {
       background: linear-gradient(
@@ -206,20 +205,9 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.6s linear;
+      animation: grabShimmer 0.7s linear forwards;
     }
-    /* Reverse shimmer for navigating to scheduled items */
-    @keyframes reverseShimmer {
-      0% {
-        background-position: 200% 0;
-      }
-      50% {
-        background-position: 20% 0;
-      }
-      100% {
-        background-position: -100% 0;
-      }
-    }
+    /* Shimmer for navigating to scheduled items - same as drop, 200ms L-to-R */
     .just-shimmered {
       position: relative;
       overflow: hidden;
@@ -239,7 +227,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: reverseShimmer 0.6s linear;
+      animation: dropShimmer 0.2s linear;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -252,7 +240,7 @@
       );
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: reverseShimmer 0.6s linear;
+      animation: dropShimmer 0.2s linear;
     }
 
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -1802,7 +1790,7 @@
             setCanDrag(true);
             setJustGrabbed(true);
             // Clear grab animation after it plays
-            setTimeout(() => setJustGrabbed(false), 600);
+            setTimeout(() => setJustGrabbed(false), 700);
           }, 0); // Shimmer starts immediately, animation shows slow-then-fast effect
         }
       };
@@ -3346,99 +3334,62 @@
           const instanceDate = `${parts[1]}-${parts[2]}-${parts[3]}`; // Always YYYY-MM-DD (original date for moved items)
           const isMoved = id.endsWith('-moved');
 
-          // Find the original recurring item
-          const originalItem = items.find(i => i.id === numId);
-          if (!originalItem) return;
+          setItems(p => p.map(i => {
+            if (i.id !== numId) return i;
+            const newExceptions = { ...(i.exceptions || {}) };
+            const currentException = newExceptions[instanceDate] || {};
 
-          const currentException = originalItem.exceptions?.[instanceDate] || {};
-          // Determine the actual display date (for completedDate)
-          // For moved instances, use movedTo.date; otherwise use instanceDate
-          const displayDate = currentException.movedTo?.date || instanceDate;
+            // Determine the actual display date (for completedDate)
+            // For moved instances, use movedTo.date; otherwise use instanceDate
+            const displayDate = currentException.movedTo?.date || instanceDate;
 
-          // For recurring items: mark as deleted and create independent completed item
-          // This allows the user to move the completed item freely without affecting other instances
-          setItems(p => {
-            // Mark this instance as deleted in the recurring item
-            const updated = p.map(i => {
-              if (i.id !== numId) return i;
-              const newExceptions = { ...(i.exceptions || {}) };
-              newExceptions[instanceDate] = { ...currentException, deleted: true };
-              delete newExceptions[instanceDate].movedTo;
+            // Toggle completed state for this instance
+            if (currentException.completed) {
               delete newExceptions[instanceDate].completed;
               delete newExceptions[instanceDate].completedDate;
-              return { ...i, exceptions: newExceptions };
-            });
-
-            // Create new independent completed item
-            const newItemId = Date.now();
-            const newItem = {
-              id: newItemId,
-              title: currentException.title ?? originalItem.title,
-              description: currentException.description ?? originalItem.description ?? '',
-              category: originalItem.category,
-              effort: currentException.effort ?? originalItem.effort,
-              scheduledDate: displayDate,
-              scheduledSlot: originalItem.scheduledSlot || 'todo',
-              sortOrder: 0,
-              completed: true,
-              completedDate: displayDate,
-              createdAt: formatDate(REAL_TODAY),
-              isArchived: false,
-              repeat: null, // Independent item - no recurrence
-            };
-
-            return [...updated, newItem];
-          });
+              // Clean up empty exception only if no other properties
+              if (Object.keys(newExceptions[instanceDate]).length === 0) {
+                delete newExceptions[instanceDate];
+              }
+            } else {
+              newExceptions[instanceDate] = {
+                ...currentException,
+                completed: true,
+                completedDate: displayDate
+              };
+            }
+            return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
+          }));
         } else {
           // For non-recurring items OR recurring items from sidebar (no date in ID)
-          setItems(p => {
-            const item = p.find(i => i.id === numId);
-            if (!item) return p;
+          setItems(p => p.map(i => {
+            if (i.id !== numId) return i;
 
-            // If it's a recurring item without date in ID (from sidebar), use today's date
-            if (item.repeat) {
+            // If it's a recurring item without date in ID (from sidebar), create exception for today
+            if (i.repeat) {
               const todayStr = formatDate(REAL_TODAY);
-              const currentException = item.exceptions?.[todayStr] || {};
-
-              // Mark this instance as deleted and create independent completed item
-              const updated = p.map(i => {
-                if (i.id !== numId) return i;
-                const newExceptions = { ...(i.exceptions || {}) };
-                newExceptions[todayStr] = { ...currentException, deleted: true };
-                delete newExceptions[todayStr].movedTo;
+              const newExceptions = { ...(i.exceptions || {}) };
+              const currentException = newExceptions[todayStr] || {};
+              if (currentException.completed) {
                 delete newExceptions[todayStr].completed;
                 delete newExceptions[todayStr].completedDate;
-                return { ...i, exceptions: newExceptions };
-              });
-
-              // Create new independent completed item
-              const newItemId = Date.now();
-              const newItem = {
-                id: newItemId,
-                title: currentException.title ?? item.title,
-                description: currentException.description ?? item.description ?? '',
-                category: item.category,
-                effort: currentException.effort ?? item.effort,
-                scheduledDate: todayStr,
-                scheduledSlot: item.scheduledSlot || 'todo',
-                sortOrder: 0,
-                completed: true,
-                completedDate: todayStr,
-                createdAt: formatDate(REAL_TODAY),
-                isArchived: false,
-                repeat: null, // Independent item - no recurrence
-              };
-
-              return [...updated, newItem];
+                if (Object.keys(newExceptions[todayStr]).length === 0) {
+                  delete newExceptions[todayStr];
+                }
+              } else {
+                newExceptions[todayStr] = {
+                  ...currentException,
+                  completed: true,
+                  completedDate: todayStr
+                };
+              }
+              return { ...i, exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined };
             }
 
             // For regular non-recurring items
-            return p.map(i => {
-              if (i.id !== numId) return i;
-              const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
-              return { ...i, completed: !i.completed, completedDate };
-            });
-          });
+            const completedDate = !i.completed ? (i.scheduledDate || formatDate(REAL_TODAY)) : null;
+            return { ...i, completed: !i.completed, completedDate };
+          }));
         }
       };
 
@@ -3617,13 +3568,13 @@
           }
 
           if (sameDay && !sameSlot) {
-            // Cambio de slot en el mismo día - aplicar "solo este evento" automáticamente
-            console.log('Same day, different slot - auto apply this event only');
-            handleRecurringMoveThis(originalItem, exceptionDate, originalSlot, date, slot, dropIndex);
+            // Cambio de slot en el mismo día - modificar exception pero mantener recurrencia
+            console.log('Same day, different slot - modify exception, keep recurrence');
+            handleRecurringSameDaySlotChange(originalItem, exceptionDate, date, slot, dropIndex);
             return;
           }
 
-          // Diferente día - mostrar popover de opciones
+          // Diferente día - mostrar popover de opciones (incluyendo movimientos a/desde done)
           // Set pending drop to show item temporarily in target position
           // Calculate proper sortOrder for the pending item
           const slotItems = allItemsWithRecurring.filter(i => {
@@ -3750,7 +3701,7 @@
 
         // Trigger drop feedback animation
         setJustDroppedItemId(numId);
-        setTimeout(() => setJustDroppedItemId(null), 600);
+        setTimeout(() => setJustDroppedItemId(null), 200);
       };
 
       const handleDropCategory = (data, cat, archived) => {
@@ -3819,7 +3770,7 @@
 
         // Trigger drop feedback animation
         setJustDroppedItemId(itemId);
-        setTimeout(() => setJustDroppedItemId(null), 600);
+        setTimeout(() => setJustDroppedItemId(null), 200);
       };
 
       const handleEditCategory = (u) => {
@@ -3930,6 +3881,50 @@
         return { insertedSortOrder, otherSortOrders };
       };
 
+      // Mismo día, cambio de slot: modificar exception pero mantener recurrencia
+      // Si va a done: marcar como completed en exception
+      // Si sale de done: quitar completed de exception
+      // Si va entre important/todo: marcar movedTo en exception
+      const handleRecurringSameDaySlotChange = (item, originalDate, targetDate, targetSlot, dropIndex) => {
+        console.log('handleRecurringSameDaySlotChange called', { itemId: item.id, originalDate, targetDate, targetSlot });
+
+        setItems(p => {
+          return p.map(i => {
+            if (i.id !== item.id) return i;
+
+            const newExceptions = { ...(i.exceptions || {}) };
+            const existingException = newExceptions[originalDate] || {};
+
+            if (targetSlot === 'done') {
+              // Moving to done - mark as completed
+              newExceptions[originalDate] = {
+                ...existingException,
+                completed: true,
+                completedDate: targetDate,
+              };
+              // Remove movedTo if it was set
+              delete newExceptions[originalDate].movedTo;
+              delete newExceptions[originalDate].deleted;
+            } else {
+              // Moving to important/todo - remove completed, set movedTo
+              newExceptions[originalDate] = {
+                ...existingException,
+                movedTo: { date: targetDate, slot: targetSlot },
+              };
+              delete newExceptions[originalDate].completed;
+              delete newExceptions[originalDate].completedDate;
+              delete newExceptions[originalDate].deleted;
+            }
+
+            return { ...i, exceptions: newExceptions };
+          });
+        });
+
+        // Trigger drop feedback animation
+        setJustDroppedItemId(item.id);
+        setTimeout(() => setJustDroppedItemId(null), 200);
+      };
+
       // Solo este evento: marcar instancia como deleted y crear nuevo item independiente
       const handleRecurringMoveThis = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
         console.log('handleRecurringMoveThis called', { itemId: item.id, originalDate, targetDate, targetSlot });
@@ -3987,7 +3982,7 @@
           // Trigger drop feedback animation for the new item
           setTimeout(() => {
             setJustDroppedItemId(newItemId);
-            setTimeout(() => setJustDroppedItemId(null), 600);
+            setTimeout(() => setJustDroppedItemId(null), 200);
           }, 0);
 
           return [...updated, newItem];
@@ -4075,7 +4070,7 @@
           // Trigger drop feedback animation for the new item
           setTimeout(() => {
             setJustDroppedItemId(newItemId);
-            setTimeout(() => setJustDroppedItemId(null), 600);
+            setTimeout(() => setJustDroppedItemId(null), 200);
           }, 0);
 
           return [...updated, newItem];
@@ -4117,7 +4112,7 @@
 
         // Trigger drop feedback animation for the moved item
         setJustDroppedItemId(item.id);
-        setTimeout(() => setJustDroppedItemId(null), 600);
+        setTimeout(() => setJustDroppedItemId(null), 200);
       };
 
       const navigateDays = (numDays) => {
@@ -4299,7 +4294,7 @@
             // Show shimmer on the item
             const itemId = item.repeat ? `${item.id}-${targetDate}` : item.id;
             setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
-            setTimeout(() => setJustShimmeredItemId(null), 600);
+            setTimeout(() => setJustShimmeredItemId(null), 200);
 
             // Open bottom sheet for editing
             setTimeout(() => {
@@ -4330,7 +4325,7 @@
 
             // Trigger reverse shimmer animation
             setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
-            setTimeout(() => setJustShimmeredItemId(null), 600);
+            setTimeout(() => setJustShimmeredItemId(null), 200);
 
             // Show edit popover after shimmer starts
             setTimeout(() => {
