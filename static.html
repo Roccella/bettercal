@@ -333,8 +333,8 @@
       display: none;
       background: var(--bg-header);
       border-top: 1px solid var(--border-color);
-      padding: 0 12px;
-      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+      padding: 0 20px;
+      padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
@@ -569,6 +569,18 @@
       // Additional scheduled items
       { id: 430, title: 'Reunión proyecto X', category: 'work', effort: 2, scheduledDate: '2026-02-03', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
       { id: 431, title: 'Entregar informe', category: 'work', effort: 1, scheduledDate: '2026-02-04', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+
+      // Lunes 2026-02-02 - 10 items normales
+      { id: 500, title: 'Revisar emails pendientes', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 501, title: 'Actualizar documentación', category: 'ai', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-30', isArchived: false, repeat: null, description: '' },
+      { id: 502, title: 'Llamar banco', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-29', isArchived: false, repeat: null, description: '' },
+      { id: 503, title: 'Ordenar escritorio', category: 'home', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-29', isArchived: false, repeat: null, description: '' },
+      { id: 504, title: 'Revisar agenda semana', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 505, title: 'Comprar café', category: 'home', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-28', isArchived: false, repeat: null, description: '' },
+      { id: 506, title: 'Responder mensajes', category: 'social', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-27', isArchived: false, repeat: null, description: '' },
+      { id: 507, title: 'Planificar comidas', category: 'health', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-27', isArchived: false, repeat: null, description: '' },
+      { id: 508, title: 'Revisar suscripciones', category: 'work', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-26', isArchived: false, repeat: null, description: '' },
+      { id: 509, title: 'Descargar podcast', category: 'entertainment', effort: 1, scheduledDate: '2026-02-02', scheduledSlot: 'todo', completed: false, completedDate: null, createdAt: '2026-01-26', isArchived: false, repeat: null, description: '' },
     ];
 
     const initialDayEnergy = { '2026-02-02': 2, '2026-02-03': 3, '2026-02-04': 2, '2026-02-05': 1, '2026-02-06': 2, '2026-02-07': 3, '2026-02-08': 2, '2026-02-09': 2 };
@@ -1959,14 +1971,14 @@
 
       // Handle click to edit - only if not dragging (no significant mouse movement)
       const handleMouseDown = (e) => {
-        // Don't track if clicking on checkbox area
-        if (e.target.closest('[data-checkbox]')) return;
+        // Don't track if clicking on checkbox or important button
+        if (e.target.closest('[data-checkbox]') || e.target.closest('[data-important-btn]')) return;
         mouseDownPos.current = { x: e.clientX, y: e.clientY };
       };
 
       const handleMouseUp = (e) => {
-        // Don't handle if clicking on checkbox area
-        if (e.target.closest('[data-checkbox]')) return;
+        // Don't handle if clicking on checkbox or important button
+        if (e.target.closest('[data-checkbox]') || e.target.closest('[data-important-btn]')) return;
         if (!mouseDownPos.current) return;
 
         const dx = Math.abs(e.clientX - mouseDownPos.current.x);
@@ -2092,11 +2104,11 @@
         return 'var(--bg-card-future)';
       };
 
-      // Text color: important=red, completed=muted, recurring=yellow, past=past, else normal
+      // Text color: important=yellow, completed=muted, recurring=blue, past=past, else normal
       const getTextColor = () => {
         if (item.completed) return 'var(--text-muted)';
-        if (item.isImportant) return 'var(--accent-red)';
-        if (item.repeat) return 'var(--accent-yellow)';
+        if (item.isImportant) return 'var(--accent-yellow)';
+        if (item.repeat) return 'var(--accent-blue)';
         if (isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -2173,8 +2185,8 @@
               gap: '4px',
               alignItems: 'center',
             }}>
-              {/* Important button - visible on hover */}
-              {onToggleImportant && (
+              {/* Important button - visible on hover, hidden for recurring items */}
+              {onToggleImportant && !item.repeat && (
                 <div
                   data-important-btn="true"
                   onClick={(e) => { e.stopPropagation(); onToggleImportant(item.id); }}
@@ -2188,14 +2200,14 @@
                     opacity: isHovered || item.isImportant ? 1 : 0,
                     transition: 'opacity 0.1s',
                     flexShrink: 0,
-                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-muted)',
+                    color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-muted)',
                   }}
                   title={item.isImportant ? "Quitar importante" : "Marcar importante"}
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-red)' : 'none'} stroke="currentColor" strokeWidth="2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-yellow)' : 'none'} stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    <line x1="12" y1="7" x2="12" y2="13"/>
+                    <circle cx="12" cy="17" r="1" fill="currentColor"/>
                   </svg>
                 </div>
               )}
@@ -2594,8 +2606,8 @@
             <div
               onClick={(e) => handleAddItem(e, false)}
               style={{
-                padding: '8px 12px',
-                minHeight: '44px',
+                padding: '8px 8px',
+                minHeight: '36px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'baseline',
@@ -2619,7 +2631,7 @@
             </div>
 
             {/* Items list - flex column to allow click area to expand */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px', display: 'flex', flexDirection: 'column' }}>
               {/* Drop indicator at top */}
               <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -3010,7 +3022,7 @@
           <div className="category-heading" draggable={isCategoryDraggable}
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('categoryId', category.id); setDragging(true); }}
             onDragEnd={() => setDragging(false)}
-            onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '44px', background: expanded ? `${category.color}12` : 'transparent' }}>
+            onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '36px', background: expanded ? `${category.color}12` : 'transparent' }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
             <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
             <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '0.625rem', padding: '4px' }}>▼</span>
@@ -3212,7 +3224,7 @@
             draggable={isCategoryDraggable}
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('expandedCategoryId', category.id); setIsDraggingColumn(true); }}
             onDragEnd={() => setIsDraggingColumn(false)}
-            style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '44px', background: `${category.color}12`, cursor: isCategoryDraggable ? 'grab' : 'default', opacity: isDraggingColumn ? 0.5 : 1 }}>
+            style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '36px', background: `${category.color}12`, cursor: isCategoryDraggable ? 'grab' : 'default', opacity: isDraggingColumn ? 0.5 : 1 }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
             <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
           </div>
@@ -3347,7 +3359,7 @@
             flexDirection: 'column',
             borderRight: '1px solid var(--border-color)',
             height: '100%',
-            background: 'var(--bg-primary)',
+            background: 'var(--bg-header)',
           }}>
           {/* Category header - clickable to add item */}
           <div
@@ -3360,8 +3372,8 @@
             onDragEnd={() => setIsDraggingColumn(false)}
             onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
             style={{
-              padding: '8px 12px',
-              minHeight: '44px',
+              padding: '8px 8px',
+              minHeight: '36px',
               cursor: 'pointer',
               opacity: isDraggingColumn ? 0.5 : 1,
               display: 'flex',
@@ -3374,7 +3386,7 @@
           </div>
 
           {/* Items list - flex column to allow click area to expand */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => (
@@ -3640,10 +3652,10 @@
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    color: item.isImportant ? 'var(--accent-red)' : 'var(--text-secondary)',
+                    color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-secondary)',
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-red)' : 'none'} stroke="currentColor" strokeWidth="2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={item.isImportant ? 'var(--accent-yellow)' : 'none'} stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="8" x2="12" y2="12"/>
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -3761,29 +3773,19 @@
           onDrop={handleDrop}
           style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}
         >
-          {/* Day header */}
-          <div style={{ padding: '14px', touchAction: 'none' }}>
+          {/* Day header - desktop style with 150% size */}
+          <div style={{ padding: '16px 20px 8px', touchAction: 'none' }}>
             <div style={{
-              fontSize: '0.625rem',
-              color: getHeaderColor(),
-              fontWeight: '500',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '0',
-            }}>
-              {formatDayNumber(day.date)} {getShortMonthName(day.date)} {day.date.getFullYear()}
-            </div>
-            <div style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
+              fontSize: '1.25rem',
               color: getHeaderColor(),
             }}>
-              {formatDayNameFull(day.date)}
+              <span style={{ fontWeight: '700' }}>{formatDayNumber(day.date)}</span>
+              <span style={{ fontWeight: '400' }}> {formatDayNameFull(day.date)}</span>
             </div>
           </div>
 
-          {/* Items list */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 8px' }} className="hide-scrollbar">
+          {/* Items list - 150% scale with more padding */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '0 20px 16px' }} className="hide-scrollbar">
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {dayItems.map((item, index) => (
@@ -4085,7 +4087,16 @@
               : null;
             // For category items, use hiddenFromSidebar instead of moving to calendar
             const hiddenFromSidebar = !i.scheduledDate && !i.completed;
-            return { ...i, completed: !i.completed, completedDate, hiddenFromSidebar: !i.completed && !i.scheduledDate ? true : undefined };
+            // When uncompleting, move to end of normal items
+            let newSortOrder = i.sortOrder;
+            if (i.completed && i.scheduledDate) {
+              // Find max sortOrder of non-recurring, non-important items on same date
+              const maxSortOrder = p
+                .filter(it => it.scheduledDate === i.scheduledDate && !it.completed && !it.repeat && !it.isImportant)
+                .reduce((max, it) => Math.max(max, it.sortOrder || 0), 0);
+              newSortOrder = maxSortOrder + 1;
+            }
+            return { ...i, completed: !i.completed, completedDate, hiddenFromSidebar: !i.completed && !i.scheduledDate ? true : undefined, sortOrder: newSortOrder, isImportant: i.completed ? false : i.isImportant };
           }));
         }
       };
@@ -4242,6 +4253,8 @@
         setItems(p => {
           const item = p.find(i => i.id === numId);
           if (!item) return p;
+          // Recurring items cannot be marked as important
+          if (item.repeat) return p;
           const newIsImportant = !item.isImportant;
 
           // If marking as important, move to top (lowest sortOrder)
@@ -4375,16 +4388,47 @@
           return;
         }
 
-        performDrop(numId, date, slot, dropIndex);
+        // For non-recurring items, check if moving important/completed item to normal zone
+        const dropOptions = {};
+        if (originalItem && slot !== 'done') {
+          // Get items for target date to determine zones
+          const targetDayItems = allItemsWithRecurring.filter(i => {
+            const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
+            if (baseId === numId) return false;
+            return (i.scheduledDate === date && !i.completed);
+          });
+          const targetRecurringCount = targetDayItems.filter(i => i.repeat || i.originalId).length;
+          const targetImportantCount = targetDayItems.filter(i => !i.repeat && !i.originalId && i.isImportant).length;
+          const normalZoneStart = targetRecurringCount + targetImportantCount;
+
+          // If dropping in normal zone, remove important status
+          if (originalItem.isImportant && dropIndex > normalZoneStart) {
+            dropOptions.removeImportant = true;
+          }
+          // If item was completed, mark for removal
+          if (originalItem.completed) {
+            dropOptions.removeCompleted = true;
+          }
+        }
+
+        performDrop(numId, date, slot, dropIndex, dropOptions);
       };
 
-      const performDrop = (numId, date, slot, dropIndex) => {
+      const performDrop = (numId, date, slot, dropIndex, options = {}) => {
+        // Options: { removeImportant: bool, removeCompleted: bool }
+        const { removeImportant, removeCompleted } = options;
+
         // Get visual items for this date (includes recurring instances)
-        // In the simplified layout, all items for a day go together (no separate slots)
+        // Use same sorting as DayColumn: completed last, recurring first, important second, then normal
         const visualSlotItems = allItemsWithRecurring.filter(i =>
           (i.scheduledDate === date && !i.completed) ||
           (i.completedDate === date && i.completed)
-        ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        ).sort((a, b) => {
+          if (a.completed !== b.completed) return a.completed ? 1 : -1;
+          if (!!a.repeat !== !!b.repeat) return a.repeat ? -1 : 1;
+          if (!a.repeat && !b.repeat && a.isImportant !== b.isImportant) return a.isImportant ? -1 : 1;
+          return (a.sortOrder || 0) - (b.sortOrder || 0);
+        });
 
         // Find original index of dragged item in visual list (if it's already in this slot)
         const originalIndex = visualSlotItems.findIndex(i => {
@@ -4437,7 +4481,11 @@
                 if (slot === 'done') {
                   return { ...i, completed: true, completedDate: date, scheduledDate: date, scheduledSlot: i.scheduledSlot || 'todo', sortOrder: sortInfo?.sortOrder ?? 0 };
                 }
-                return { ...i, scheduledDate: date, scheduledSlot: slot, isArchived: false, completed: false, completedDate: null, sortOrder: sortInfo?.sortOrder ?? 0 };
+                // Apply options to remove important/completed status
+                const newIsImportant = removeImportant ? false : i.isImportant;
+                const newCompleted = removeCompleted ? false : false;
+                const newCompletedDate = removeCompleted ? null : null;
+                return { ...i, scheduledDate: date, scheduledSlot: slot, isArchived: false, completed: newCompleted, completedDate: newCompletedDate, sortOrder: sortInfo?.sortOrder ?? 0, isImportant: newIsImportant };
               }
             }
 
@@ -5146,16 +5194,15 @@
                   </div>
                 </div>
 
-                {/* Mobile Categories - horizontal scroll like desktop */}
+                {/* Mobile Categories - vertical scroll, one column */}
                 <div className="mobile-view-panel" style={{ background: 'var(--bg-header)', display: 'flex', flexDirection: 'column' }}>
-                  {/* Horizontal scroll container for category columns */}
+                  {/* Vertical scroll container */}
                   <div
                     style={{
                       flex: 1,
-                      display: 'flex',
-                      overflowX: 'auto',
-                      overflowY: 'hidden',
+                      overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
+                      padding: '0 16px',
                     }}
                   >
                     {categories.map(cat => {
@@ -5168,16 +5215,13 @@
                         <div
                           key={cat.id}
                           style={{
-                            flex: '0 0 200px',
-                            width: '200px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            borderRight: '1px solid var(--border-color)',
-                            height: '100%',
+                            marginBottom: '16px',
                             background: 'var(--bg-primary)',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
                           }}
                         >
-                          {/* Category header */}
+                          {/* Category header - same style as desktop */}
                           <div
                             onClick={() => {
                               const minSortOrder = backlogItems.length > 0 ? Math.min(...backlogItems.map(i => i.sortOrder || 0)) : 0;
@@ -5196,23 +5240,22 @@
                               });
                             }}
                             style={{
-                              padding: '8px 12px',
-                              minHeight: '44px',
+                              padding: '12px 16px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
                             }}
                           >
-                            <div style={{ fontSize: '0.875rem', color: cat.color }}>
+                            <div style={{ fontSize: '1rem', color: cat.color }}>
                               <span style={{ fontWeight: '700' }}>{cat.name}</span>
                               <span style={{ fontWeight: '400', opacity: 0.7 }}> ({backlogItems.length})</span>
                             </div>
                           </div>
 
                           {/* Items list */}
-                          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ padding: '0 16px 12px' }}>
                             {backlogItems.map((item) => (
-                              <div key={item.id} style={{ marginBottom: '0' }}>
+                              <div key={item.id} style={{ marginBottom: '4px' }}>
                                 <ItemCard
                                   item={item}
                                   categories={categories}
@@ -5225,51 +5268,27 @@
                                 />
                               </div>
                             ))}
-                            {/* Click area to add at end */}
-                            <div
-                              onClick={() => {
-                                const maxSortOrder = backlogItems.length > 0 ? Math.max(...backlogItems.map(i => i.sortOrder || 0)) : 0;
-                                handleSave({
-                                  title: '',
-                                  description: '',
-                                  category: cat.id,
-                                  effort: 1,
-                                  repeat: null,
-                                  scheduledDate: null,
-                                  scheduledSlot: null,
-                                  completed: false,
-                                  completedDate: null,
-                                  sortOrder: maxSortOrder + 1,
-                                  _isNewItem: true,
-                                });
-                              }}
-                              style={{
-                                minHeight: '80px',
-                                flex: 1,
-                                cursor: 'pointer',
-                              }}
-                            />
+                            {backlogItems.length === 0 && (
+                              <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', padding: '8px 0' }}>
+                                Sin items
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
                     })}
 
-                    {/* Add category button as column */}
+                    {/* Add category button */}
                     <div
                       onClick={() => setCategoriesModalOpen(true)}
                       style={{
-                        flex: '0 0 200px',
-                        width: '200px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRight: '1px solid var(--border-color)',
-                        height: '100%',
-                        background: 'var(--bg-primary)',
+                        padding: '16px',
+                        textAlign: 'center',
                         cursor: 'pointer',
+                        marginBottom: '16px',
                       }}
                     >
-                      <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
+                      <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>+ Agregar categoría</span>
                     </div>
                   </div>
                 </div>
@@ -5281,10 +5300,10 @@
               <div className="mobile-footer-inner">
                 {/* Left: Month selector */}
                 <div className="mobile-footer-section">
-                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.625rem' }}>
+                  <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.875rem' }}>
                     {getShortMonthName(currentMobileDay)}
                   </button>
-                  {mobileViewMode === 'calendar' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.625rem' }}>Hoy</button>}
+                  {mobileViewMode === 'calendar' && !mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.875rem' }}>Hoy</button>}
                 </div>
 
                 {/* Center: View tabs */}
@@ -5294,7 +5313,7 @@
                     onClick={() => setMobileViewMode('calendar')}
                     style={{ paddingLeft: '40px' }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                       <line x1="16" y1="2" x2="16" y2="6"/>
                       <line x1="8" y1="2" x2="8" y2="6"/>
@@ -5306,7 +5325,7 @@
                     onClick={() => setMobileViewMode('categories')}
                     style={{ paddingRight: '40px' }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7"/>
                       <rect x="14" y="3" width="7" height="7"/>
                       <rect x="14" y="14" width="7" height="7"/>
@@ -5317,7 +5336,7 @@
 
                 {/* Right: Add button */}
                 <div className="mobile-footer-section right">
-                  <button className="btn" onClick={handleMobileAddClick} style={{ fontSize: '0.625rem', background: 'var(--bg-button)' }}>Agregar</button>
+                  <button className="btn" onClick={handleMobileAddClick} style={{ fontSize: '0.875rem', background: 'var(--bg-button)' }}>Agregar</button>
                 </div>
               </div>
             </div>
@@ -5416,7 +5435,13 @@
           </div>
 
           {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
-          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onClose={() => setEditPopover(null)} targetRect={editPopover.rect} />}
+          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onClose={() => {
+            // Delete empty new items when closing without saving
+            if (editPopover.item?._isNewItem && !editPopover.item?.title?.trim()) {
+              setItems(p => p.filter(i => i.id !== editPopover.item.id));
+            }
+            setEditPopover(null);
+          }} targetRect={editPopover.rect} />}
           {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
           {categoriesModalOpen && <CategoriesModal categories={categories} items={items} onSave={handleEditCategory} onDelete={(id) => setCategories(prev => prev.filter(c => c.id !== id))} onReorder={(order) => setCategories(prev => { const fixed = prev.filter(c => c.isFixed); const nonFixed = order.map(id => prev.find(c => c.id === id)).filter(Boolean); return [...fixed, ...nonFixed]; })} onClose={() => setCategoriesModalOpen(false)} />}
           {recurringEditPopover && <RecurringActionPopover
