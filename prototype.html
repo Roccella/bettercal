@@ -157,7 +157,7 @@
       border-radius: inherit;
     }
 
-    /* Grab (mobile): 600ms R→L ease-in */
+    /* Grab (mobile): 200ms delay + 600ms R→L ease-in */
     .just-grabbed::after {
       content: '';
       position: absolute;
@@ -165,7 +165,7 @@
       background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.6s ease-in;
+      animation: grabShimmer 0.6s ease-in 0.2s both;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -1746,9 +1746,9 @@
           longPressTimer.current = setTimeout(() => {
             setCanDrag(true);
             setJustGrabbed(true);
-            // Clear grab animation after it plays
-            setTimeout(() => setJustGrabbed(false), 600);
-          }, 0); // Shimmer starts immediately, animation shows slow-then-fast effect
+            // Clear grab animation after it plays (200ms delay + 600ms animation)
+            setTimeout(() => setJustGrabbed(false), 800);
+          }, 0); // Class applied immediately, CSS handles 200ms delay before animation starts
         }
       };
 
@@ -4261,31 +4261,9 @@
 
         if (!targetDate) return;
 
-        // For mobile: switch to calendar view and navigate to the day
+        // For mobile: just open the edit popover (bottom sheet) without navigating
         if (isMobile) {
-          setMobileViewMode('calendar');
-          const targetDateObj = new Date(targetDate + 'T00:00:00');
-          setCurrentMobileDay(targetDateObj);
-
-          // After a short delay, scroll to the day and show edit popover
-          setTimeout(() => {
-            // Find the day index and scroll to it
-            const dayIndex = days.findIndex(d => formatDate(d.date) === targetDate);
-            if (dayIndex !== -1 && mobileScrollRef.current) {
-              const dayWidth = mobileScrollRef.current.scrollWidth / days.length;
-              mobileScrollRef.current.scrollTo({ left: dayIndex * dayWidth, behavior: 'smooth' });
-            }
-
-            // Show shimmer on the item
-            const itemId = item.repeat ? `${item.id}-${targetDate}` : item.id;
-            setJustShimmeredItemId(typeof itemId === 'string' ? parseInt(itemId.split('-')[0]) : itemId);
-            setTimeout(() => setJustShimmeredItemId(null), 300);
-
-            // Open bottom sheet for editing
-            setTimeout(() => {
-              setBottomSheetItem({ item: items.find(i => i.id === item.id) || item, visualDate: targetDate });
-            }, 200);
-          }, 300);
+          setBottomSheetItem({ item: items.find(i => i.id === item.id) || item, visualDate: targetDate });
           return;
         }
 

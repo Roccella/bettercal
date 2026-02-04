@@ -131,8 +131,14 @@ Cada día tiene 3 slots:
 - Permite mover recurrentes entre Importante y Pendiente sin confirmación
 
 #### Mismo día, slot Hecho
-- Aplica automáticamente "Solo este evento"
+- Aplica automáticamente "Solo este evento" usando exception `completed`
 - No muestra popover de opciones
+- El item permanece recurrente (solo esa instancia se marca como completada)
+
+#### Mismo día, desde Hecho a otro slot
+- Quita el estado `completed` de la exception
+- Si vuelve al slot original, elimina la exception completamente
+- Permite mover un recurrente completado de vuelta a Importante/Pendiente
 
 #### Diferente día, slot normal
 Al soltar el item:
@@ -275,11 +281,17 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - `useEffect` guarda cambios automáticamente cuando los estados cambian
 - Los botones "Expandir todo" / "Colapsar todo" actualizan ambos estados
 
-### Feedback Visual de Drop
-- Animación shimmer (destello de izquierda a derecha) cuando se suelta un item
-- Clase CSS `.just-dropped` con pseudo-elemento `::after` animado
-- Estado `justDroppedItemId` en App, se limpia después de 600ms
-- Funciona en calendario y sidebar, para items normales y recurrentes
+### Feedback Visual (Shimmer Animations)
+
+| Animación | Duración | Dirección | Timing | Uso |
+|-----------|----------|-----------|--------|-----|
+| **dropShimmer** | 300ms | L→R | linear | Cuando suelto un item después de arrastrarlo |
+| **grabShimmer** | 200ms delay + 600ms | R→L | ease-in | Cuando arrastro un item en mobile (touch) |
+| **navigateShimmer** | 300ms | R→L | linear | Cuando hago click en un item "Agendado" para navegar al calendario |
+
+- Todas usan gradiente blanco semitransparente (`rgba(255,255,255,0.4)` light, `rgba(255,255,255,0.15)` dark)
+- Clases CSS: `.just-dropped`, `.just-grabbed`, `.just-shimmered`
+- Estados: `justDroppedItemId`, `justShimmeredItemId` en App
 
 ## Versión Mobile
 
@@ -300,8 +312,9 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - **Transición entre vistas**: Animación slide horizontal (0.3s ease-out) entre calendario y categorías usando CSS transform
 
 ### Interacción Touch en Items (Mobile)
-- **Long-press para drag**: El shimmer de feedback aparece inmediatamente (0ms) y dura 600ms con efecto de aceleración (lento al inicio, rápido después de 300ms).
+- **Long-press para drag**: El shimmer de feedback aparece después de 200ms delay, luego dura 600ms con ease-in (lento al inicio, rápido al final).
 - **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
+- **Tap en item agendado (categorías)**: Abre directamente el popover de edición (BottomSheet) sin navegar al calendario.
 - **touch-action: manipulation**: Los items permiten scroll en ambas direcciones (vertical y horizontal).
 - **Drag ghost oculto**: Se usa `setDragImage` con imagen transparente para ocultar la copia fantasma durante el drag.
 - **Prevención de interacción post-cierre**: `lastPopoverCloseTime` evita que al cerrar el BottomSheet se active un item debajo
