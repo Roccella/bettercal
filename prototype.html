@@ -431,7 +431,7 @@
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
     // Day width is base unit, sidebar is 1.2x
-    const DAY_WIDTH = 220;
+    const DAY_WIDTH = 210;
     const SIDEBAR_WIDTH = 300;
 
     const initialCategories = [
@@ -827,7 +827,7 @@
             background: 'none',
             border: 'none',
             padding: '0',
-            fontSize: '0.7rem',
+            fontSize: '0.6125rem',
             cursor: 'pointer',
             opacity: energy === l ? 1 : 0.3,
             filter: energy === l ? 'none' : 'grayscale(100%)',
@@ -1746,7 +1746,7 @@
             setTimeout(() => setJustGrabbed(false), 300);
             // Vibrate if supported to indicate drag is enabled
             if (navigator.vibrate) navigator.vibrate(50);
-          }, 150); // 150ms long press - needs to match Safari's drag activation time
+          }, 200); // 200ms long press - needs to match Safari's drag activation time
         }
       };
 
@@ -2131,7 +2131,7 @@
           position: isSticky ? 'sticky' : 'relative', left: isSticky ? 0 : 'auto',
           zIndex: isSticky ? 10 : 1, boxShadow: isSticky ? '4px 0 10px rgba(0,0,0,0.1)' : 'none',
         }}>
-          <div style={{ padding: '10px', minHeight: '44px', borderBottom: '1px solid var(--border-color)', background: isToday ? 'var(--today-header)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ padding: '20px 10px 10px', minHeight: '44px', borderBottom: '1px solid var(--border-color)', background: isToday ? 'var(--today-header)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ fontSize: '0.8125rem', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)', fontWeight: '400' }}>{formatDayName(day.date)}</span>
               <span style={{ fontSize: '0.8125rem', fontWeight: '700', color: isToday ? 'var(--accent-blue)' : day.isPast ? 'var(--text-past)' : 'var(--text-primary)' }}>{formatDayNumber(day.date)}</span>
@@ -4199,12 +4199,14 @@
                   <button
                     className={`mobile-tab-btn ${mobileViewMode === 'calendar' ? 'active' : ''}`}
                     onClick={() => setMobileViewMode('calendar')}
+                    style={{ paddingLeft: '40px' }}
                   >
                     📅
                   </button>
                   <button
                     className={`mobile-tab-btn ${mobileViewMode === 'categories' ? 'active' : ''}`}
                     onClick={() => setMobileViewMode('categories')}
+                    style={{ paddingRight: '40px' }}
                   >
                     📁
                   </button>
@@ -4264,7 +4266,7 @@
                   </div>
                   <button onClick={goToToday} className="btn">Hoy</button>
                   <div style={{ flex: 1 }} />
-                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} style={{ background: 'none', border: 'none', padding: '0', fontSize: '0.875rem', cursor: 'pointer' }}>{theme === 'light' ? '🌙' : '☀️'}</button>
+                  <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} style={{ background: 'none', border: 'none', padding: '0', fontSize: '0.6125rem', cursor: 'pointer' }}>{theme === 'light' ? '🌙' : '☀️'}</button>
                 </div>
                 <div ref={scrollRef} style={{ flex: 1, display: 'flex', overflow: 'auto', background: 'var(--bg-primary)' }}>
                   {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={formatDate(day.date) === formatDate(REAL_TODAY) && sticky} justDroppedItemId={justDroppedItemId} />)}
@@ -4275,7 +4277,7 @@
             {/* Expanded Categories Mode - full width with horizontal scroll */}
             {expandedCategoriesMode ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-primary)' }}>
-                <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ padding: '18px 10px 8px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                   <div style={{ flex: 1 }} />
                   <button onClick={(e) => { if (!editPopover) setNewCatRect(e.currentTarget.getBoundingClientRect()); }} className="btn" style={{ opacity: editPopover ? 0.5 : 1, cursor: editPopover ? 'default' : 'pointer' }}>Agregar categoría</button>
@@ -4292,7 +4294,7 @@
               /* Sidebar - normal mode */
               <div style={{ width: `${SIDEBAR_WIDTH}px`, background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <div style={{ borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '8px 10px', display: 'flex', alignItems: 'center' }}>
+                  <div style={{ padding: '18px 10px 8px', display: 'flex', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-muted)' }}>Categorías</span>
                     <div style={{ flex: 1 }} />
                     <button onClick={() => setExpandedCategoriesMode(true)} className="btn">Ampliar</button>

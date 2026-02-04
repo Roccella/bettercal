@@ -40,7 +40,7 @@ Actualmente el prototipo usa CDN para:
 ## Estructura de la UI
 
 ### Layout Principal
-- **Calendario**: Vista de 12 días con scroll horizontal (columnas de 200px)
+- **Calendario**: Vista de 12 días con scroll horizontal (columnas de 210px)
 - **Sidebar derecha**: Categorías (300px de ancho) con grupos Backlog, Hacer y Hecho (en ese orden)
 - **Ancho sidebar**: SIDEBAR_WIDTH = 300px (fijo tanto en vista calendario como en modo ampliado)
 - **Borde de domingo**: Línea vertical de 10px en color gris desaturado para separar semanas
@@ -287,7 +287,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 
 ### Layout Responsive
 - Breakpoint: 600px
-- Desktop (>600px): Layout original con 12 días + sidebar (columnas de 200px)
+- Desktop (>600px): Layout original con 12 días + sidebar (columnas de 210px)
 - Mobile (≤600px): Vista de 1 día con swipe + footer con tabs
 
 ### Características Mobile
@@ -302,7 +302,7 @@ Para items recurrentes, completar crea una excepción `completed` para esa insta
 - **Transición entre vistas**: Animación slide horizontal (0.3s ease-out) entre calendario y categorías usando CSS transform
 
 ### Interacción Touch en Items (Mobile)
-- **Long-press para drag**: Los items requieren mantener presionado ~30ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
+- **Long-press para drag**: Los items requieren mantener presionado ~200ms antes de poder arrastrarlos. Esto evita que un swipe rápido sobre un item arrastre el item en vez de hacer scroll del día.
 - **Vibración feedback**: Al activarse el drag después del long-press, el dispositivo vibra brevemente (si soporta `navigator.vibrate`).
 - **Click en touchend**: El tap en items se activa al soltar (touchend), no al tocar. Si hay movimiento durante el touch, se cancela el click (es un swipe).
 - **touch-action: manipulation**: Los items permiten scroll en ambas direcciones (vertical y horizontal).
