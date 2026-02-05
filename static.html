@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Better Cal - Prototype v23</title>
+  <title>Tudux</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -4070,12 +4070,12 @@
 
       // Load expanded state from localStorage, fallback to all expanded
       const defaultExpanded = { temp: true, ai: true, work: true, health: true, social: true, music: true, entertainment: true, home: true, fitness: true };
-      const [expanded, setExpanded] = useState(() => loadFromStorage('bettercal_expanded', defaultExpanded));
+      const [expanded, setExpanded] = useState(() => loadFromStorage('tudux_expanded', defaultExpanded));
 
       // Groups expanded state per category: { categoryId: { backlog: bool, scheduled: bool, done: bool } }
       const defaultGroupsExp = {};
       initialCategories.forEach(c => { defaultGroupsExp[c.id] = { backlog: true, scheduled: true, done: true }; });
-      const [categoryGroupsExp, setCategoryGroupsExp] = useState(() => loadFromStorage('bettercal_groups', defaultGroupsExp));
+      const [categoryGroupsExp, setCategoryGroupsExp] = useState(() => loadFromStorage('tudux_groups', defaultGroupsExp));
 
       const [groupsExpandedState, setGroupsExpandedState] = useState(null); // null, 'expanded', 'collapsed'
       const [calendarRect, setCalendarRect] = useState(null);
@@ -4133,13 +4133,13 @@
       // Persist expanded states to localStorage
       useEffect(() => {
         try {
-          localStorage.setItem('bettercal_expanded', JSON.stringify(expanded));
+          localStorage.setItem('tudux_expanded', JSON.stringify(expanded));
         } catch (e) {}
       }, [expanded]);
 
       useEffect(() => {
         try {
-          localStorage.setItem('bettercal_groups', JSON.stringify(categoryGroupsExp));
+          localStorage.setItem('tudux_groups', JSON.stringify(categoryGroupsExp));
         } catch (e) {}
       }, [categoryGroupsExp]);
 

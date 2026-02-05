@@ -1,15 +1,15 @@
-# Better Cal - Contexto del Proyecto
+# Tudux - Contexto del Proyecto
 
 ## Instrucciones para Claude
 - **NO abrir el archivo en el navegador después de editar** - el usuario prefiere refrescar la página manualmente
 - **COMMITS AUTOMÁTICOS**: Después de completar cambios drásticos o significativos, crear un commit automáticamente SIN preguntar al usuario.
 
 ## Repositorio
-- **GitHub**: https://github.com/Roccella/bettercal (privado)
+- **GitHub**: https://github.com/Roccella/tudux (privado)
 - **Branch principal**: main
 
 ## Descripción General
-Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementada como un prototipo en un único archivo HTML usando React 18 con Babel standalone.
+Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada como un prototipo en un único archivo HTML usando React 18 con Babel standalone.
 
 ## Arquitectura Técnica
 - **Stack**: HTML + React 18 + Babel standalone (sin build process)
