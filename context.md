@@ -24,8 +24,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ## Estructura de la UI (Estilo TeuxDeux)
 
 ### Layout Principal - Dos Filas
-- **Fila 1 (58%)**: Calendario con scroll horizontal (32 columnas de 240px)
-- **Fila 2 (42%)**: Categorías con scroll horizontal (columnas de 200px)
+- **Fila 1 (59%)**: Calendario con scroll horizontal (32 columnas de 240px)
+- **Fila 2 (41%)**: Categorías con scroll horizontal (columnas de 200px)
 - **Header**: Fondo `--bg-header`, botones de navegación, "Hoy" condicional, "Borrar hechos", "Editar categorías"
 
 ### Características Visuales
