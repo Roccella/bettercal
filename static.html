@@ -5290,7 +5290,7 @@
           setTimeout(() => {
             const dayColumn = document.querySelector('.mobile-day-column:nth-child(' + (currentMobileDayIndex + 1) + ') .hide-scrollbar');
             if (dayColumn) dayColumn.scrollTop = 0;
-          }, 0);
+          }, 50);
         } else {
           // In categories view: create item in backlog (existing behavior)
           const newItem = {
@@ -5315,7 +5315,7 @@
           setTimeout(() => {
             const categoriesContainer = document.querySelector('.mobile-view-panel:nth-child(2) > div');
             if (categoriesContainer) categoriesContainer.scrollTop = 0;
-          }, 0);
+          }, 50);
         }
       };
 
