@@ -5283,11 +5283,23 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: formatDate(currentMobileDay) });
-          // Scroll day container to top after React renders the new item
-          setTimeout(() => {
+          // Scroll day container to top - use visualViewport resize event for keyboard
+          const scrollDayToTop = () => {
             const dayColumn = document.querySelector('.mobile-day-column:nth-child(' + (currentMobileDayIndex + 1) + ') .hide-scrollbar');
             if (dayColumn) dayColumn.scrollTop = 0;
-          }, 50);
+          };
+          // Listen for keyboard appearance (visualViewport resize)
+          if (window.visualViewport) {
+            const handler = () => {
+              scrollDayToTop();
+              window.visualViewport.removeEventListener('resize', handler);
+            };
+            window.visualViewport.addEventListener('resize', handler);
+            // Cleanup after 1s if keyboard never appears
+            setTimeout(() => window.visualViewport.removeEventListener('resize', handler), 1000);
+          }
+          // Also do initial scroll after render
+          setTimeout(scrollDayToTop, 50);
         } else {
           // In categories view: create item in backlog (existing behavior)
           const newItem = {
@@ -5308,11 +5320,23 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: null });
-          // Scroll categories container to top after React renders the new item
-          setTimeout(() => {
+          // Scroll categories container to top - use visualViewport resize event for keyboard
+          const scrollCategoriesToTop = () => {
             const categoriesContainer = document.querySelector('.mobile-view-panel:nth-child(2) > div');
             if (categoriesContainer) categoriesContainer.scrollTop = 0;
-          }, 50);
+          };
+          // Listen for keyboard appearance (visualViewport resize)
+          if (window.visualViewport) {
+            const handler = () => {
+              scrollCategoriesToTop();
+              window.visualViewport.removeEventListener('resize', handler);
+            };
+            window.visualViewport.addEventListener('resize', handler);
+            // Cleanup after 1s if keyboard never appears
+            setTimeout(() => window.visualViewport.removeEventListener('resize', handler), 1000);
+          }
+          // Also do initial scroll after render
+          setTimeout(scrollCategoriesToTop, 50);
         }
       };
 
