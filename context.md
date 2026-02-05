@@ -53,12 +53,16 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
   - **Reset de mute**: El estado mute se resetea al soltar el item en cualquier destino
 
 ### Items Recurrentes
-- **Texto azul** (color `--accent-blue`)
-- **Ícono SVG** de flechas de recurrencia (siempre visible a la derecha)
+- **Texto azul** (color `--accent-blue`), **naranja si overdue** (#F97316)
+- **Ícono SVG** de flechas de recurrencia (siempre visible a la derecha, con tooltip del patrón)
 - **No pueden ser marcados como importantes**
 - **Solo se pueden mover a otras zonas de recurrentes**
 - **No se pueden mover a categorías** (drag & drop bloqueado)
 - **No se pueden modificar en días pasados** (cambios se ignoran silenciosamente)
+- **No se pueden mover al pasado** (días < hoy se mutean y no aceptan drop)
+- **Restricción de rango** (modelo Outlook): solo puede moverse entre instancia anterior y siguiente
+- **Overdue**: instancias pasadas sin completar se muestran en naranja
+- **Crear en día fuera del patrón weekdays**: se ajusta a la primera fecha válida del patrón
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
@@ -123,7 +127,8 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
   every: number,
   days: number[], // Para weekdays: 0=Dom, 1=Lun, ..., 6=Sab
   startDate: string | null,
-  endDate: string | null
+  endDate: string | null,
+  mode: 'fixed' | 'completion' // Solo para type 'days': fixed=desde fecha base, completion=desde última completación
 }
 ```
 
