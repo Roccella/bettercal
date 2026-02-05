@@ -5237,7 +5237,15 @@
 
       // Solo este evento: marcar instancia como deleted y crear nuevo item independiente
       const handleRecurringMoveThis = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
-        console.log('handleRecurringMoveThis called', { itemId: item.id, originalDate, targetDate, targetSlot });
+        console.log('handleRecurringMoveThis called', { itemId: item.id, originalDate, targetDate, targetSlot, dropIndex });
+
+        // Validate originalDate - must be a valid date string
+        if (!originalDate || !/^\d{4}-\d{2}-\d{2}$/.test(originalDate)) {
+          console.error('Invalid originalDate:', originalDate);
+          setToast({ message: 'Error: fecha original inválida' });
+          return;
+        }
+
         const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
 
         // Get any property overrides from existing exception (if instance was already modified)
@@ -5255,6 +5263,7 @@
               newExceptions[originalDate] = { ...existingException, deleted: true };
               // Clean up movedTo if it existed
               delete newExceptions[originalDate].movedTo;
+              console.log('Marked exception as deleted:', { itemId: i.id, originalDate, newExceptions });
               return { ...i, exceptions: newExceptions };
             }
 
@@ -5280,14 +5289,18 @@
             category: item.category,
             effort: instanceEffort,
             scheduledDate: targetDate,
-            scheduledSlot: targetSlot,
+            scheduledSlot: targetSlot || 'todo',  // Ensure valid slot
             sortOrder: insertedSortOrder,
             completed: targetSlot === 'done',
             completedDate: targetSlot === 'done' ? targetDate : null,
             createdAt: formatDate(REAL_TODAY),
             isArchived: false,
+            hiddenFromSidebar: false,
+            isImportant: false,
             repeat: null, // No recurrence - independent item
           };
+
+          console.log('Created new independent item:', newItem);
 
           // Trigger drop feedback animation for the new item
           setTimeout(() => {
