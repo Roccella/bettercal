@@ -334,7 +334,7 @@
       background: var(--bg-header);
       border-top: 1px solid var(--border-color);
       padding: 0 20px;
-      height: calc(80px + env(safe-area-inset-bottom, 0px));
+      height: calc(92px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
@@ -380,7 +380,7 @@
       .mobile-footer { display: flex; }
 
       /* Toast wider and higher in mobile to not cover footer */
-      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -439,7 +439,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useRef, useEffect, useMemo, useCallback } = React;
+    const { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } = React;
 
     const TEMP_COLOR = '#9CA3AF';
     const COLORS = ['#DC2626','#EA580C','#D97706','#65A30D','#059669','#0D9488','#2563EB','#7C3AED','#DB2777'];
@@ -3660,9 +3660,10 @@
       const isNewUntitledItem = !!item?._isNewItem || (!!item?.id && originalTitle === '');
 
       // Only auto-focus for new items, not editing existing ones
-      useEffect(() => {
-        if (isNewUntitledItem) {
-          setTimeout(() => inputRef.current?.focus(), 100);
+      // Use useLayoutEffect for Safari iOS compatibility (runs synchronously before paint)
+      useLayoutEffect(() => {
+        if (isNewUntitledItem && inputRef.current) {
+          inputRef.current.focus();
         }
       }, [isNewUntitledItem]);
 
@@ -3999,7 +4000,7 @@
         >
           {/* Day header - desktop style with 150% size */}
           <div style={{
-            padding: '48px 20px 10px',
+            padding: '24px 20px 10px',
             touchAction: 'none',
             borderBottom: isScrolled ? '1px solid var(--border-color)' : '1px solid transparent',
             transition: 'border-color 0.15s',
@@ -4322,8 +4323,8 @@
               ? (i.scheduledDate ? i.scheduledDate : null) // No date for category items
               : null;
             // Items stay in place when toggling completed status - keep same sortOrder
-            // Only clear isImportant when completing (not when uncompleting)
-            return { ...i, completed: !i.completed, completedDate, isImportant: i.completed ? i.isImportant : false };
+            // Preserve isImportant status when toggling completed
+            return { ...i, completed: !i.completed, completedDate };
           }));
         }
       };
@@ -5420,7 +5421,7 @@
             {mobileViewMode === 'calendar' && (
               <div style={{
                 position: 'fixed',
-                top: `calc(48px + env(safe-area-inset-top, 0px))`,
+                top: `calc(24px + env(safe-area-inset-top, 0px))`,
                 right: '20px',
                 zIndex: 100,
                 display: 'flex',
@@ -5473,7 +5474,7 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '48px 12px 0',
+                      padding: '24px 12px 0',
                     }}
                   >
                     {categories.map((cat, catIndex) => {
@@ -5573,7 +5574,7 @@
               onClick={handleMobileAddClick}
               style={{
                 position: 'fixed',
-                bottom: `calc(80px + env(safe-area-inset-bottom, 0px))`,
+                bottom: `calc(92px + env(safe-area-inset-bottom, 0px))`,
                 right: '20px',
                 fontSize: '0.75rem',
                 padding: '22px 36px',
