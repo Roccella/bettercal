@@ -278,14 +278,15 @@
     }
 
     .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 20px; left: 0; right: 0;
+      margin: 0 auto; width: fit-content;
       background: var(--bg-primary); color: var(--text-primary);
       padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       z-index: 10001;
       display: flex; align-items: center; gap: 12px;
       animation: slideUp 0.2s ease-out;
     }
-    @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     .discard-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -384,7 +385,7 @@
 
       /* Toast from top in mobile */
       .toast { width: calc(100vw - 40px); max-width: 400px; bottom: auto; top: calc(20px + env(safe-area-inset-top, 0px)); animation: slideDown 0.2s ease-out; }
-      @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+      @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -1320,7 +1321,7 @@
       );
     };
 
-    const AddEditItemPopover = ({ categories, onSave, onDelete, onComplete, onClose, targetRect, editItem, defaultCategory, defaultSlot, defaultDate, addCompleted, visualDate }) => {
+    const AddEditItemPopover = ({ categories, onSave, onDelete, onComplete, onClose, onDuplicate, targetRect, editItem, defaultCategory, defaultSlot, defaultDate, addCompleted, visualDate }) => {
       const [title, setTitle] = useState(editItem?.title || '');
       const [description, setDescription] = useState(editItem?.description || '');
       const [category, setCategory] = useState(editItem?.category || defaultCategory || 'temp');
@@ -1555,6 +1556,7 @@
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
+                {isEditing && !editItem?.repeat && onDuplicate && <button type="button" onClick={() => { onDuplicate(editItem.id); onClose(); }} className="btn" style={{ padding: '6px 8px', background: 'var(--bg-button)' }} title="Duplicar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
             </form>
@@ -2828,7 +2830,7 @@
       );
     };
 
-    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onToggleImportant, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId, draggingItemType, onDragTypeChange }) => {
+    const DayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onDelete, onToggleImportant, onDrop, onAdd, onSetEnergy, isSticky, justDroppedItemId, draggingItemType, onDragTypeChange, draggingRecurringRange }) => {
       const dateStr = formatDate(day.date);
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isSunday = day.date.getDay() === 0;
@@ -2984,7 +2986,17 @@
       };
 
       // Mute past days when dragging recurring item (can't drop recurring items in the past)
-      const isMutedForRecurring = draggingItemType === 'recurring' && day.isPast;
+      // Mute column if outside valid range for recurring item drag
+      const isMutedForRecurring = (() => {
+        if (draggingItemType !== 'recurring') return false;
+        if (day.isPast) return true; // Always mute past days for recurring
+        if (draggingRecurringRange) {
+          const { minDate, maxDate } = draggingRecurringRange;
+          if (minDate && dateStr < minDate) return true;
+          if (maxDate && dateStr > maxDate) return true;
+        }
+        return false;
+      })();
 
       return (
         <>
@@ -3776,6 +3788,9 @@
         setNewItemId('pending');
       };
 
+      // Mute category column when dragging recurring items (can't drop recurring in categories)
+      const isMutedForRecurring = draggingItemType === 'recurring';
+
       return (
         <div
           ref={columnRef}
@@ -3790,6 +3805,8 @@
             borderRight: '1px solid var(--border-color)',
             height: '100%',
             background: 'var(--bg-header)',
+            opacity: isMutedForRecurring ? 0.3 : 1,
+            pointerEvents: isMutedForRecurring ? 'none' : 'auto',
           }}>
           {/* Category header - clickable to add item */}
           <div
@@ -3885,7 +3902,7 @@
     // ============ MOBILE COMPONENTS ============
 
     // BottomSheet for mobile item editing
-    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onComplete, onToggleImportant, onClose, closing }) => {
+    const BottomSheet = ({ item, visualDate, categories, onSave, onDelete, onComplete, onToggleImportant, onDuplicate, onClose, closing }) => {
       const [title, setTitle] = useState(item?.title || '');
       const [description, setDescription] = useState(item?.description || '');
       const [category, setCategory] = useState(item?.category || 'temp');
@@ -4158,9 +4175,12 @@
                 </button>
               </div>
             )}
-            {/* Delete and Cancel buttons */}
+            {/* Delete, Duplicate and Cancel buttons */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-              <div>{isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
+                {isEditing && !item.repeat && onDuplicate && <button type="button" onClick={() => { onDuplicate(item.id); onClose(); }} className="btn" style={{ padding: '10px 12px', background: 'var(--bg-button)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
+              </div>
               <button type="button" onClick={handleRequestClose} className="btn" style={{ fontSize: '0.75rem', padding: '8px 16px' }}>Cancelar</button>
             </div>
           </div>
@@ -4170,7 +4190,7 @@
     };
 
     // Mobile Day Column Component for scroll-snap
-    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId, onGoToToday, onOpenCalendar, monthName, draggingItemType }) => {
+    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId, onGoToToday, onOpenCalendar, monthName, draggingItemType, draggingRecurringRange }) => {
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
@@ -4262,8 +4282,17 @@
         setIsScrolled(e.target.scrollTop > 0);
       };
 
-      // Mute past days when dragging recurring item
-      const isMutedForRecurring = draggingItemType === 'recurring' && isPast;
+      // Mute column if outside valid range for recurring item drag
+      const isMutedForRecurring = (() => {
+        if (draggingItemType !== 'recurring') return false;
+        if (isPast) return true; // Always mute past days for recurring
+        if (draggingRecurringRange) {
+          const { minDate, maxDate } = draggingRecurringRange;
+          if (minDate && dateStr < minDate) return true;
+          if (maxDate && dateStr > maxDate) return true;
+        }
+        return false;
+      })();
 
       return (
         <div
@@ -4272,7 +4301,7 @@
           onDragOver={isMutedForRecurring ? undefined : handleColumnDragOver}
           onDragLeave={handleDragLeave}
           onDrop={isMutedForRecurring ? undefined : handleDrop}
-          style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', opacity: isMutedForRecurring ? 0.3 : 1 }}
+          style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', opacity: isMutedForRecurring ? 0.3 : 1, pointerEvents: isMutedForRecurring ? 'none' : 'auto' }}
         >
           {/* Day header - desktop style with 150% size */}
           <div style={{
@@ -4354,6 +4383,7 @@
       const [justShimmeredItemId, setJustShimmeredItemId] = useState(null); // For reverse shimmer animation on scheduled item click
       const [draggingUnscheduledItem, setDraggingUnscheduledItem] = useState(false); // Track when dragging unscheduled item
       const [draggingItemType, setDraggingItemType] = useState(null); // 'recurring' | 'important' | 'normal' | null - for zone muting
+      const [draggingRecurringRange, setDraggingRecurringRange] = useState(null); // { minDate, maxDate } - valid move range for dragged recurring item
 
       // Mobile states
       const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 600);
@@ -4421,12 +4451,30 @@
             if (item) {
               const itemType = item.repeat ? 'recurring' : (item.isImportant ? 'important' : 'normal');
               setDraggingItemType(itemType);
+
+              // Compute valid range for recurring items
+              if (item.repeat) {
+                // Extract visual date from item ID (format: baseId-YYYY-MM-DD)
+                let visualDate = null;
+                if (typeof itemId === 'string' && itemId.includes('-')) {
+                  const parts = itemId.split('-');
+                  if (parts.length >= 4) {
+                    visualDate = `${parts[1]}-${parts[2]}-${parts[3]}`;
+                  }
+                }
+                if (!visualDate) visualDate = item.scheduledDate || item.createdAt;
+                if (visualDate) {
+                  const range = getValidMoveRange(item, visualDate);
+                  setDraggingRecurringRange(range);
+                }
+              }
             }
           }
         };
         const handleDragEnd = () => {
           setDraggingUnscheduledItem(false);
           setDraggingItemType(null); // Reset mute state
+          setDraggingRecurringRange(null);
         };
         document.addEventListener('dragstart', handleDragStart);
         document.addEventListener('dragend', handleDragEnd);
@@ -4861,6 +4909,38 @@
         setToast(null);
       };
 
+      const handleDuplicate = (id) => {
+        const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
+        const originalItem = items.find(i => i.id === numId);
+        if (!originalItem || originalItem.repeat) return; // Don't duplicate recurring items
+
+        const newId = Date.now();
+        const duplicatedItem = {
+          ...originalItem,
+          id: newId,
+          completed: false,
+          completedDate: null,
+          createdAt: formatDate(REAL_TODAY),
+          sortOrder: (originalItem.sortOrder || 0) + 0.5, // Insert just after original
+        };
+
+        // Insert right after the original item
+        setItems(p => {
+          const idx = p.findIndex(i => i.id === numId);
+          const newItems = [...p];
+          newItems.splice(idx + 1, 0, duplicatedItem);
+          // Normalize sortOrders for items in the same day/category
+          return newItems;
+        });
+
+        // Trigger drop shimmer on the new item
+        setJustDroppedItemId(newId);
+        setTimeout(() => setJustDroppedItemId(null), 300);
+
+        // Close popovers
+        setEditPopover(null);
+      };
+
       // Keyboard shortcut: Cmd+Z / Ctrl+Z for undo
       useEffect(() => {
         const handleKeyDown = (e) => {
@@ -4914,15 +4994,9 @@
             const { minDate, maxDate } = getValidMoveRange(originalItem, effectiveVisualDate);
             console.log('Valid move range:', { minDate, maxDate, targetDate: date });
 
-            // Check if target date is within valid range
-            if (minDate && date < minDate) {
+            // Check if target date is within valid range - silently ignore if outside range
+            if ((minDate && date < minDate) || (maxDate && date > maxDate)) {
               setDraggingItemType(null);
-              setToast({ message: 'No se puede mover antes de la instancia anterior' });
-              return;
-            }
-            if (maxDate && date > maxDate) {
-              setDraggingItemType(null);
-              setToast({ message: 'No se puede mover después de la siguiente instancia' });
               return;
             }
           }
@@ -5890,6 +5964,7 @@
                         onOpenCalendar={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())}
                         monthName={getShortMonthName(day.date)}
                         draggingItemType={draggingItemType}
+                        draggingRecurringRange={draggingRecurringRange}
                       />
                     ))}
                   </div>
@@ -6063,6 +6138,7 @@
                 onDelete={handleDelete}
                 onComplete={handleComplete}
                 onToggleImportant={handleToggleImportant}
+                onDuplicate={handleDuplicate}
                 onClose={handleBottomSheetClose}
                 closing={bottomSheetClosing}
               />
@@ -6125,7 +6201,7 @@
               <button onClick={() => setCategoriesModalOpen(true)} className="btn" style={{ background: 'var(--bg-button)' }}>Editar categorías</button>
             </div>
             <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', background: 'var(--bg-primary)' }}>
-              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={setDraggingItemType} />)}
+              {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={setDraggingItemType} draggingRecurringRange={draggingRecurringRange} />)}
             </div>
           </div>
 
@@ -6166,7 +6242,7 @@
           </div>
 
           {calendarRect && <CalendarPopover baseDate={viewBase} visibleDates={days.map(d => d.date)} onClose={() => setCalendarRect(null)} targetRect={calendarRect} onSelectDate={(d) => { setViewBase(d); setCalendarRect(null); }} />}
-          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onClose={() => {
+          {editPopover && <AddEditItemPopover categories={categories} editItem={editPopover.item} visualDate={editPopover.visualDate} onSave={handleSave} onDelete={handleDelete} onComplete={handleComplete} onDuplicate={handleDuplicate} onClose={() => {
             // Delete empty new items when closing without saving
             if (editPopover.item?._isNewItem && !editPopover.item?.title?.trim()) {
               setItems(p => p.filter(i => i.id !== editPopover.item.id));

@@ -50,7 +50,10 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Drag & Drop con mute**:
   - Al arrastrar recurrente: zona normal se pone mute (opacity 0.3)
   - Al arrastrar normal/importante: zona recurrente se pone mute
-  - Indicador de drop (línea azul) solo aparece en zona válida
+  - Al arrastrar recurrente: días fuera del rango válido (Outlook) se mutean completamente (opacity 0.3, pointerEvents none)
+  - Al arrastrar recurrente: columnas de categorías se mutean (no se pueden soltar ahí)
+  - Indicador de drop (línea azul) solo aparece en zona válida, nunca en áreas muteadas
+  - Soltar en área muteada no hace nada (silencioso, sin toast)
   - **Items recurrentes NO se pueden mover a categorías**
   - **Soltar recurrente en área vacía o sobre zona normal**: Se posiciona al final de la zona de recurrentes
   - **Mover item de día a categoría**: Se mueve directamente sin confirmación
@@ -108,8 +111,9 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Checkbox en hover**: Marca como completado
 - **Completar en categorías**: Item se queda en lugar visible (no desaparece)
 - **Hotkey Command+E**: Eliminar item (desktop)
-- **Undo**: Al deshacer un borrado, el item vuelve a su posición exacta en el array
+- **Undo**: Al deshacer un borrado, el item vuelve a su posición exacta en el array (con shimmer)
 - **Doble-click en headings de categorías**: Protección contra ghost items (no crea item si ya hay uno pendiente)
+- **Duplicar**: Botón ícono (copiar) en el editor, solo para items no recurrentes, entre trash y guardar. Crea copia debajo del original con shimmer
 
 ## Modelo de Datos
 
