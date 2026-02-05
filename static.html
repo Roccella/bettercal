@@ -372,8 +372,8 @@
 
     /* Mobile media query */
     @media (max-width: 600px) {
-      html { font-size: 150%; overflow: hidden; height: 100%; }
-      body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100%; position: fixed; width: 100%; }
+      html { font-size: 150%; overflow: hidden; height: 100dvh; }
+      body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100dvh; margin: 0; }
 
       .mobile-only { display: flex; }
       .desktop-only { display: none !important; }
@@ -3660,18 +3660,8 @@
       // Check if this is a new item created with empty title (from FAB click)
       const isNewUntitledItem = !!item?._isNewItem || (!!item?.id && originalTitle === '');
 
-      // Only auto-focus for new items, not editing existing ones
-      // Wait for slideUp animation (0.3s) to complete before focusing
-      useEffect(() => {
-        if (isNewUntitledItem) {
-          const timer = setTimeout(() => {
-            if (inputRef.current) {
-              inputRef.current.focus();
-            }
-          }, 350); // Wait for 0.3s animation + small buffer
-          return () => clearTimeout(timer);
-        }
-      }, []);
+      // Auto-focus for new items - use autoFocus attribute instead of programmatic focus
+      // Safari iOS blocks programmatic focus() outside of direct user interaction
 
       const hasChanges = title !== originalTitle || description !== originalDescription ||
         category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
@@ -3771,6 +3761,7 @@
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Item..."
+              autoFocus={isNewUntitledItem}
               style={{
                 width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
                 fontSize: '0.875rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
@@ -5422,7 +5413,7 @@
       if (isMobile) {
         // MOBILE LAYOUT
         return (
-          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', overflow: 'hidden' }}>
+          <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', overflow: 'hidden' }}>
             {/* Floating header buttons - only visible in calendar mode */}
             {mobileViewMode === 'calendar' && (
               <div style={{
@@ -5583,7 +5574,7 @@
                 onClick={handleMobileAddClick}
                 style={{
                   position: 'absolute',
-                  top: '-76px',
+                  top: '-92px',
                   right: '20px',
                   fontSize: '0.75rem',
                   padding: '22px 36px',

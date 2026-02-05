@@ -209,7 +209,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado relativo al footer (top: -76px), con touchAction manipulation
+- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado relativo al footer (top: -92px), con touchAction manipulation
 - **Footer**: 112px de alto con position:relative, íconos arriba (padding 20px 20px 0), zonas de tap completas
 - **Padding top**: 10px en heading de día y contenedor de categorías
 - **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones (permite scroll through)
@@ -221,7 +221,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
 - **Toast**: Sale desde arriba de la pantalla (top: 20px + safe-area) con animación slideDown
-- **Bottom sheet focus**: Delay de 350ms para esperar animación slideUp antes de focus
+- **Bottom sheet focus**: Usa autoFocus en el input para nuevos items (Safari iOS compatible)
 - **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
 - **Heading de día**: Muestra borde inferior al hacer scroll, sin botones (están en header flotante)
 
