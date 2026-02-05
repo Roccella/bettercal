@@ -1992,6 +1992,9 @@
         onConfirm('following', options);
       };
 
+      // Detectar si es weekdays para mostrar opciones diferentes
+      const isWeekdays = originalRepeatType === 'weekdays';
+
       return (
         <Popover onClose={onCancel} targetRect={computedRect}>
           <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
@@ -2002,12 +2005,28 @@
             <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               <div>Solo este evento</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
-                Elimina la repetición
+                Mover solo esta instancia
               </div>
             </button>
-            {!isDoneTarget && !showFollowingOptions && (
+            {/* Para weekdays: mostrar "Modificar repetición" */}
+            {!isDoneTarget && isWeekdays && (
+              <button onClick={() => onConfirm('edit')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+                <div>Modificar repetición</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
+                  Cambiar días de toda la serie
+                </div>
+              </button>
+            )}
+            {/* Para days/weeks: mostrar "Este y los siguientes" */}
+            {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
               <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
                 Este y los siguientes
+              </button>
+            )}
+            {/* Para days/weeks: mostrar "Todos los eventos" */}
+            {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
+              <button onClick={() => onConfirm('all')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+                Todos los eventos
               </button>
             )}
             {showFollowingOptions && (
@@ -5139,6 +5158,16 @@
             // "Todos" uses visualDate for calculating the day offset
             handleRecurringMoveAll(item, visualDate, originalSlot, targetDate, targetSlot, dropIndex);
             break;
+          case 'edit':
+            // "Modificar repetición" - abrir editor del item
+            // Cerrar popovers primero, luego abrir editor
+            setRecurringEditPopover(null);
+            setPendingRecurringDrop(null);
+            // Pequeño delay para que se cierre el popover antes de abrir el editor
+            setTimeout(() => {
+              setEditPopover({ item, rect: null, visualDate });
+            }, 50);
+            return; // Early return para evitar el setRecurringEditPopover de abajo
         }
         setRecurringEditPopover(null);
         setPendingRecurringDrop(null);
@@ -5235,7 +5264,8 @@
         setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
-      // Solo este evento: marcar instancia como deleted y crear nuevo item independiente
+      // Solo este evento: crear excepción movedTo (modelo Google Calendar)
+      // El item sigue siendo parte de la serie recurrente, solo se mueve esta instancia
       const handleRecurringMoveThis = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
         console.log('handleRecurringMoveThis called', { itemId: item.id, originalDate, targetDate, targetSlot, dropIndex });
 
@@ -5248,22 +5278,34 @@
 
         const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
 
-        // Get any property overrides from existing exception (if instance was already modified)
-        const existingException = item.exceptions?.[originalDate] || {};
-        const instanceTitle = existingException.title ?? item.title;
-        const instanceDescription = existingException.description ?? item.description;
-        const instanceEffort = existingException.effort ?? item.effort;
-
         setItems(p => {
-          // Mark this instance as deleted in the recurring item
-          const updated = p.map(i => {
+          return p.map(i => {
             if (i.id === item.id) {
               const newExceptions = { ...(i.exceptions || {}) };
-              // Mark as deleted (removes from recurring series)
-              newExceptions[originalDate] = { ...existingException, deleted: true };
-              // Clean up movedTo if it existed
-              delete newExceptions[originalDate].movedTo;
-              console.log('Marked exception as deleted:', { itemId: i.id, originalDate, newExceptions });
+              const existingException = newExceptions[originalDate] || {};
+
+              // Si se mueve a "done", marcar como completed
+              if (targetSlot === 'done') {
+                newExceptions[originalDate] = {
+                  ...existingException,
+                  movedTo: { date: targetDate, slot: targetSlot },
+                  completed: true,
+                  completedDate: targetDate,
+                };
+              } else {
+                // Crear excepción movedTo (el item sigue siendo parte de la serie)
+                newExceptions[originalDate] = {
+                  ...existingException,
+                  movedTo: { date: targetDate, slot: targetSlot },
+                };
+                // Limpiar completed si existía (ya no está en done)
+                delete newExceptions[originalDate].completed;
+                delete newExceptions[originalDate].completedDate;
+              }
+              // Limpiar deleted si existía
+              delete newExceptions[originalDate].deleted;
+
+              console.log('Created movedTo exception:', { itemId: i.id, originalDate, movedTo: newExceptions[originalDate].movedTo });
               return { ...i, exceptions: newExceptions };
             }
 
@@ -5279,37 +5321,11 @@
 
             return i;
           });
-
-          // Create new independent item (no recurrence)
-          const newItemId = Date.now();
-          const newItem = {
-            id: newItemId,
-            title: instanceTitle,
-            description: instanceDescription || '',
-            category: item.category,
-            effort: instanceEffort,
-            scheduledDate: targetDate,
-            scheduledSlot: targetSlot || 'todo',  // Ensure valid slot
-            sortOrder: insertedSortOrder,
-            completed: targetSlot === 'done',
-            completedDate: targetSlot === 'done' ? targetDate : null,
-            createdAt: formatDate(REAL_TODAY),
-            isArchived: false,
-            hiddenFromSidebar: false,
-            isImportant: false,
-            repeat: null, // No recurrence - independent item
-          };
-
-          console.log('Created new independent item:', newItem);
-
-          // Trigger drop feedback animation for the new item
-          setTimeout(() => {
-            setJustDroppedItemId(newItemId);
-            setTimeout(() => setJustDroppedItemId(null), 300);
-          }, 0);
-
-          return [...updated, newItem];
         });
+
+        // Trigger drop feedback animation
+        setJustDroppedItemId(item.id);
+        setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
       // Este y los siguientes: terminar serie original, crear nueva

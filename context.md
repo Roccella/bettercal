@@ -64,6 +64,14 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Overdue**: instancias pasadas sin completar se muestran en rojo (texto e ícono)
 - **Crear en día fuera del patrón weekdays**: se ajusta a la primera fecha válida del patrón
 
+### Opciones al mover recurrentes (modelo Google Calendar)
+- **"Solo este evento"**: Crea excepción `movedTo` - el item sigue siendo parte de la serie
+- **Para weekdays**: Solo 2 opciones: "Solo este evento" / "Modificar repetición"
+- **Para cada X días/semanas**: 3 opciones: "Solo este" / "Este y siguientes" / "Todos"
+- **"Modificar repetición"**: Abre el editor para cambiar días de toda la serie
+- **"Este y los siguientes"**: Termina serie original, crea nueva desde la fecha destino
+- **"Todos los eventos"**: Desplaza toda la serie
+
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
 - **Se quedan en su posición** al marcar/desmarcar (no se reordenan)
