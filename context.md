@@ -196,6 +196,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 ### CategoriesModal
 - Abre desde botón "Editar categorías" en header
 - Listado de categorías con drag & drop para reordenar
+- Drag & drop con línea azul indicadora (drop indicator) y shimmer al soltar
 - Cada fila: drag handle + color swatch + input nombre + botón borrar
 - Botones: Nueva categoría, Guardar
 

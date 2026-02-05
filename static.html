@@ -1836,6 +1836,7 @@
       };
 
       const [dropIndex, setDropIndex] = useState(-1);
+      const [justDroppedCatId, setJustDroppedCatId] = useState(null);
 
       const handleDragStart = (e, index) => {
         setDraggedIndex(index);
@@ -1858,6 +1859,7 @@
 
       const handleDragEnd = () => {
         if (draggedIndex !== null && dropIndex >= 0) {
+          const droppedId = localCategories[draggedIndex].id;
           setLocalCategories(prev => {
             const updated = [...prev];
             const [dragged] = updated.splice(draggedIndex, 1);
@@ -1865,6 +1867,8 @@
             updated.splice(insertAt, 0, dragged);
             return updated;
           });
+          setJustDroppedCatId(droppedId);
+          setTimeout(() => setJustDroppedCatId(null), 300);
         }
         setDraggedIndex(null);
         setDropIndex(-1);
@@ -1910,7 +1914,7 @@
                     onDragStart={(e) => handleDragStart(e, index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    className="cat-modal-row"
+                    className={`cat-modal-row ${justDroppedCatId === cat.id ? 'just-dropped' : ''}`}
                     style={{ opacity: draggedIndex === index ? 0.4 : 1, marginBottom: '8px' }}
                   >
                   {/* Drag handle */}
