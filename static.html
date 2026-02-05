@@ -160,7 +160,7 @@
       background-repeat: no-repeat;
       animation: dropShimmer 0.3s linear;
       pointer-events: none;
-      border-radius: inherit;
+      border-radius: 2px;
     }
 
     /* Grab (mobile): 200ms delay + 600ms R→L ease-in */
@@ -173,7 +173,7 @@
       background-repeat: no-repeat;
       animation: grabShimmer 0.3s linear 0.3s both;
       pointer-events: none;
-      border-radius: inherit;
+      border-radius: 2px;
     }
 
     /* Navigate (click en agendado): 300ms R→L */
@@ -186,7 +186,7 @@
       background-repeat: no-repeat;
       animation: navigateShimmer 0.3s linear;
       pointer-events: none;
-      border-radius: inherit;
+      border-radius: 2px;
     }
 
     /* Dark theme variants */
@@ -5286,8 +5286,9 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: formatDate(currentMobileDay) });
-          // Scroll to top so input is visible when keyboard opens
-          window.scrollTo(0, 0);
+          // Scroll day container to top so new item is visible
+          const dayColumn = document.querySelector('.mobile-day-column:nth-child(' + (currentMobileDayIndex + 1) + ') .hide-scrollbar');
+          if (dayColumn) dayColumn.scrollTop = 0;
         } else {
           // In categories view: create item in backlog (existing behavior)
           const newItem = {
@@ -5308,8 +5309,9 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: null });
-          // Scroll to top so input is visible when keyboard opens
-          window.scrollTo(0, 0);
+          // Scroll categories container to top so new item is visible
+          const categoriesContainer = document.querySelector('.mobile-view-panel:nth-child(2) > div');
+          if (categoriesContainer) categoriesContainer.scrollTop = 0;
         }
       };
 
@@ -5451,8 +5453,8 @@
                 gap: '6px',
                 alignItems: 'center',
               }}>
-                {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'manipulation' }}>Hoy</button>}
-                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'manipulation' }}>{getShortMonthName(currentMobileDay)}</button>
+                {!mobileIsToday && <button onClick={goToToday} onTouchStart={(e) => e.stopPropagation()} className="btn btn-primary" style={{ fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'none' }}>Hoy</button>}
+                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} onTouchStart={(e) => e.stopPropagation()} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'none' }}>{getShortMonthName(currentMobileDay)}</button>
               </div>
             )}
 
