@@ -67,8 +67,8 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **No se pueden mover a categorías** (drag & drop bloqueado)
 - **No se pueden modificar en días pasados** (cambios se ignoran silenciosamente)
 - **No se pueden mover al pasado** (días < hoy se mutean y no aceptan drop)
-- **Restricción de rango** (modelo Outlook): solo puede moverse entre instancia anterior y siguiente (aplica tanto en drag & drop como en edición de fecha desde popover/bottom sheet)
-- **Edición de fecha**: Cambiar la fecha de una instancia recurrente desde el editor muestra las mismas opciones que el drag & drop (Solo este evento / Este y los siguientes / Todos)
+- **Restricción de rango** (modelo Outlook): solo puede moverse entre instancia anterior y siguiente (aplica en drag & drop, edición de fecha, y calendario del editor)
+- **Edición de fecha**: Cambiar la fecha de una instancia recurrente desde el editor muestra las mismas opciones que el drag & drop (Solo este evento / Este y los siguientes / Todos). El calendario deshabilita días fuera del rango válido (opacity 0.3, no clickeables)
 - **Overdue**: instancias pasadas sin completar se muestran en rojo (texto e ícono)
 - **Crear en día fuera del patrón weekdays**: se ajusta a la primera fecha válida del patrón
 
@@ -113,7 +113,8 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Hotkey Command+E**: Eliminar item (desktop)
 - **Undo**: Al deshacer un borrado, el item vuelve a su posición exacta en el array (con shimmer)
 - **Doble-click en headings de categorías**: Protección contra ghost items (no crea item si ya hay uno pendiente)
-- **Duplicar**: Botón ícono (copiar) en el editor, solo para items no recurrentes, entre trash y guardar. Crea copia debajo del original con shimmer
+- **Duplicar**: Botón ícono (copiar) en el editor, entre trash y guardar. Para items normales: crea copia debajo del original. Para recurrentes: crea copia como item normal al inicio del listado del día. Siempre con shimmer
+- **Borrar hechos**: Elimina items completados de categorías (backlog sin fecha, no recurrentes)
 
 ## Modelo de Datos
 

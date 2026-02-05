@@ -1254,7 +1254,7 @@
     };
 
     // Mini calendar for date picking
-    const MiniCalendar = ({ selectedDate, onSelect, onClose }) => {
+    const MiniCalendar = ({ selectedDate, onSelect, onClose, validDateRange }) => {
       const [viewMonth, setViewMonth] = useState(() => {
         if (selectedDate) return new Date(selectedDate + 'T00:00:00');
         return new Date(REAL_TODAY);
@@ -1297,16 +1297,23 @@
               const dateStr = formatDate(day);
               const isSelected = dateStr === selectedDate;
               const isToday = dateStr === formatDate(REAL_TODAY);
+              const isDisabled = validDateRange && (
+                (validDateRange.minDate && dateStr < validDateRange.minDate) ||
+                (validDateRange.maxDate && dateStr > validDateRange.maxDate)
+              );
               return (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => { onSelect(dateStr); onClose(); }}
+                  onClick={isDisabled ? undefined : () => { onSelect(dateStr); onClose(); }}
+                  disabled={isDisabled}
                   style={{
-                    padding: '4px', border: 'none', borderRadius: '4px', cursor: 'pointer',
+                    padding: '4px', border: 'none', borderRadius: '4px',
+                    cursor: isDisabled ? 'default' : 'pointer',
                     background: isSelected ? 'var(--accent-blue)' : isToday ? 'var(--today-header)' : 'transparent',
-                    color: isSelected ? '#FFF' : 'var(--text-primary)',
+                    color: isDisabled ? 'var(--text-muted)' : isSelected ? '#FFF' : 'var(--text-primary)',
                     fontSize: '0.625rem', fontWeight: isToday ? '700' : '400',
+                    opacity: isDisabled ? 0.3 : 1,
                   }}
                 >
                   {day.getDate()}
@@ -1342,6 +1349,12 @@
 
       const isEditing = !!editItem?.id && !editItem._isNewItem;
       const hadRepeat = !!editItem?.repeat;
+
+      // Compute valid date range for recurring items (Outlook restriction)
+      const validDateRange = useMemo(() => {
+        if (!editItem?.repeat || !visualDate) return null;
+        return getValidMoveRange(editItem, visualDate);
+      }, [editItem, visualDate]);
       const originalTitle = editItem?.title || '';
       const originalDescription = editItem?.description || '';
       const originalCategory = editItem?.category || defaultCategory || 'temp';
@@ -1511,7 +1524,7 @@
                 </button>
                 {showDatePicker && (
                   <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, marginTop: '4px' }}>
-                    <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} />
+                    <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} validDateRange={validDateRange} />
                   </div>
                 )}
               </div>
@@ -1556,7 +1569,7 @@
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
-                {isEditing && !editItem?.repeat && onDuplicate && <button type="button" onClick={() => { onDuplicate(editItem.id); onClose(); }} className="btn" style={{ padding: '6px 8px', background: 'var(--bg-button)' }} title="Duplicar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
+                {isEditing && onDuplicate && <button type="button" onClick={() => { onDuplicate(editItem.id); onClose(); }} className="btn" style={{ padding: '6px 8px', background: 'var(--bg-button)' }} title="Duplicar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
                 <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
             </form>
@@ -3924,6 +3937,12 @@
       const originalTitle = item?.title || '';
       const originalDescription = item?.description || '';
 
+      // Compute valid date range for recurring items (Outlook restriction)
+      const validDateRange = useMemo(() => {
+        if (!item?.repeat || !visualDate) return null;
+        return getValidMoveRange(item, visualDate);
+      }, [item, visualDate]);
+
       // Check if this is a new item created with empty title (from FAB click)
       const isNewUntitledItem = !!item?._isNewItem || (!!item?.id && originalTitle === '');
 
@@ -4071,7 +4090,7 @@
               </button>
               {showDatePicker && (
                 <div style={{ marginTop: '8px' }}>
-                  <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} />
+                  <MiniCalendar selectedDate={scheduledDate} onSelect={(date) => { setScheduledDate(date); if (!date) { setRepeatType('none'); setUserClearedDate(true); } }} onClose={() => setShowDatePicker(false)} validDateRange={validDateRange} />
                 </div>
               )}
             </div>
@@ -4179,7 +4198,7 @@
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(item.id); onClose(); }} className="btn-icon-danger" style={{ padding: '10px 12px' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
-                {isEditing && !item.repeat && onDuplicate && <button type="button" onClick={() => { onDuplicate(item.id); onClose(); }} className="btn" style={{ padding: '10px 12px', background: 'var(--bg-button)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
+                {isEditing && onDuplicate && <button type="button" onClick={() => { onDuplicate(item.id); onClose(); }} className="btn" style={{ padding: '10px 12px', background: 'var(--bg-button)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
               </div>
               <button type="button" onClick={handleRequestClose} className="btn" style={{ fontSize: '0.75rem', padding: '8px 16px' }}>Cancelar</button>
             </div>
@@ -4476,11 +4495,29 @@
           setDraggingItemType(null); // Reset mute state
           setDraggingRecurringRange(null);
         };
+        // Allow drop on document body so 'drop' event fires even on muted areas
+        // (without this, dragend fires only after browser snap-back animation ~1s delay)
+        const handleDocumentDragOver = (e) => {
+          // Only preventDefault if we're actively dragging an item (to allow drop event to fire)
+          if (e.dataTransfer && Array.from(e.dataTransfer.types).some(t => t.toLowerCase() === 'itemdata')) {
+            e.preventDefault();
+          }
+        };
+        const handleDocumentDrop = (e) => {
+          // Reset mute state immediately on any drop (including on muted areas)
+          setDraggingUnscheduledItem(false);
+          setDraggingItemType(null);
+          setDraggingRecurringRange(null);
+        };
         document.addEventListener('dragstart', handleDragStart);
         document.addEventListener('dragend', handleDragEnd);
+        document.addEventListener('dragover', handleDocumentDragOver);
+        document.addEventListener('drop', handleDocumentDrop);
         return () => {
           document.removeEventListener('dragstart', handleDragStart);
           document.removeEventListener('dragend', handleDragEnd);
+          document.removeEventListener('dragover', handleDocumentDragOver);
+          document.removeEventListener('drop', handleDocumentDrop);
         };
       }, [items]);
 
@@ -4691,14 +4728,10 @@
             const visualDate = currentVisualDate;
 
             // Validate range restriction (Outlook model: can't skip over adjacent instances)
+            // Calendar disables invalid dates, but validate as safety net
             const { minDate, maxDate } = getValidMoveRange(existingItem, visualDate);
-            if (minDate && targetDate < minDate) {
-              setToast({ message: 'No se puede mover antes de la instancia anterior' });
-              return;
-            }
-            if (maxDate && targetDate > maxDate) {
-              setToast({ message: 'No se puede mover después de la siguiente instancia' });
-              return;
+            if ((minDate && targetDate < minDate) || (maxDate && targetDate > maxDate)) {
+              return; // Silently ignore - calendar should have prevented this
             }
 
             // Get the exception date for this instance
@@ -4912,26 +4945,40 @@
       const handleDuplicate = (id) => {
         const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
         const originalItem = items.find(i => i.id === numId);
-        if (!originalItem || originalItem.repeat) return; // Don't duplicate recurring items
+        if (!originalItem) return;
 
+        const isRecurring = !!originalItem.repeat;
         const newId = Date.now();
+
+        // For recurring items: duplicate as a normal (non-recurring) item at the top of the day's list
+        // For normal items: duplicate right below the original
+        const visualDate = editPopover?.visualDate || bottomSheetItem?.visualDate || originalItem.scheduledDate;
         const duplicatedItem = {
           ...originalItem,
           id: newId,
           completed: false,
           completedDate: null,
           createdAt: formatDate(REAL_TODAY),
-          sortOrder: (originalItem.sortOrder || 0) + 0.5, // Insert just after original
+          repeat: null, // Always create as non-recurring
+          exceptions: undefined,
+          dateOverrides: undefined,
+          scheduledDate: isRecurring ? (visualDate || originalItem.scheduledDate) : originalItem.scheduledDate,
+          scheduledSlot: originalItem.scheduledSlot || 'todo',
+          sortOrder: isRecurring ? -1 : (originalItem.sortOrder || 0) + 0.5,
         };
 
-        // Insert right after the original item
-        setItems(p => {
-          const idx = p.findIndex(i => i.id === numId);
-          const newItems = [...p];
-          newItems.splice(idx + 1, 0, duplicatedItem);
-          // Normalize sortOrders for items in the same day/category
-          return newItems;
-        });
+        if (isRecurring) {
+          // For recurring: add at top of normal zone (low sortOrder)
+          setItems(p => [...p, duplicatedItem]);
+        } else {
+          // For normal: insert right after the original item
+          setItems(p => {
+            const idx = p.findIndex(i => i.id === numId);
+            const newItems = [...p];
+            newItems.splice(idx + 1, 0, duplicatedItem);
+            return newItems;
+          });
+        }
 
         // Trigger drop shimmer on the new item
         setJustDroppedItemId(newId);
@@ -5667,19 +5714,20 @@
 
       // Clear completed items from categories (hiddenFromSidebar)
       const clearCategoryDone = useCallback(() => {
-        const categoryItems = items.filter(item =>
-          item.category &&
+        // Find completed backlog items (no scheduledDate, not recurring, completed)
+        const completedBacklogItems = items.filter(item =>
+          item.completed &&
           !item.scheduledDate &&
-          item.hiddenFromSidebar
+          !item.repeat
         );
-        if (categoryItems.length === 0) {
-          setToast({ message: 'No hay items completados en categorías', type: 'info' });
+        if (completedBacklogItems.length === 0) {
+          setToast({ message: 'No hay items completados en categorías' });
           return;
         }
         setItems(prev => prev.filter(item =>
-          !(item.category && !item.scheduledDate && item.hiddenFromSidebar)
+          !(item.completed && !item.scheduledDate && !item.repeat)
         ));
-        setToast({ message: `${categoryItems.length} items eliminados`, type: 'success' });
+        setToast({ message: `${completedBacklogItems.length} items eliminados` });
       }, [items]);
 
       // ===== Mobile Functions =====
