@@ -33,6 +33,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Header**: Fondo `--bg-header`, botones de navegación, "Hoy" condicional, "Borrar hechos", "Editar categorías"
 
 ### Características Visuales
+- **Desktop**: `body { overflow: hidden }` - sin scroll vertical, todo cabe en 100vh
 - **Solo dark mode** (sin light mode)
 - **Items sin cards**: Texto plano con checkbox en hover
 - **Columnas**: días 240px, categorías 200px
@@ -114,7 +115,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Undo**: Al deshacer un borrado, el item vuelve a su posición exacta en el array (con shimmer)
 - **Doble-click en headings de categorías**: Protección contra ghost items (no crea item si ya hay uno pendiente)
 - **Duplicar**: Botón ícono (copiar) en el editor, entre trash y guardar. Para items normales: crea copia debajo del original. Para recurrentes: crea copia como item normal al inicio del listado del día. Siempre con shimmer
-- **Borrar hechos**: Elimina items completados de categorías (backlog sin fecha, no recurrentes)
+- **Borrar hechos**: Elimina items completados de categorías (backlog sin fecha, no recurrentes). Deshacer restaura todos los items en sus posiciones originales
 
 ## Modelo de Datos
 

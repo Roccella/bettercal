@@ -77,7 +77,8 @@
     }
 
     html { font-size: 130%; }
-    body { font-family: 'IBM Plex Sans', -apple-system, sans-serif; background: var(--bg-app); min-height: 100vh; color: var(--text-primary); }
+    body { font-family: 'IBM Plex Sans', -apple-system, sans-serif; background: var(--bg-app); min-height: 100vh; color: var(--text-primary); overflow: hidden; }
+    @media (max-width: 600px) { body { overflow: auto; } }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -4936,6 +4937,18 @@
           // Trigger drop shimmer on the restored item
           setJustDroppedItemId(toast.item.id);
           setTimeout(() => setJustDroppedItemId(null), 300);
+        } else if (toast?.deletedItems) {
+          // Undo bulk delete (e.g. "borrar hechos") - restore all items at their original positions
+          setItems(p => {
+            const newItems = [...p];
+            // Sort by index ascending so earlier insertions don't shift later ones
+            const sorted = [...toast.deletedItems].sort((a, b) => a.index - b.index);
+            sorted.forEach(({ item, index }) => {
+              const insertAt = Math.min(index, newItems.length);
+              newItems.splice(insertAt, 0, item);
+            });
+            return newItems;
+          });
         } else if (toast?.hiddenIds) {
           setItems(p => p.map(i => toast.hiddenIds.includes(i.id) ? { ...i, hiddenFromSidebar: false } : i));
         }
@@ -5712,14 +5725,15 @@
         }
       }, [isTodayVisible, viewBase, isMobile]);
 
-      // Clear completed items from categories (hiddenFromSidebar)
+      // Clear completed items from categories
       const clearCategoryDone = useCallback(() => {
         // Find completed backlog items (no scheduledDate, not recurring, completed)
-        const completedBacklogItems = items.filter(item =>
-          item.completed &&
-          !item.scheduledDate &&
-          !item.repeat
-        );
+        const completedBacklogItems = [];
+        items.forEach((item, index) => {
+          if (item.completed && !item.scheduledDate && !item.repeat) {
+            completedBacklogItems.push({ item, index });
+          }
+        });
         if (completedBacklogItems.length === 0) {
           setToast({ message: 'No hay items completados en categorías' });
           return;
@@ -5727,7 +5741,10 @@
         setItems(prev => prev.filter(item =>
           !(item.completed && !item.scheduledDate && !item.repeat)
         ));
-        setToast({ message: `${completedBacklogItems.length} items eliminados` });
+        setToast({
+          message: `${completedBacklogItems.length} items eliminados`,
+          deletedItems: completedBacklogItems, // Store items with their original indices for undo
+        });
       }, [items]);
 
       // ===== Mobile Functions =====
