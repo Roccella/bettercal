@@ -5286,9 +5286,11 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: formatDate(currentMobileDay) });
-          // Scroll day container to top so new item is visible
-          const dayColumn = document.querySelector('.mobile-day-column:nth-child(' + (currentMobileDayIndex + 1) + ') .hide-scrollbar');
-          if (dayColumn) dayColumn.scrollTop = 0;
+          // Scroll day container to top after React renders the new item
+          setTimeout(() => {
+            const dayColumn = document.querySelector('.mobile-day-column:nth-child(' + (currentMobileDayIndex + 1) + ') .hide-scrollbar');
+            if (dayColumn) dayColumn.scrollTop = 0;
+          }, 0);
         } else {
           // In categories view: create item in backlog (existing behavior)
           const newItem = {
@@ -5309,9 +5311,11 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: null });
-          // Scroll categories container to top so new item is visible
-          const categoriesContainer = document.querySelector('.mobile-view-panel:nth-child(2) > div');
-          if (categoriesContainer) categoriesContainer.scrollTop = 0;
+          // Scroll categories container to top after React renders the new item
+          setTimeout(() => {
+            const categoriesContainer = document.querySelector('.mobile-view-panel:nth-child(2) > div');
+            if (categoriesContainer) categoriesContainer.scrollTop = 0;
+          }, 0);
         }
       };
 
