@@ -3663,13 +3663,15 @@
       // Only auto-focus for new items, not editing existing ones
       // Wait for slideUp animation (0.3s) to complete before focusing
       useEffect(() => {
-        if (isNewUntitledItem && inputRef.current) {
+        if (isNewUntitledItem) {
           const timer = setTimeout(() => {
-            inputRef.current?.focus();
+            if (inputRef.current) {
+              inputRef.current.focus();
+            }
           }, 350); // Wait for 0.3s animation + small buffer
           return () => clearTimeout(timer);
         }
-      }, [isNewUntitledItem]);
+      }, []);
 
       const hasChanges = title !== originalTitle || description !== originalDescription ||
         category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
