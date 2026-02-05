@@ -336,6 +336,7 @@
       padding: 0 20px;
       height: calc(112px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
+      position: relative;
     }
     .mobile-footer-inner {
       display: flex;
@@ -379,8 +380,9 @@
 
       .mobile-footer { display: flex; }
 
-      /* Toast wider and higher in mobile to not cover footer */
-      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+      /* Toast from top in mobile */
+      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: auto; top: calc(20px + env(safe-area-inset-top, 0px)); animation: slideDown 0.2s ease-out; }
+      @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -5571,27 +5573,26 @@
               </div>
             </div>
 
-            {/* Mobile FAB - floating add button */}
-            <button
-              className="btn btn-primary mobile-only"
-              onClick={handleMobileAddClick}
-              style={{
-                position: 'fixed',
-                bottom: `calc(120px + env(safe-area-inset-bottom, 0px))`,
-                right: '20px',
-                fontSize: '0.75rem',
-                padding: '22px 36px',
-                borderRadius: '35px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                touchAction: 'manipulation',
-                zIndex: 100,
-              }}
-            >
-              Agregar
-            </button>
-
             {/* Mobile Footer - Two large tap zones */}
             <div className="mobile-footer">
+              {/* FAB - positioned relative to footer */}
+              <button
+                className="btn btn-primary"
+                onClick={handleMobileAddClick}
+                style={{
+                  position: 'absolute',
+                  top: '-28px',
+                  right: '20px',
+                  fontSize: '0.75rem',
+                  padding: '22px 36px',
+                  borderRadius: '35px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  touchAction: 'manipulation',
+                  zIndex: 100,
+                }}
+              >
+                Agregar
+              </button>
               {/* Left half - Calendar */}
               <button
                 onClick={() => setMobileViewMode('calendar')}
@@ -5600,7 +5601,7 @@
                   display: 'flex',
                   justifyContent: 'flex-end',
                   alignItems: 'flex-start',
-                  padding: '24px 20px 0',
+                  padding: '20px 20px 0',
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -5622,7 +5623,7 @@
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
-                  padding: '24px 20px 0',
+                  padding: '20px 20px 0',
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
