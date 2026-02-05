@@ -171,7 +171,7 @@
       background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
       background-size: 50% 100%;
       background-repeat: no-repeat;
-      animation: grabShimmer 0.6s linear 0.2s both;
+      animation: grabShimmer 0.3s linear 0.3s both;
       pointer-events: none;
       border-radius: inherit;
     }
@@ -3915,7 +3915,7 @@
     };
 
     // Mobile Day Column Component for scroll-snap
-    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId, onGoToToday, onOpenCalendar, monthName }) => {
+    const MobileDayColumn = ({ day, items, categories, dayEnergy, onComplete, onEdit, onSetEnergy, onDrop, onAdd, onDelete, justDroppedItemId, onGoToToday, onOpenCalendar, monthName, draggingItemType }) => {
       const isToday = formatDate(day.date) === formatDate(REAL_TODAY);
       const isPast = day.date < REAL_TODAY;
       const dateStr = formatDate(day.date);
@@ -3932,6 +3932,10 @@
         return (a.sortOrder || 0) - (b.sortOrder || 0);
       });
 
+      // Separate zones for drag logic (same as desktop)
+      const recurringZone = dayItems.filter(i => i.repeat);
+      const normalZone = dayItems.filter(i => !i.repeat);
+
       const [dropIndex, setDropIndex] = useState(-1);
       const [isScrolled, setIsScrolled] = useState(false);
       const columnRef = useRef(null);
@@ -3946,7 +3950,18 @@
           const rect = e.currentTarget.getBoundingClientRect();
           const y = e.clientY - rect.top;
           const isTopHalf = y < rect.height / 2;
-          setDropIndex(isTopHalf ? index : index + 1);
+          let targetIndex = isTopHalf ? index : index + 1;
+
+          // If dragging a recurring item over normal zone, clamp to end of recurring zone
+          if (draggingItemType === 'recurring' && targetIndex > recurringZone.length) {
+            targetIndex = recurringZone.length;
+          }
+          // If dragging a normal item over recurring zone, clamp to start of normal zone
+          if ((draggingItemType === 'normal' || draggingItemType === 'important') && targetIndex < recurringZone.length) {
+            targetIndex = recurringZone.length;
+          }
+
+          setDropIndex(targetIndex);
         }
       };
 
@@ -3954,7 +3969,12 @@
         if (hasItemData(e)) {
           e.preventDefault();
           if (!e.target.closest('[data-mobile-item]')) {
-            setDropIndex(dayItems.length);
+            // If dragging a recurring item, drop at end of recurring zone, not end of all items
+            if (draggingItemType === 'recurring') {
+              setDropIndex(recurringZone.length);
+            } else {
+              setDropIndex(dayItems.length);
+            }
           }
         }
       };
@@ -5431,8 +5451,8 @@
                 gap: '6px',
                 alignItems: 'center',
               }}>
-                {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.75rem', pointerEvents: 'auto' }}>Hoy</button>}
-                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem', pointerEvents: 'auto' }}>{getShortMonthName(currentMobileDay)}</button>
+                {!mobileIsToday && <button onClick={goToToday} className="btn btn-primary" style={{ fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'manipulation' }}>Hoy</button>}
+                <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'manipulation' }}>{getShortMonthName(currentMobileDay)}</button>
               </div>
             )}
 
@@ -5464,6 +5484,7 @@
                         onGoToToday={goToToday}
                         onOpenCalendar={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())}
                         monthName={getShortMonthName(day.date)}
+                        draggingItemType={draggingItemType}
                       />
                     ))}
                   </div>

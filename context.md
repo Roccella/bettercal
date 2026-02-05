@@ -209,16 +209,16 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (fontSize 0.9rem, padding 18px 30px, borderRadius 300px) posicionado relativo al footer (top: -64px)
+- **FAB flotante**: Botón "Agregar" (fontSize 0.9rem, padding 18px 30px, borderRadius 300px) posicionado relativo al footer (top: -84px)
 - **Footer**: 84px de alto con position:relative, íconos centrados verticalmente (alignItems: center)
 - **Padding top**: 10px en heading de día y contenedor de categorías
-- **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones (permite scroll through)
+- **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones con touchAction: manipulation (bloquea scroll al tocar)
 - **Scroll bloqueado**: html/body con overflow:hidden, position:fixed (top/left/right/bottom:0) en mobile
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
-- **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
+- **Items**: fontSize 0.875rem, padding 6px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
 - **Toast**: Sale desde arriba de la pantalla (top: 20px + safe-area) con animación slideDown
 - **Bottom sheet focus**: Usa autoFocus en el input para nuevos items (Safari iOS compatible)
@@ -230,7 +230,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Tocar heading categoría**: Crea item y abre BottomSheet
 - **Calendario popover**: Se cierra al tocar fuera sin hacer shimmer al siguiente item
 - **FAB Agregar**: Crea nuevo item y abre BottomSheet
-- **Long press (300ms+)**: Activa drag mode con shimmer visual
+- **Long press (300ms+)**: Activa drag mode con grabShimmer (300ms duración, 300ms delay, linear)
+- **Drag de recurrentes**: Misma lógica que desktop - indicador azul se clampea a zona de recurrentes
 - **Tap rápido**: No genera shimmer, solo abre el editor
 
 ### Safe Area (iPhone)
