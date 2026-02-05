@@ -334,7 +334,7 @@
       background: var(--bg-header);
       border-top: 1px solid var(--border-color);
       padding: 0 20px;
-      padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+      height: calc(80px + env(safe-area-inset-bottom, 0px));
       touch-action: none;
     }
     .mobile-footer-inner {
@@ -380,7 +380,7 @@
       .mobile-footer { display: flex; }
 
       /* Toast wider and higher in mobile to not cover footer */
-      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+      .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 
       /* Sidebar mobile fullwidth */
       .sidebar-mobile { width: 100% !important; border-left: none !important; }
@@ -1821,7 +1821,7 @@
             <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
               <div>Solo este evento</div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
-                Crea una copia en el backlog
+                Elimina la repetición
               </div>
             </button>
             {!isDoneTarget && !showFollowingOptions && (
@@ -3415,9 +3415,9 @@
     const CategoryColumnSimple = ({ category, items, allItems, categories, onComplete, onEdit, onAdd, onDrop, onEditCategory, onDelete, onToggleImportant, onSidebarGroupDrop, justDroppedItemId, draggingItemType, onDragTypeChange }) => {
       const categoryItems = items.filter(i => i.category === category.id);
 
-      // Get only backlog items (no scheduledDate, not completed, not recurring)
+      // Get backlog items (no scheduledDate, not recurring) - includes completed items
       const backlogItems = categoryItems.filter(i =>
-        !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat
+        !i.scheduledDate && !i.isArchived && !i.repeat
       ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
       const [dropIndex, setDropIndex] = useState(-1);
@@ -3734,7 +3734,7 @@
             <div style={{
               position: 'sticky', top: 0, zIndex: 10,
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '12px 16px', marginBottom: '12px',
+              padding: '0 16px 12px', marginBottom: '12px',
               marginLeft: '-16px', marginRight: '-16px',
               borderBottom: '1px solid var(--border-color)',
               background: 'inherit'
@@ -3999,7 +3999,7 @@
         >
           {/* Day header - desktop style with 150% size */}
           <div style={{
-            padding: '24px 20px 10px',
+            padding: '48px 20px 10px',
             touchAction: 'none',
             borderBottom: isScrolled ? '1px solid var(--border-color)' : '1px solid transparent',
             transition: 'border-color 0.15s',
@@ -4495,6 +4495,20 @@
         }
         setToast(null);
       };
+
+      // Keyboard shortcut: Cmd+Z / Ctrl+Z for undo
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+            if (toast?.item || toast?.hiddenIds) {
+              e.preventDefault();
+              handleUndoDelete();
+            }
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [toast]);
 
       // Toggle important status - marks item as important (red, moves to top)
       const handleToggleImportant = (id) => {
@@ -5406,7 +5420,7 @@
             {mobileViewMode === 'calendar' && (
               <div style={{
                 position: 'fixed',
-                top: `calc(20px + env(safe-area-inset-top, 0px))`,
+                top: `calc(48px + env(safe-area-inset-top, 0px))`,
                 right: '20px',
                 zIndex: 100,
                 display: 'flex',
@@ -5459,13 +5473,13 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '24px 12px 0',
+                      padding: '48px 12px 0',
                     }}
                   >
                     {categories.map((cat, catIndex) => {
                       const categoryItems = allItemsWithRecurring.filter(i => i.category === cat.id);
                       const backlogItems = categoryItems.filter(i =>
-                        !i.scheduledDate && !i.completed && !i.isArchived && !i.repeat
+                        !i.scheduledDate && !i.isArchived && !i.repeat
                       ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
                       return (
@@ -5580,15 +5594,16 @@
                   flex: 1,
                   display: 'flex',
                   justifyContent: 'flex-end',
-                  alignItems: 'flex-start',
-                  padding: '12px 20px',
-                  paddingBottom: `calc(28px + env(safe-area-inset-bottom, 0px))`,
+                  alignItems: 'center',
+                  padding: '0 20px',
+                  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
+                  height: '100%',
                 }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'calendar' ? 1 : 0.35, filter: mobileViewMode === 'calendar' ? 'none' : 'grayscale(100%)' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'calendar' ? 1 : 0.35, filter: mobileViewMode === 'calendar' ? 'none' : 'grayscale(100%)' }}>
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                   <line x1="16" y1="2" x2="16" y2="6"/>
                   <line x1="8" y1="2" x2="8" y2="6"/>
@@ -5602,15 +5617,16 @@
                   flex: 1,
                   display: 'flex',
                   justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  padding: '12px 20px',
-                  paddingBottom: `calc(28px + env(safe-area-inset-bottom, 0px))`,
+                  alignItems: 'center',
+                  padding: '0 20px',
+                  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
+                  height: '100%',
                 }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'categories' ? 1 : 0.35, filter: mobileViewMode === 'categories' ? 'none' : 'grayscale(100%)' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'categories' ? 1 : 0.35, filter: mobileViewMode === 'categories' ? 'none' : 'grayscale(100%)' }}>
                   <rect x="3" y="3" width="7" height="7"/>
                   <rect x="14" y="3" width="7" height="7"/>
                   <rect x="14" y="14" width="7" height="7"/>
