@@ -15,7 +15,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Stack**: HTML + React 18 + Babel standalone (sin build process)
 - **Archivo principal**: `static.html` (responsive: desktop + mobile)
 - **Estado**: Manejado con React hooks (useState, useMemo, useEffect, useCallback)
-- **Fecha simulada**: `REAL_TODAY = new Date('2026-02-03')` (Martes 3 de febrero de 2026)
+- **Fecha simulada**: `REAL_TODAY = new Date('2026-02-04')` (Miércoles 4 de febrero de 2026)
 
 ### Dependencias Externas (CDN)
 - React 18, ReactDOM 18, Babel standalone (unpkg.com)
@@ -32,7 +32,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Solo dark mode** (sin light mode)
 - **Items sin cards**: Texto plano con checkbox en hover
 - **Columnas**: días 240px, categorías 200px
-- **Padding horizontal**: 12px en celdas de días y categorías
+- **Padding horizontal**: 12px izquierdo, 6px derecho en celdas de días y categorías (para compensar checkbox)
 - **Headings de días**: "2 Lunes" (número en bold, día normal), badge "HOY" azul para día actual
 - **Headings de categorías**: "Música (2)" (nombre en bold, contador entre paréntesis)
 - **Borde de domingo**: Línea vertical de 12px que suma al ancho de la columna (no comprime items)
@@ -203,8 +203,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (padding 17px 28px) más grande y más arriba (110px)
-- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías)
+- **FAB flotante**: Botón "Agregar" (padding 27px 45px, ~60% más grande) posicionado a 95px del fondo
+- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías), padding 16px 20px, paddingBottom 36px + safe-area
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)

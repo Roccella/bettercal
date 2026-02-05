@@ -602,7 +602,7 @@
     ];
 
     const initialDayEnergy = { '2026-02-02': 2, '2026-02-03': 3, '2026-02-04': 2, '2026-02-05': 1, '2026-02-06': 2, '2026-02-07': 3, '2026-02-08': 2, '2026-02-09': 2 };
-    const REAL_TODAY = new Date('2026-02-03');
+    const REAL_TODAY = new Date('2026-02-04');
 
     // Global timestamp to track when a popover was just closed
     let lastPopoverCloseTime = 0;
@@ -2774,7 +2774,7 @@
             </div>
 
             {/* Items list - flex column to allow click area to expand */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 6px 8px 12px', display: 'flex', flexDirection: 'column' }}>
               {/* Drop indicator at top - only show if drop is valid */}
               <div className={`drop-indicator ${dropIndex === 0 && isDropValidAtIndex(0) ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -3580,7 +3580,7 @@
           </div>
 
           {/* Items list - flex column to allow click area to expand */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 6px 8px 12px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => {
@@ -4346,7 +4346,8 @@
         if (numId) {
           const existingItem = items.find(i => i.id === numId);
           const wasScheduled = existingItem && (existingItem.scheduledDate || existingItem.repeat);
-          const isNowBacklog = !cleanData.scheduledDate && !cleanData.repeat && !cleanData.completed;
+          // Item is now backlog if it has no date and no repeat (completed status doesn't matter for the move)
+          const isNowBacklog = !cleanData.scheduledDate && !cleanData.repeat;
           const isRecurring = existingItem?.repeat;
 
           // Check if relevant properties changed for recurring items
@@ -5574,11 +5575,11 @@
               onClick={handleMobileAddClick}
               style={{
                 position: 'fixed',
-                bottom: `calc(110px + env(safe-area-inset-bottom, 0px))`,
+                bottom: `calc(95px + env(safe-area-inset-bottom, 0px))`,
                 right: '20px',
                 fontSize: '0.75rem',
-                padding: '17px 28px',
-                borderRadius: '28px',
+                padding: '27px 45px',
+                borderRadius: '35px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                 zIndex: 100,
               }}
@@ -5596,8 +5597,8 @@
                   display: 'flex',
                   justifyContent: 'flex-end',
                   alignItems: 'flex-start',
-                  padding: '12px 16px',
-                  paddingBottom: `calc(30px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '16px 20px',
+                  paddingBottom: `calc(36px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -5618,8 +5619,8 @@
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
-                  padding: '12px 16px',
-                  paddingBottom: `calc(30px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '16px 20px',
+                  paddingBottom: `calc(36px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
