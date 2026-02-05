@@ -33,7 +33,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Items sin cards**: Texto plano con checkbox en hover
 - **Columnas**: días 240px, categorías 200px
 - **Padding horizontal**: 12px izquierdo, 6px derecho en celdas de días y categorías (para compensar checkbox)
-- **Headings de días**: "2 Lunes" (número en bold, día normal), badge "HOY" azul para día actual
+- **Headings de días**: "2 Lunes" (número en bold, día normal), badge "HOY" azul para día actual, color azul para día de hoy (desktop y mobile)
 - **Headings de categorías**: "Música (2)" (nombre en bold, contador entre paréntesis)
 - **Borde de domingo**: Línea vertical de 12px que suma al ancho de la columna (no comprime items)
 
@@ -47,6 +47,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
   - Al arrastrar normal/importante: zona recurrente se pone mute
   - Indicador de drop (línea azul) solo aparece en zona válida
   - **Items recurrentes NO se pueden mover a categorías**
+  - **Soltar recurrente en área vacía**: Se posiciona al final de la zona de recurrentes
+  - **Mover item de día a categoría**: Se mueve directamente sin confirmación
 
 ### Items Recurrentes
 - **Texto azul** (color `--accent-blue`)
@@ -169,6 +171,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
   - Botón Importante: toggle sin cerrar el popover
   - Botón Hecho: guarda y cierra el popover
   - **Select de recurrencia solo visible si hay fecha**
+  - **Auto-focus**: Solo para items nuevos, no para edición de existentes
 
 ## Funciones Clave
 
@@ -203,8 +206,8 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (padding 27px 45px, ~60% más grande) posicionado a 95px del fondo
-- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías), padding 16px 20px, paddingBottom 36px + safe-area
+- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado a 95px del fondo
+- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías), padding 20px, paddingBottom 42px + safe-area
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)

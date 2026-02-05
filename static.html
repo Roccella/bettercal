@@ -1143,7 +1143,7 @@
             })}
           </div>
           <button type="button" onClick={() => { onSelect(null); onClose(); }} className="btn" style={{ width: '100%', fontSize: '0.625rem' }}>
-            Sin fecha (Backlog)
+            Sin fecha
           </button>
         </div>
       );
@@ -1294,14 +1294,14 @@
           scheduledSlot: (finalScheduledDate || repeat) ? scheduledSlot : null,
           completed: addCompleted || editItem?.completed,
           completedDate: addCompleted ? defaultDate : editItem?.completedDate,
-          isArchived: !finalScheduledDate && !addCompleted && !repeat,
+          isArchived: false, // Items go to backlog, not archived
           dateOverrides: repeat ? editItem?.dateOverrides : undefined, // Clear dateOverrides if no longer recurring
         });
         onClose();
       };
 
       const getDateLabel = () => {
-        if (!scheduledDate) return 'Sin fecha (Backlog)';
+        if (!scheduledDate) return 'Sin fecha';
         return formatDateLabel(scheduledDate);
       };
 
@@ -2650,7 +2650,12 @@
         if (hasItemData(e)) {
           e.preventDefault();
           if (!e.target.closest('[data-day-item]')) {
-            setDropIndex(dayItems.length);
+            // If dragging a recurring item, drop at end of recurring zone, not end of all items
+            if (draggingItemType === 'recurring') {
+              setDropIndex(recurringZone.length);
+            } else {
+              setDropIndex(dayItems.length);
+            }
           }
         }
       };
@@ -2718,9 +2723,9 @@
 
       const editingItem = editRect ? dayItems.find(i => i.id === editRect.itemId) : null;
 
-      // Header text color based on day type (today is white, not blue)
+      // Header text color based on day type
       const getHeaderColor = () => {
-        if (isToday) return 'var(--text-primary)';
+        if (isToday) return 'var(--accent-blue)';
         if (day.isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
       };
@@ -2749,7 +2754,7 @@
             <div
               onClick={(e) => handleAddItem(e, false)}
               style={{
-                padding: '6px 6px 2px 12px',
+                padding: '6px 8px 2px 12px',
                 minHeight: '28px',
                 cursor: 'pointer',
                 display: 'flex',
@@ -3091,19 +3096,7 @@
         // Don't allow recurring items to be moved to categories at all
         if (item.repeat) return;
 
-        // If item has a scheduled date and dropping to backlog, show confirmation popover
-        if (item.scheduledDate && targetGroup === 'backlog') {
-          const rect = {
-            top: e?.clientY || window.innerHeight / 2,
-            bottom: (e?.clientY || window.innerHeight / 2) + 10,
-            left: (e?.clientX || window.innerWidth / 2) - 140,
-            right: (e?.clientX || window.innerWidth / 2) + 140,
-          };
-          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: false });
-          return;
-        }
-
-        // Call parent handler with target group and drop index
+        // Move directly without confirmation
         onSidebarGroupDrop?.(numId, targetGroup, category.id, dropIdx);
       };
 
@@ -3317,16 +3310,7 @@
         // Don't allow recurring items to be moved to categories at all
         if (item.repeat) return;
 
-        if (item.scheduledDate && targetGroup === 'backlog') {
-          const rect = {
-            top: e?.clientY || window.innerHeight / 2,
-            bottom: (e?.clientY || window.innerHeight / 2) + 10,
-            left: (e?.clientX || window.innerWidth / 2) - 140,
-            right: (e?.clientX || window.innerWidth / 2) + 140,
-          };
-          setRemoveDatePopover({ item, rect, dropIdx, isRecurring: false });
-          return;
-        }
+        // Move directly without confirmation
         onSidebarGroupDrop?.(numId, targetGroup, category.id, dropIdx);
       };
 
@@ -3673,9 +3657,12 @@
       // Check if this is a new item created with empty title (from FAB click)
       const isNewUntitledItem = !!item?._isNewItem || (!!item?.id && originalTitle === '');
 
+      // Only auto-focus for new items, not editing existing ones
       useEffect(() => {
-        setTimeout(() => inputRef.current?.focus(), 100);
-      }, []);
+        if (isNewUntitledItem) {
+          setTimeout(() => inputRef.current?.focus(), 100);
+        }
+      }, [isNewUntitledItem]);
 
       const hasChanges = title !== originalTitle || description !== originalDescription ||
         category !== (item?.category || 'temp') || effort !== (item?.effort ?? 1) ||
@@ -3733,7 +3720,7 @@
       const toggleDay = (d) => setRepeatDays(p => p.includes(d) ? p.filter(x => x !== d) : [...p, d]);
 
       const getDateLabel = () => {
-        if (!scheduledDate) return 'Sin fecha (Backlog)';
+        if (!scheduledDate) return 'Sin fecha';
         return formatDateLabel(scheduledDate);
       };
 
@@ -5597,8 +5584,8 @@
                   display: 'flex',
                   justifyContent: 'flex-end',
                   alignItems: 'flex-start',
-                  padding: '16px 20px',
-                  paddingBottom: `calc(36px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '20px 20px',
+                  paddingBottom: `calc(42px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -5619,8 +5606,8 @@
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
-                  padding: '16px 20px',
-                  paddingBottom: `calc(36px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '20px 20px',
+                  paddingBottom: `calc(42px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
