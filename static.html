@@ -5504,7 +5504,7 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '10px 12px 0',
+                      padding: '10px 12px 100px',
                     }}
                   >
                     {categories.map((cat, catIndex) => {
@@ -5581,18 +5581,6 @@
                       );
                     })}
 
-                    {/* Add category button */}
-                    <div
-                      onClick={() => setCategoriesModalOpen(true)}
-                      style={{
-                        padding: '16px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        marginBottom: '16px',
-                      }}
-                    >
-                      <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>+ Agregar categoría</span>
-                    </div>
                   </div>
                 </div>
               </div>
