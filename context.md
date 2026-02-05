@@ -15,7 +15,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Stack**: HTML + React 18 + Babel standalone (sin build process)
 - **Archivo principal**: `static.html` (responsive: desktop + mobile)
 - **Estado**: Manejado con React hooks (useState, useMemo, useEffect, useCallback)
-- **Fecha simulada**: `REAL_TODAY = new Date('2026-02-05')` (Jueves 5 de febrero de 2026)
+- **Fecha simulada**: `REAL_TODAY = new Date('2026-02-06')` (Viernes 6 de febrero de 2026)
 
 ### Dependencias Externas (CDN)
 - React 18, ReactDOM 18, Babel standalone (unpkg.com)
@@ -209,17 +209,18 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado a 104px del fondo, con touchAction manipulation
-- **Footer**: 96px de alto, íconos arriba (padding 16px 20px 0), zonas de tap completas
+- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado a 120px del fondo, con touchAction manipulation
+- **Footer**: 112px de alto, íconos arriba (padding 24px 20px 0), zonas de tap completas
 - **Padding top**: 10px en heading de día y contenedor de categorías
 - **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones (permite scroll through)
+- **Scroll bloqueado**: html/body con overflow:hidden y position:fixed en mobile, solo scroll en contenedores internos
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
 - **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
-- **Toast**: Posición más arriba (116px + safe-area) para no tapar footer
+- **Toast**: Posición más arriba (132px + safe-area) para no tapar footer
 - **Bottom sheet focus**: Delay de 350ms para esperar animación slideUp antes de focus
 - **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
 - **Heading de día**: Muestra borde inferior al hacer scroll, sin botones (están en header flotante)
