@@ -2642,7 +2642,18 @@
           const rect = e.currentTarget.getBoundingClientRect();
           const y = e.clientY - rect.top;
           const isTopHalf = y < rect.height / 2;
-          setDropIndex(isTopHalf ? index : index + 1);
+          let targetIndex = isTopHalf ? index : index + 1;
+
+          // If dragging a recurring item over normal zone, clamp to end of recurring zone
+          if (draggingItemType === 'recurring' && targetIndex > recurringZone.length) {
+            targetIndex = recurringZone.length;
+          }
+          // If dragging a normal item over recurring zone, clamp to start of normal zone
+          if ((draggingItemType === 'normal' || draggingItemType === 'important') && targetIndex < recurringZone.length) {
+            targetIndex = recurringZone.length;
+          }
+
+          setDropIndex(targetIndex);
         }
       };
 
@@ -2670,6 +2681,7 @@
         e.preventDefault();
         const currentDropIndex = dropIndex;
         setDropIndex(-1);
+        onDragTypeChange?.(null); // Reset mute state on drop
         const data = e.dataTransfer.getData('itemData');
         if (data) {
           onDrop(JSON.parse(data), dateStr, 'todo', currentDropIndex, { x: e.clientX, y: e.clientY });
@@ -2754,7 +2766,7 @@
             <div
               onClick={(e) => handleAddItem(e, false)}
               style={{
-                padding: '6px 8px 2px 12px',
+                padding: '10px 12px 2px 16px',
                 minHeight: '28px',
                 cursor: 'pointer',
                 display: 'flex',
@@ -2779,7 +2791,7 @@
             </div>
 
             {/* Items list - flex column to allow click area to expand */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 6px 8px 12px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 8px 16px', display: 'flex', flexDirection: 'column' }}>
               {/* Drop indicator at top - only show if drop is valid */}
               <div className={`drop-indicator ${dropIndex === 0 && isDropValidAtIndex(0) ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -3539,7 +3551,7 @@
             onDragEnd={() => setIsDraggingColumn(false)}
             onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
             style={{
-              padding: '6px 12px 2px',
+              padding: '10px 12px 2px 16px',
               minHeight: '28px',
               cursor: 'pointer',
               opacity: isDraggingColumn ? 0.5 : 1,
@@ -3553,7 +3565,7 @@
           </div>
 
           {/* Items list - flex column to allow click area to expand */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 6px 8px 12px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 8px 16px', display: 'flex', flexDirection: 'column' }}>
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => {
@@ -5555,7 +5567,7 @@
               onClick={handleMobileAddClick}
               style={{
                 position: 'fixed',
-                bottom: `calc(95px + env(safe-area-inset-bottom, 0px))`,
+                bottom: `calc(110px + env(safe-area-inset-bottom, 0px))`,
                 right: '20px',
                 fontSize: '0.75rem',
                 padding: '22px 36px',
