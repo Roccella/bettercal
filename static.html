@@ -3483,6 +3483,7 @@
         e.preventDefault();
         const currentDropIndex = dropIndex;
         setDropIndex(-1);
+        onDragTypeChange?.(null); // Reset mute state on drop
         const data = e.dataTransfer.getData('itemData');
         if (data) {
           const parsed = JSON.parse(data);
@@ -3998,7 +3999,7 @@
         >
           {/* Day header - desktop style with 150% size */}
           <div style={{
-            padding: '20px 20px 10px',
+            padding: '24px 20px 10px',
             touchAction: 'none',
             borderBottom: isScrolled ? '1px solid var(--border-color)' : '1px solid transparent',
             transition: 'border-color 0.15s',
@@ -4345,6 +4346,15 @@
             existingItem.effort !== cleanData.effort
           );
 
+          // Don't allow modifying recurring items on past days
+          const visualDateObj = editPopover?.visualDate ? new Date(editPopover.visualDate + 'T00:00:00') : null;
+          const isPastDay = visualDateObj && visualDateObj < REAL_TODAY;
+          if (isRecurring && propsChanged && isPastDay) {
+            // Silently ignore changes to recurring items on past days
+            setEditPopover(null);
+            return;
+          }
+
           // If recurring item with property changes, show confirmation popover
           if (propsChanged && !forceApplyAll && editPopover?.visualDate) {
             setRecurringSavePopover({
@@ -4538,9 +4548,10 @@
             const normalItemsCount = dayItemsExcludingDragged.filter(i => !i.repeat && !i.originalId).length;
 
             // If there are normal items and dropIndex is beyond the recurring zone, show alert
-            // The recurring zone ends at index = otherRecurringCount (0-indexed, so position otherRecurringCount is the first normal position)
-            // We show alert only if moving to normal items zone (where normal items exist)
-            if (normalItemsCount > 0 && dropIndex > otherRecurringCount) {
+            // The recurring zone ends at index = otherRecurringCount + 1 (because the dragged item is also recurring)
+            // dropIndex is clamped to recurringZone.length which includes the dragged item
+            // So we compare with otherRecurringCount + 1 to account for the dragged item
+            if (normalItemsCount > 0 && dropIndex > otherRecurringCount + 1) {
               console.log('Moving recurring to normal zone - showing alert', { dropIndex, otherRecurringCount, normalItemsCount });
               setDraggingItemType(null); // Reset mute state when showing alert
               setRemoveRecurrenceAlert({
@@ -4617,27 +4628,8 @@
         }
 
         // For non-recurring items, check if moving important/completed item to normal zone
+        // Preserve item states - only remove completed if explicitly dropping to non-done slot from done
         const dropOptions = {};
-        if (originalItem && slot !== 'done') {
-          // Get items for target date to determine zones
-          const targetDayItems = allItemsWithRecurring.filter(i => {
-            const baseId = typeof i.id === 'string' ? parseInt(i.id.split('-')[0]) : i.id;
-            if (baseId === numId) return false;
-            return (i.scheduledDate === date && !i.completed);
-          });
-          const targetRecurringCount = targetDayItems.filter(i => i.repeat || i.originalId).length;
-          const targetImportantCount = targetDayItems.filter(i => !i.repeat && !i.originalId && i.isImportant).length;
-          const normalZoneStart = targetRecurringCount + targetImportantCount;
-
-          // If dropping in normal zone, remove important status
-          if (originalItem.isImportant && dropIndex > normalZoneStart) {
-            dropOptions.removeImportant = true;
-          }
-          // If item was completed, mark for removal
-          if (originalItem.completed) {
-            dropOptions.removeCompleted = true;
-          }
-        }
 
         setDraggingItemType(null); // Reset mute state
         performDrop(numId, date, slot, dropIndex, dropOptions);
@@ -4710,10 +4702,10 @@
                 if (slot === 'done') {
                   return { ...i, completed: true, completedDate: date, scheduledDate: date, scheduledSlot: i.scheduledSlot || 'todo', sortOrder: sortInfo?.sortOrder ?? 0 };
                 }
-                // Apply options to remove important/completed status
+                // Preserve important and completed status unless explicitly removing
                 const newIsImportant = removeImportant ? false : i.isImportant;
-                const newCompleted = removeCompleted ? false : false;
-                const newCompletedDate = removeCompleted ? null : null;
+                const newCompleted = removeCompleted ? false : i.completed;
+                const newCompletedDate = removeCompleted ? null : i.completedDate;
                 return { ...i, scheduledDate: date, scheduledSlot: slot, isArchived: false, completed: newCompleted, completedDate: newCompletedDate, sortOrder: sortInfo?.sortOrder ?? 0, isImportant: newIsImportant };
               }
             }
@@ -5467,7 +5459,7 @@
                       flex: 1,
                       overflowY: 'auto',
                       WebkitOverflowScrolling: 'touch',
-                      padding: '12px 12px 0',
+                      padding: '24px 12px 0',
                     }}
                   >
                     {categories.map((cat, catIndex) => {
@@ -5567,7 +5559,7 @@
               onClick={handleMobileAddClick}
               style={{
                 position: 'fixed',
-                bottom: `calc(110px + env(safe-area-inset-bottom, 0px))`,
+                bottom: `calc(80px + env(safe-area-inset-bottom, 0px))`,
                 right: '20px',
                 fontSize: '0.75rem',
                 padding: '22px 36px',
@@ -5589,8 +5581,8 @@
                   display: 'flex',
                   justifyContent: 'flex-end',
                   alignItems: 'flex-start',
-                  padding: '20px 20px',
-                  paddingBottom: `calc(42px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '12px 20px',
+                  paddingBottom: `calc(28px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -5611,8 +5603,8 @@
                   display: 'flex',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
-                  padding: '20px 20px',
-                  paddingBottom: `calc(42px + env(safe-area-inset-bottom, 0px))`,
+                  padding: '12px 20px',
+                  paddingBottom: `calc(28px + env(safe-area-inset-bottom, 0px))`,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',

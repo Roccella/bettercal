@@ -58,6 +58,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **No pueden ser marcados como importantes**
 - **Solo se pueden mover a otras zonas de recurrentes**
 - **No se pueden mover a categorías** (drag & drop bloqueado)
+- **No se pueden modificar en días pasados** (cambios se ignoran silenciosamente)
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
@@ -208,8 +209,9 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
-- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado a 110px del fondo
-- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías), padding 20px, paddingBottom 42px + safe-area
+- **FAB flotante**: Botón "Agregar" (padding 22px 36px) posicionado a 80px del fondo
+- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías), padding 12px 20px, paddingBottom 28px + safe-area
+- **Padding top**: 24px en heading de día y contenedor de categorías
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
