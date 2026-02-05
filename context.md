@@ -219,6 +219,14 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - Resetea el scroll horizontal al inicio (desktop)
 - Hace scroll al top de la página
 
+### Funciones de Recurrentes
+- **handleRecurringMoveThis**: "Solo este evento" - crea excepción `movedTo`, item sigue en la serie
+- **handleRecurringMoveFollowing**: "Este y siguientes" / "Modificar repetición" - termina serie original, crea nueva
+- **handleRecurringMoveAll**: "Todos los eventos" - desplaza toda la serie (startDate, createdAt, excepciones)
+- **shiftRepeatConfig**: Desplaza configuración de repeat (días de semana o startDate/endDate)
+- **shiftExceptions**: Desplaza todas las excepciones por N días
+- **generateRecurringInstances**: Genera instancias visuales de items recurrentes (incluyendo movedTo)
+
 ## Versión Mobile
 
 ### Layout Responsive
