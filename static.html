@@ -373,8 +373,8 @@
 
     /* Mobile media query */
     @media (max-width: 600px) {
-      html { font-size: 150%; overflow: hidden; height: 100%; }
-      body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100%; margin: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+      html { font-size: 150%; height: 100%; overflow: hidden; }
+      body { height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
 
       .mobile-only { display: flex; }
       .desktop-only { display: none !important; }
@@ -5414,7 +5414,7 @@
       if (isMobile) {
         // MOBILE LAYOUT
         return (
-          <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', overflow: 'hidden' }}>
+          <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', overflow: 'hidden' }}>
             {/* Floating header buttons - only visible in calendar mode */}
             {mobileViewMode === 'calendar' && (
               <div style={{
@@ -5665,8 +5665,8 @@
       // ===== DESKTOP LAYOUT - Two rows: Calendar top, Categories bottom =====
       return (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
-          {/* Row 1: Calendar with header - 55% height */}
-          <div style={{ flex: '0 0 55%', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
+          {/* Row 1: Calendar with header - 58% height */}
+          <div style={{ flex: '0 0 58%', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
             {/* Calendar header */}
             <div style={{ padding: '8px 10px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
               <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-button)' }}>
