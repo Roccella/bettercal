@@ -687,10 +687,19 @@
     // Mover toda la configuración de repeat (para "todos los eventos")
     const shiftRepeatConfig = (repeat, dayOffset) => {
       if (repeat.type === 'weekdays') {
+        // Para weekdays, desplazar los días de la semana
         const newDays = repeat.days.map(d => ((d + dayOffset) % 7 + 7) % 7);
         return { ...repeat, days: [...new Set(newDays)].sort((a, b) => a - b) };
       }
-      return { ...repeat };
+      // Para days/weeks, desplazar startDate y endDate
+      const newRepeat = { ...repeat };
+      if (repeat.startDate) {
+        newRepeat.startDate = shiftDate(repeat.startDate, dayOffset);
+      }
+      if (repeat.endDate) {
+        newRepeat.endDate = shiftDate(repeat.endDate, dayOffset);
+      }
+      return newRepeat;
     };
 
     // Mover excepciones cuando se mueve toda la serie
@@ -5419,12 +5428,15 @@
       // Todos los eventos: mover toda la serie
       const handleRecurringMoveAll = (item, originalDate, originalSlot, targetDate, targetSlot, dropIndex) => {
         const dayOffset = getDayDiff(originalDate, targetDate);
+        console.log('handleRecurringMoveAll called', { itemId: item.id, originalDate, targetDate, dayOffset });
         const { insertedSortOrder, otherSortOrders } = calculateSortOrdersForDrop(targetDate, targetSlot, dropIndex, item.id);
 
         setItems(p => p.map(i => {
           if (i.id === item.id) {
             // Actualizar configuración de repeat
             const newRepeat = shiftRepeatConfig(i.repeat, dayOffset);
+            const newCreatedAt = shiftDate(i.createdAt, dayOffset);
+            console.log('Shifting repeat config:', { oldRepeat: i.repeat, newRepeat, oldCreatedAt: i.createdAt, newCreatedAt });
 
             return {
               ...i,
@@ -5432,7 +5444,7 @@
               scheduledSlot: targetSlot,
               sortOrder: insertedSortOrder,
               exceptions: shiftExceptions(i.exceptions, dayOffset, targetSlot),
-              createdAt: shiftDate(i.createdAt, dayOffset),
+              createdAt: newCreatedAt,
             };
           }
 
