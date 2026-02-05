@@ -2342,11 +2342,11 @@
         return 'var(--bg-card-future)';
       };
 
-      // Text color: important=yellow, completed=muted, overdue=orange, recurring=blue, past=past, else normal
+      // Text color: important=yellow, completed=muted, overdue=red, recurring=blue, past=past, else normal
       const getTextColor = () => {
         if (item.completed) return 'var(--text-muted)';
         if (item.isImportant) return 'var(--accent-yellow)';
-        if (item._isOverdue) return '#F97316'; // Orange for overdue recurring items
+        if (item._isOverdue) return 'var(--accent-red)'; // Red for overdue recurring items
         if (item.repeat) return 'var(--accent-blue)';
         if (isPast) return 'var(--text-past)';
         return 'var(--text-primary)';
@@ -2439,7 +2439,7 @@
             {/* DESKTOP: Icons always visible, checkbox on hover */}
             {!isMobileDevice && (
               <>
-                {/* Recurrence icon - always visible */}
+                {/* Recurrence icon - always visible, red if overdue */}
                 {item.repeat && (
                   <div
                     title={getRecurrenceTooltip(item.repeat)}
@@ -2452,7 +2452,7 @@
                       flexShrink: 0,
                     }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={item._isOverdue ? 'var(--accent-red)' : 'var(--accent-blue)'} strokeWidth="2">
                       <path d="M17 1l4 4-4 4"/>
                       <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
                       <path d="M7 23l-4-4 4-4"/>
@@ -2525,10 +2525,10 @@
             {/* MOBILE: Only show icons if state is active */}
             {isMobileDevice && (
               <>
-                {/* Recurrence icon - always visible */}
+                {/* Recurrence icon - always visible, red if overdue */}
                 {item.repeat && (
                   <div title={getRecurrenceTooltip(item.repeat)} style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={item._isOverdue ? 'var(--accent-red)' : 'var(--accent-blue)'} strokeWidth="2">
                       <path d="M17 1l4 4-4 4"/>
                       <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
                       <path d="M7 23l-4-4 4-4"/>
