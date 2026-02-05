@@ -2017,12 +2017,12 @@
                 Mover solo esta instancia
               </div>
             </button>
-            {/* Para weekdays: mostrar "Modificar repetición" */}
-            {!isDoneTarget && isWeekdays && (
-              <button onClick={() => onConfirm('edit')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+            {/* Para weekdays: mostrar "Modificar repetición" que expande opciones */}
+            {!isDoneTarget && isWeekdays && !showFollowingOptions && (
+              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
                 <div>Modificar repetición</div>
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
-                  Cambiar días de toda la serie
+                  Cambiar días a partir de esta fecha
                 </div>
               </button>
             )}
@@ -2046,29 +2046,34 @@
                 marginTop: '4px'
               }}>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                  La serie continuará a partir de {formatDateLabel(targetDate)}:
+                  {isWeekdays
+                    ? `Seleccioná los días a partir de ${formatDateLabel(targetDate)}:`
+                    : `La serie continuará a partir de ${formatDateLabel(targetDate)}:`
+                  }
                 </div>
 
-                {/* Repeat type selector */}
-                <select
-                  value={newRepeatType}
-                  onChange={(e) => setNewRepeatType(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '0.625rem',
-                    background: 'var(--bg-input)',
-                    outline: 'none',
-                    color: 'var(--text-primary)',
-                    marginBottom: '8px'
-                  }}
-                >
-                  <option value="days">Cada X días</option>
-                  <option value="weeks">Cada X semanas</option>
-                  <option value="weekdays">Días de semana</option>
-                </select>
+                {/* Repeat type selector - solo para days/weeks, no para weekdays */}
+                {!isWeekdays && (
+                  <select
+                    value={newRepeatType}
+                    onChange={(e) => setNewRepeatType(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '6px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '0.625rem',
+                      background: 'var(--bg-input)',
+                      outline: 'none',
+                      color: 'var(--text-primary)',
+                      marginBottom: '8px'
+                    }}
+                  >
+                    <option value="days">Cada X días</option>
+                    <option value="weeks">Cada X semanas</option>
+                    <option value="weekdays">Días de semana</option>
+                  </select>
+                )}
 
                 {/* Days/Weeks frequency input */}
                 {(newRepeatType === 'days' || newRepeatType === 'weeks') && (
@@ -2147,7 +2152,7 @@
                     opacity: (!hasValidConfig || !hasChanges) ? 0.5 : 1,
                   }}
                 >
-                  Aplicar a este y los siguientes
+                  {isWeekdays ? 'Aplicar cambios' : 'Aplicar a este y los siguientes'}
                 </button>
               </div>
             )}
@@ -5167,16 +5172,6 @@
             // "Todos" uses visualDate for calculating the day offset
             handleRecurringMoveAll(item, visualDate, originalSlot, targetDate, targetSlot, dropIndex);
             break;
-          case 'edit':
-            // "Modificar repetición" - abrir editor del item
-            // Cerrar popovers primero, luego abrir editor
-            setRecurringEditPopover(null);
-            setPendingRecurringDrop(null);
-            // Pequeño delay para que se cierre el popover antes de abrir el editor
-            setTimeout(() => {
-              setEditPopover({ item, rect: null, visualDate });
-            }, 50);
-            return; // Early return para evitar el setRecurringEditPopover de abajo
         }
         setRecurringEditPopover(null);
         setPendingRecurringDrop(null);
