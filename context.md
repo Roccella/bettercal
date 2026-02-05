@@ -71,6 +71,12 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Checkbox**: aparece en hover, desplazando los íconos a la izquierda
 - **Borde checkbox**: 1px
 
+### Shimmers (Animaciones)
+- **Border radius**: 2px en todos los shimmers
+- **Drop shimmer**: 300ms L→R al soltar item
+- **Grab shimmer**: 300ms delay + 300ms R→L al hacer long press (mobile)
+- **Navigate shimmer**: 300ms R→L al navegar a fecha agendada
+
 ### CalendarPopover
 - **Día de hoy**: Estilo btn-primary (fondo azul, texto blanco)
 - **32 días visibles**: Fondo azulado con contraste (rgba azul 15%)
@@ -170,7 +176,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 ### Popovers
 - `AddEditItemPopover` (desktop): Editor de items
   - **Select de recurrencia solo visible si hay fecha**
-- `BottomSheet` (mobile): Editor fullscreen con botones Importante y Hecho
+- `BottomSheet` (mobile): Editor fullscreen con botones Cancelar, Importante y Hecho
   - Botón Importante: toggle sin cerrar el popover
   - Botón Hecho: guarda y cierra el popover
   - **Select de recurrencia solo visible si hay fecha**
@@ -212,24 +218,24 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **FAB flotante**: Botón "Agregar" (fontSize 0.9rem, padding 18px 30px, borderRadius 300px) posicionado relativo al footer (top: -84px)
 - **Footer**: 84px de alto con position:relative, íconos centrados verticalmente (alignItems: center)
 - **Padding top**: 10px en heading de día y contenedor de categorías
-- **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones con touchAction: manipulation (bloquea scroll al tocar)
+- **Botones flotantes (Hoy/Mes)**: pointerEvents none en container, auto en botones con touchAction: none + onTouchStart stopPropagation (bloquea scroll en Safari iOS)
 - **Scroll bloqueado**: html/body con overflow:hidden, position:fixed (top/left/right/bottom:0) en mobile
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
-- **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
+- **BottomSheet**: Editor con botones Cancelar (fondo gris), Importante y Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
 - **Items**: fontSize 0.875rem, padding 6px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
 - **Toast**: Sale desde arriba de la pantalla (top: 20px + safe-area) con animación slideDown
 - **Bottom sheet focus**: Usa autoFocus en el input para nuevos items (Safari iOS compatible)
-- **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
+- **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones, padding bottom 100px para evitar que FAB tape items, sin botón "Agregar categoría"
 - **Heading de día**: Muestra borde inferior al hacer scroll, sin botones (están en header flotante)
 
 ### Interacciones Mobile
 - **Tocar item**: Abre BottomSheet (pero no si el calendario está abierto, en ese caso solo cierra calendario)
 - **Tocar heading categoría**: Crea item y abre BottomSheet
 - **Calendario popover**: Se cierra al tocar fuera sin hacer shimmer al siguiente item
-- **FAB Agregar**: Crea nuevo item y abre BottomSheet
+- **FAB Agregar**: Crea nuevo item y abre BottomSheet, hace scrollIntoView al nuevo item
 - **Long press (300ms+)**: Activa drag mode con grabShimmer (300ms duración, 300ms delay, linear)
 - **Drag de recurrentes**: Misma lógica que desktop - indicador azul se clampea a zona de recurrentes
 - **Tap rápido**: No genera shimmer, solo abre el editor
