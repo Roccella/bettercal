@@ -439,6 +439,132 @@
         overflow: hidden;
       }
     }
+
+    /* ===== EXTRACTED CSS CLASSES ===== */
+
+    /* Form Controls */
+    .form-control {
+      width: 100%; border: none; border-radius: 4px;
+      background: var(--bg-input); color: var(--text-primary); outline: none;
+    }
+    .form-control-sm { padding: 6px; font-size: 0.6875rem; }
+    .form-control-md { padding: 8px; font-size: 0.75rem; }
+    .form-textarea { resize: none; font-family: inherit; }
+    .form-label { font-size: 0.625rem; color: var(--text-muted); margin-bottom: 4px; }
+    .form-group { margin-bottom: 8px; }
+    .form-group-lg { margin-bottom: 10px; }
+    .form-group-rel { margin-bottom: 8px; position: relative; }
+    .bottom-sheet .form-control { border-radius: 8px; }
+    .bottom-sheet .form-group { margin-bottom: 10px; }
+
+    /* Popover content patterns */
+    .popover-info { margin-bottom: 12px; font-size: 0.6875rem; color: var(--text-primary); }
+    .popover-title { font-weight: 500; margin-bottom: 4px; }
+    .popover-subtitle { color: var(--text-muted); }
+    .popover-actions { display: flex; gap: 8px; }
+    .popover-actions-col { display: flex; flex-direction: column; gap: 6px; }
+
+    /* Button variants */
+    .btn-action { padding: 10px 12px; text-align: left; font-size: 0.6875rem; }
+    .btn-action-hint { color: var(--text-muted); font-size: 0.625rem; margin-top: 2px; }
+    .btn-submit { flex: 1; padding: 8px; }
+    .btn-submit-lg { flex: 1; padding: 10px; }
+
+    /* Icon container */
+    .icon-box { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .icon-box-sm { width: 20px; height: 20px; }
+    .icon-box-md { width: 24px; height: 24px; }
+
+    /* Checkbox inner */
+    .checkbox-inner { display: flex; align-items: center; justify-content: center; border-radius: 3px; flex-shrink: 0; }
+
+    /* Mini Calendar */
+    .mini-calendar { padding: 8px; background: var(--bg-card); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .mini-calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .mini-calendar-month { font-size: 0.6875rem; font-weight: 600; text-transform: capitalize; }
+    .mini-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 8px; }
+    .mini-calendar-day-label { text-align: center; font-size: 0.5625rem; color: var(--text-muted); padding: 2px; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-body { background: var(--bg-secondary); border-radius: 12px; padding: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow: auto; }
+
+    /* Warning box */
+    .warning-box { padding: 8px; background: rgba(239, 68, 68, 0.15); border-radius: 6px; font-size: 0.625rem; color: #EF4444; }
+
+    /* Discard dialog text */
+    .dialog-title { font-size: 0.8125rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+    .dialog-text { font-size: 0.6875rem; color: var(--text-secondary); margin-bottom: 16px; }
+
+    /* Column layout (DayColumn / CategoryColumnSimple) */
+    .column-header { padding: 10px 12px 2px 16px; min-height: 28px; cursor: pointer; display: flex; align-items: baseline; justify-content: space-between; }
+    .column-items { flex: 1; overflow-y: auto; padding: 0 10px 8px 16px; display: flex; flex-direction: column; }
+    .column-click-area { min-height: 80px; flex: 1; cursor: pointer; }
+
+    /* Dashed add button */
+    .btn-add-dashed {
+      width: 100%; padding: 4px 8px; background: transparent;
+      border: 1px dashed var(--border-color); border-radius: 4px;
+      color: var(--text-muted); font-size: 0.5625rem; cursor: pointer;
+    }
+
+    /* Category elements */
+    .cat-swatch { width: 12px; height: 12px; border-radius: 3px; margin-right: 10px; }
+    .cat-swatch-lg { width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0; cursor: pointer; }
+    .cat-name { font-weight: 600; font-size: 0.8125rem; flex: 1; }
+    .color-picker-dropdown {
+      position: absolute; top: 100%; left: 32px; margin-top: 4px; padding: 8px;
+      background: var(--bg-card); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      z-index: 10; display: flex; gap: 4px; flex-wrap: wrap; width: 140px;
+    }
+
+    /* Desktop layout */
+    .app-desktop { height: 100vh; display: flex; flex-direction: column; background: var(--bg-app); }
+    .calendar-row { flex: 0 0 59%; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1px solid var(--border-color); }
+    .categories-row { flex: 0 0 45%; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-header); }
+    .header-bar { padding: 8px 10px; background: var(--bg-header); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; height: 44px; }
+    .calendar-scroll { flex: 1; display: flex; overflow-x: auto; overflow-y: hidden; background: var(--bg-primary); }
+    .categories-scroll { flex: 1; display: flex; overflow-x: auto; overflow-y: hidden; }
+
+    /* Mobile layout */
+    .app-mobile { height: 100dvh; display: flex; flex-direction: column; background: var(--bg-app); padding-top: env(safe-area-inset-top); overflow: hidden; }
+    .floating-header { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 100; display: flex; pointer-events: none; gap: 6px; align-items: center; }
+    .fab { position: absolute; top: -84px; right: 20px; font-size: 0.9rem; padding: 18px 30px; border-radius: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); touch-action: manipulation; z-index: 100; }
+    .footer-tab { flex: 1; display: flex; align-items: center; padding: 0 20px; padding-bottom: env(safe-area-inset-bottom, 0px); border: none; background: transparent; cursor: pointer; height: 100%; }
+    .footer-tab-left { justify-content: flex-end; }
+    .footer-tab-right { justify-content: flex-start; }
+
+    /* Bottom sheet sticky header */
+    .bs-header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 16px 12px; margin: 0 -16px 12px; border-bottom: 1px solid var(--border-color); background: inherit; }
+
+    /* Bottom sheet action buttons */
+    .bs-action-btn { flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+
+    /* Section toggle content row */
+    .section-toggle-content { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 0; }
+    .section-toggle-arrow { transition: transform 0.15s; font-size: 0.5rem; }
+    .section-toggle-label { font-size: 0.5625rem; font-weight: 500; }
+
+    /* Slot header and items area */
+    .slot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .slot-label { font-size: 0.5625rem; font-weight: 400; }
+    .slot-items { flex: 1; min-height: 20px; display: flex; flex-direction: column; }
+
+    /* Category modal row */
+    .cat-modal-row { display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-primary); border-radius: 8px; cursor: grab; position: relative; }
+
+    /* Utility */
+    .flex-spacer { flex: 1; }
+    .nav-group { display: flex; align-items: center; gap: 4px; }
+    .btn-top-adjust { position: relative; top: -1px; }
+
+    /* Toast */
+    .toast-message { font-size: 0.75rem; }
+    .toast-undo { padding: 4px 10px; font-size: 0.6875rem; }
+
+    /* Add category cell */
+    .add-cat-cell { flex: 0 0 60px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border-color); height: 100%; cursor: pointer; }
+    .add-cat-plus { font-size: 1.25rem; font-weight: 400; color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -1196,17 +1322,17 @@
         <>
           <div className="discard-overlay" onClick={onContinue} />
           <div className="discard-dialog">
-            <div style={{ fontSize: '0.8125rem', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+            <div className="dialog-title">
               ¿Descartar cambios?
             </div>
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            <div className="dialog-text">
               Tienes cambios sin guardar. ¿Qué deseas hacer?
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn" style={{ flex: 1, padding: '8px' }} onClick={onContinue}>
+            <div className="popover-actions">
+              <button className="btn btn-submit" onClick={onContinue}>
                 Seguir editando
               </button>
-              <button className="btn btn-danger" style={{ flex: 1, padding: '8px' }} onClick={onDiscard}>
+              <button className="btn btn-danger btn-submit" onClick={onDiscard}>
                 Descartar
               </button>
             </div>
@@ -1248,8 +1374,8 @@
 
       return (
         <div className="toast">
-          <span style={{ fontSize: '0.75rem' }}>{message}</span>
-          <button onClick={onUndo} className="btn" style={{ padding: '4px 10px', fontSize: '0.6875rem' }}>Deshacer</button>
+          <span className="toast-message">{message}</span>
+          <button onClick={onUndo} className="btn toast-undo">Deshacer</button>
         </div>
       );
     };
@@ -1283,15 +1409,15 @@
       const monthName = viewMonth.toLocaleDateString('es', { month: 'long', year: 'numeric' });
 
       return (
-        <div style={{ padding: '8px', background: 'var(--bg-card)', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div className="mini-calendar">
+          <div className="mini-calendar-header">
             <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))} className="btn" style={{ padding: '2px 6px' }}>◀</button>
-            <span style={{ fontSize: '0.6875rem', fontWeight: '600', textTransform: 'capitalize' }}>{monthName}</span>
+            <span className="mini-calendar-month">{monthName}</span>
             <button type="button" onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))} className="btn" style={{ padding: '2px 6px' }}>▶</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '8px' }}>
+          <div className="mini-calendar-grid">
             {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
-              <div key={i} style={{ textAlign: 'center', fontSize: '0.5625rem', color: 'var(--text-muted)', padding: '2px' }}>{d}</div>
+              <div key={i} className="mini-calendar-day-label">{d}</div>
             ))}
             {days.map((day, i) => {
               if (!day) return <div key={i} />;
@@ -1323,6 +1449,7 @@
             })}
           </div>
           <button type="button" onClick={() => { onSelect(null); onClose(); }} className="btn" style={{ width: '100%', fontSize: '0.625rem' }}>
+
             Sin fecha
           </button>
         </div>
@@ -1500,25 +1627,26 @@
           <Popover onClose={onClose} onRequestClose={handleRequestClose} targetRect={targetRect}>
             <form onSubmit={handleSubmit}>
               <input ref={inputRef} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Item..."
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.75rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                className="form-control form-control-md form-group"
               />
               <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descripción..." rows={2}
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)', resize: 'none', fontFamily: 'inherit' }}
+                className="form-control form-control-sm form-group form-textarea"
               />
-              <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', marginBottom: '8px', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="form-control form-control-sm form-group">
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
-              <div style={{ marginBottom: '8px', position: 'relative' }}>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
+              <div className="form-group-rel">
+                <div className="form-label">Fecha</div>
                 <button
                   ref={dateButtonRef}
                   type="button"
                   onClick={() => setShowDatePicker(!showDatePicker)}
+                  className="form-control form-control-sm"
                   style={{
-                    width: '100%', padding: '6px 8px', border: 'none', borderRadius: '4px',
-                    background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
-                    fontSize: '0.6875rem', textAlign: 'left', cursor: 'pointer',
+                    padding: '6px 8px',
+                    color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
+                    textAlign: 'left', cursor: 'pointer',
                   }}
                 >
                   {getDateLabel()}
@@ -1531,15 +1659,15 @@
               </div>
 
               {hadRepeat && userClearedDate && (
-                <div style={{ marginBottom: '8px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
+                <div className="warning-box form-group">
                   Al guardar se eliminará la recurrencia
                 </div>
               )}
 
               {/* Only show repeat options if there's a date */}
               {scheduledDate && (
-                <div style={{ marginBottom: '10px' }}>
-                  <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{ width: '100%', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}>
+                <div className="form-group-lg">
+                  <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} className="form-control" style={{ padding: '6px', fontSize: '0.625rem' }}>
                     <option value="none">No repetir</option>
                     <option value="days">Cada X días</option>
                     <option value="weeks">Cada X semanas</option>
@@ -1548,10 +1676,10 @@
                   {repeatType !== 'none' && repeatType !== 'weekdays' && (
                     <>
                       <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                        style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', textAlign: 'center', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-primary)' }}
+                        className="form-control form-control-sm" style={{ marginTop: '4px', textAlign: 'center' }}
                       />
                       {repeatType === 'days' && (
-                        <select value={repeatMode} onChange={(e) => setRepeatMode(e.target.value)} style={{ width: '100%', marginTop: '4px', padding: '6px', border: 'none', borderRadius: '4px', fontSize: '0.5625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-muted)' }}>
+                        <select value={repeatMode} onChange={(e) => setRepeatMode(e.target.value)} className="form-control" style={{ marginTop: '4px', padding: '6px', fontSize: '0.5625rem', color: 'var(--text-muted)' }}>
                           <option value="fixed">Desde fecha fija</option>
                           <option value="completion">Desde última completación</option>
                         </select>
@@ -1571,7 +1699,7 @@
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {isEditing && <button type="button" onClick={() => { onDelete(editItem.id); onClose(); }} className="btn-icon-danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
                 {isEditing && onDuplicate && <button type="button" onClick={() => { onDuplicate(editItem.id); onClose(); }} className="btn" style={{ padding: '6px 8px', background: 'var(--bg-button)' }} title="Duplicar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>}
-                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
+                <button type="submit" className="btn btn-primary btn-submit" disabled={!hasChanges && isEditing}>{isEditing ? 'Guardar' : 'Agregar'}</button>
               </div>
             </form>
           </Popover>
@@ -1616,14 +1744,14 @@
       return (
         <>
           <Popover onClose={handleRequestClose} targetRect={targetRect}>
-            <div style={{ marginBottom: '8px' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Nombre</div>
+            <div className="form-group">
+              <div className="form-label">Nombre</div>
               <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} placeholder="Categoría..."
-                style={{ width: '100%', padding: '8px', border: 'none', borderRadius: '4px', fontSize: '0.6875rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+                className="form-control form-control-sm" style={{ padding: '8px' }}
               />
             </div>
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Color</div>
+            <div className="form-group-lg">
+              <div className="form-label">Color</div>
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                 {COLORS.map(c => (
                   <button key={c} type="button" onClick={() => setColor(c)} style={{
@@ -1634,7 +1762,7 @@
             </div>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
               {!isNew && <button onClick={() => canDelete && onDelete(category.id)} disabled={!canDelete} className={canDelete ? 'btn-icon-danger' : 'btn'} style={{ padding: '6px 8px' }} title={!canDelete ? `${itemCount} items` : ''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>}
-              <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary" style={{ flex: 1, padding: '8px' }} disabled={!hasChanges}>Guardar</button>
+              <button onClick={() => { if (name.trim() && hasChanges) { onSave({ ...category, id: category?.id || `cat_${Date.now()}`, name: name.trim(), color }); onClose(); }}} className="btn btn-primary btn-submit" disabled={!hasChanges}>Guardar</button>
             </div>
             {!isNew && !canDelete && <div style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', marginTop: '4px' }}>Tiene {itemCount} items</div>}
           </Popover>
@@ -1739,28 +1867,12 @@
       };
 
       return (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0,0,0,0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }} onClick={onClose}>
-          <div style={{
-            background: 'var(--bg-secondary)',
-            borderRadius: '12px',
-            padding: '20px',
-            width: '90%',
-            maxWidth: '400px',
-            maxHeight: '80vh',
-            overflow: 'auto',
-          }} onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-body" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600' }}>Editar categorías</h3>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                <div className="form-label" style={{ marginTop: '2px', marginBottom: 0 }}>
                   {items.length} items en total
                 </div>
               </div>
@@ -1775,17 +1887,8 @@
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragEnd={handleDragEnd}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '8px',
-                    opacity: draggedIndex === index ? 0.5 : 1,
-                    cursor: 'grab',
-                    position: 'relative',
-                  }}
+                  className="cat-modal-row"
+                  style={{ opacity: draggedIndex === index ? 0.5 : 1 }}
                 >
                   {/* Drag handle */}
                   <div style={{ color: 'var(--text-muted)', cursor: 'grab' }}>⋮⋮</div>
@@ -1793,33 +1896,13 @@
                   {/* Color swatch that opens color popover */}
                   <div
                     onClick={(e) => { e.stopPropagation(); setColorPickerIndex(colorPickerIndex === index ? null : index); }}
-                    style={{
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '4px',
-                      background: cat.color,
-                      flexShrink: 0,
-                      cursor: 'pointer',
-                    }}
+                    className="cat-swatch-lg"
+                    style={{ background: cat.color }}
                   />
 
                   {/* Color picker popover */}
                   {colorPickerIndex === index && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: '32px',
-                      marginTop: '4px',
-                      padding: '8px',
-                      background: 'var(--bg-card)',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-                      zIndex: 10,
-                      display: 'flex',
-                      gap: '4px',
-                      flexWrap: 'wrap',
-                      width: '140px',
-                    }}>
+                    <div className="color-picker-dropdown">
                       {COLORS.map(c => (
                         <button
                           key={c}
@@ -1844,31 +1927,23 @@
                     value={cat.name}
                     onChange={(e) => handleNameChange(index, e.target.value)}
                     placeholder="Nombre..."
-                    style={{
-                      flex: 1,
-                      padding: '6px 8px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      background: 'var(--bg-input)',
-                      color: 'var(--text-primary)',
-                      fontSize: '0.75rem',
-                      outline: 'none',
-                    }}
+                    className="form-control form-control-md"
+                    style={{ flex: 1, padding: '6px 8px' }}
                   />
 
                   {/* Item count */}
-                  <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)', minWidth: '20px', textAlign: 'right' }}>
+                  <span className="form-label" style={{ minWidth: '20px', textAlign: 'right', marginBottom: 0 }}>
                     {getItemCount(cat.id)}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={handleAddCategory} className="btn" style={{ flex: 1, padding: '10px' }}>
+            <div className="popover-actions">
+              <button onClick={handleAddCategory} className="btn btn-submit-lg">
                 Agregar categoría
               </button>
-              <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1, padding: '10px' }}>
+              <button onClick={handleSave} className="btn btn-primary btn-submit-lg">
                 Guardar
               </button>
             </div>
@@ -2033,35 +2108,35 @@
 
       return (
         <Popover onClose={onCancel} targetRect={computedRect}>
-          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
-            <div style={{ fontWeight: '500', marginBottom: '4px' }}>{title}</div>
-            <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{item.title}"</div>
+          <div className="popover-info">
+            <div className="popover-title">{title}</div>
+            <div className="popover-subtitle" style={{ marginBottom: '12px' }}>"{item.title}"</div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button onClick={() => onConfirm('this')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+          <div className="popover-actions-col">
+            <button onClick={() => onConfirm('this')} className="btn btn-action">
               <div>Solo este evento</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
+              <div className="btn-action-hint">
                 Mover solo esta instancia
               </div>
             </button>
             {/* Para weekdays: mostrar "Modificar repetición" que expande opciones */}
             {!isDoneTarget && isWeekdays && !showFollowingOptions && (
-              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+              <button onClick={handleFollowingClick} className="btn btn-action">
                 <div>Modificar repetición</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.625rem', marginTop: '2px' }}>
+                <div className="btn-action-hint">
                   Cambiar días a partir de esta fecha
                 </div>
               </button>
             )}
             {/* Para days/weeks: mostrar "Este y los siguientes" */}
             {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
-              <button onClick={handleFollowingClick} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+              <button onClick={handleFollowingClick} className="btn btn-action">
                 Este y los siguientes
               </button>
             )}
             {/* Para days/weeks: mostrar "Todos los eventos" */}
             {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
-              <button onClick={() => onConfirm('all')} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+              <button onClick={() => onConfirm('all')} className="btn btn-action">
                 Todos los eventos
               </button>
             )}
@@ -2073,6 +2148,7 @@
                 marginTop: '4px'
               }}>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+
                   {isWeekdays
                     ? `Seleccioná los días a partir de ${formatDateLabel(targetDate)}:`
                     : `La serie continuará a partir de ${formatDateLabel(targetDate)}:`
@@ -2084,17 +2160,8 @@
                   <select
                     value={newRepeatType}
                     onChange={(e) => setNewRepeatType(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '6px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      fontSize: '0.625rem',
-                      background: 'var(--bg-input)',
-                      outline: 'none',
-                      color: 'var(--text-primary)',
-                      marginBottom: '8px'
-                    }}
+                    className="form-control form-group"
+                    style={{ padding: '6px', fontSize: '0.625rem' }}
                   >
                     <option value="days">Cada X días</option>
                     <option value="weeks">Cada X semanas</option>
@@ -2112,16 +2179,8 @@
                       max="30"
                       value={newEvery}
                       onChange={(e) => setNewEvery(Math.max(1, parseInt(e.target.value) || 1))}
-                      style={{
-                        width: '50px',
-                        padding: '6px',
-                        border: 'none',
-                        borderRadius: '4px',
-                        fontSize: '0.6875rem',
-                        textAlign: 'center',
-                        background: 'var(--bg-input)',
-                        color: 'var(--text-primary)',
-                      }}
+                      className="form-control form-control-sm"
+                      style={{ width: '50px', textAlign: 'center' }}
                     />
                     <span style={{ fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
                       {newRepeatType === 'days' ? (newEvery === 1 ? 'día' : 'días') : (newEvery === 1 ? 'semana' : 'semanas')}
@@ -2191,14 +2250,14 @@
     const RemoveDatePopover = ({ itemTitle, onConfirm, onCancel, targetRect, isRecurring }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
-          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
+          <div className="popover-info">
             {isRecurring
               ? `Para hacer esto hay que eliminar la recurrencia de "${itemTitle}"`
               : `Para hacer esto hay que eliminar la fecha de "${itemTitle}"`
             }
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={onConfirm} className="btn btn-primary" style={{ flex: 1, padding: '8px' }}>
+          <div className="popover-actions">
+            <button onClick={onConfirm} className="btn btn-primary btn-submit">
               {isRecurring ? 'Eliminar recurrencia' : 'Eliminar fecha'}
             </button>
           </div>
@@ -2209,17 +2268,17 @@
     const RemoveRecurrenceAlertPopover = ({ itemTitle, onConfirm, onCancel, targetRect }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
-          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
-            <div style={{ fontWeight: '500', marginBottom: '4px' }}>¿Quitar recurrencia?</div>
-            <div style={{ color: 'var(--text-muted)' }}>
+          <div className="popover-info">
+            <div className="popover-title">¿Quitar recurrencia?</div>
+            <div className="popover-subtitle">
               Al mover "{itemTitle}" a esta posición, solo se modificará este evento sin afectar los siguientes.
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={onCancel} className="btn" style={{ flex: 1, padding: '8px' }}>
+          <div className="popover-actions">
+            <button onClick={onCancel} className="btn btn-submit">
               Cancelar
             </button>
-            <button onClick={onConfirm} className="btn btn-primary" style={{ flex: 1, padding: '8px' }}>
+            <button onClick={onConfirm} className="btn btn-primary btn-submit">
               Confirmar
             </button>
           </div>
@@ -2230,15 +2289,15 @@
     const RecurringSavePopover = ({ itemTitle, onThis, onFollowing, onCancel, targetRect }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
-          <div style={{ marginBottom: '12px', fontSize: '0.6875rem', color: 'var(--text-primary)' }}>
-            <div style={{ fontWeight: '500', marginBottom: '4px' }}>Guardar cambios</div>
-            <div style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>"{itemTitle}"</div>
+          <div className="popover-info">
+            <div className="popover-title">Guardar cambios</div>
+            <div className="popover-subtitle" style={{ marginBottom: '12px' }}>"{itemTitle}"</div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button onClick={onThis} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+          <div className="popover-actions-col">
+            <button onClick={onThis} className="btn btn-action">
               Solo este evento
             </button>
-            <button onClick={onFollowing} className="btn" style={{ padding: '10px 12px', textAlign: 'left', fontSize: '0.6875rem' }}>
+            <button onClick={onFollowing} className="btn btn-action">
               Este y los siguientes
             </button>
           </div>
@@ -2503,14 +2562,7 @@
                 {item.repeat && (
                   <div
                     title={getRecurrenceTooltip(item.repeat)}
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
+                    className="icon-box icon-box-sm"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={item._isOverdue ? 'var(--accent-red)' : 'var(--accent-blue)'} strokeWidth="2">
                       <path d="M17 1l4 4-4 4"/>
@@ -2525,14 +2577,9 @@
                   <div
                     data-important-btn="true"
                     onClick={(e) => { e.stopPropagation(); onToggleImportant?.(item.id); }}
+                    className="icon-box icon-box-sm"
                     style={{
-                      width: '20px',
-                      height: '20px',
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
                       color: item.isImportant ? 'var(--accent-yellow)' : 'var(--text-muted)',
                       opacity: isHovered || item.isImportant ? 1 : 0,
                       transition: 'opacity 0.1s',
@@ -2550,28 +2597,19 @@
                 <div
                   data-checkbox="true"
                   onClick={handleCheckboxClick}
+                  className="icon-box"
                   style={{
                     width: isHovered || item.completed ? '20px' : '0px',
                     height: '20px',
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     overflow: 'hidden',
                     transition: 'width 0.1s',
-                    flexShrink: 0,
                   }}
                 >
-                  <div style={{
-                    width: '14px',
-                    height: '14px',
-                    borderRadius: '3px',
+                  <div className="checkbox-inner" style={{
+                    width: '14px', height: '14px',
                     border: `1px solid ${item.completed ? 'var(--accent-green)' : 'var(--text-muted)'}`,
                     background: item.completed ? 'var(--accent-green)' : 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
                   }}>
                     {item.completed && (
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -2587,7 +2625,7 @@
               <>
                 {/* Recurrence icon - always visible, red if overdue */}
                 {item.repeat && (
-                  <div title={getRecurrenceTooltip(item.repeat)} style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div title={getRecurrenceTooltip(item.repeat)} className="icon-box icon-box-md">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={item._isOverdue ? 'var(--accent-red)' : 'var(--accent-blue)'} strokeWidth="2">
                       <path d="M17 1l4 4-4 4"/>
                       <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
@@ -2598,7 +2636,7 @@
                 )}
                 {/* Important icon - only if important */}
                 {item.isImportant && !item.repeat && (
-                  <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div className="icon-box icon-box-md">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-yellow)" stroke="var(--accent-yellow)" strokeWidth="2">
                       <circle cx="12" cy="12" r="10"/>
                       <line x1="12" y1="7" x2="12" y2="13" stroke="white"/>
@@ -2608,11 +2646,10 @@
                 )}
                 {/* Checkbox - only if completed */}
                 {item.completed && (
-                  <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <div style={{
-                      width: '16px', height: '16px', borderRadius: '3px',
+                  <div className="icon-box icon-box-md">
+                    <div className="checkbox-inner" style={{
+                      width: '16px', height: '16px',
                       border: '1px solid var(--accent-green)', background: 'var(--accent-green)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
@@ -2765,13 +2802,13 @@
             onDrop={handleDrop}
           >
             <div onClick={(e) => handleAddItem(e, true)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }} onClick={(e) => e.stopPropagation()}>
+              <div className="slot-header" onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '0.5625rem', color: isDone ? 'var(--accent-green)' : slot === 'important' ? '#EF4444' : 'var(--text-secondary)', fontWeight: '400' }}>{label} ({itemCount})</span>
+                  <span className="slot-label" style={{ color: isDone ? 'var(--accent-green)' : slot === 'important' ? '#EF4444' : 'var(--text-secondary)' }}>{label} ({itemCount})</span>
                 </div>
-                {!isDone && <button onClick={(e) => handleAddItem(e, false)} className="btn" style={{ fontWeight: '700', padding: '1px 5px' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>}
+                {!isDone && <button onClick={(e) => handleAddItem(e, false)} className="btn" style={{ fontWeight: '700', padding: '1px 5px' }}><span className="btn-top-adjust">+</span></button>}
               </div>
-              <div className="slot-empty-area" style={{ flex: 1, minHeight: '20px', display: 'flex', flexDirection: 'column' }}>
+              <div className="slot-empty-area slot-items">
                 {/* Drop indicator at top */}
                 <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
                 {items.map((item, index) => (
@@ -2794,19 +2831,7 @@
                 {/* Dashed add button - right after last item (not for Done slot) */}
                 <div className={`drop-indicator ${dropIndex === items.length && items.length > 0 ? 'visible' : ''}`} />
                 {!isDone && (
-                  <button
-                    onClick={(e) => handleAddItem(e, true)}
-                    style={{
-                      padding: '4px 8px',
-                      background: 'transparent',
-                      border: '1px dashed var(--border-color)',
-                      borderRadius: '4px',
-                      color: 'var(--text-muted)',
-                      fontSize: '0.5625rem',
-                      cursor: 'pointer',
-                      width: '100%',
-                    }}
-                  >
+                  <button onClick={(e) => handleAddItem(e, true)} className="btn-add-dashed">
                     Agregar
                   </button>
                 )}
@@ -3037,14 +3062,7 @@
             {/* Header - clickable to add at top */}
             <div
               onClick={(e) => handleAddItem(e, false)}
-              style={{
-                padding: '10px 12px 2px 16px',
-                minHeight: '28px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'space-between',
-              }}>
+              className="column-header">
               <div style={{
                 fontSize: '0.875rem',
                 color: getHeaderColor(),
@@ -3063,7 +3081,7 @@
             </div>
 
             {/* Items list - flex column to allow click area to expand */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 8px 16px', display: 'flex', flexDirection: 'column' }}>
+            <div className="column-items">
               {/* Drop indicator at top - only show if drop is valid */}
               <div className={`drop-indicator ${dropIndex === 0 && isDropValidAtIndex(0) ? 'visible' : ''}`} />
               {dayItems.map((item, index) => (
@@ -3080,14 +3098,7 @@
                 </div>
               ))}
               {/* Click area to add at end - takes all remaining space */}
-              <div
-                onClick={(e) => handleAddItem(e, true)}
-                style={{
-                  minHeight: '80px',
-                  flex: 1,
-                  cursor: 'pointer',
-                }}
-              />
+              <div onClick={(e) => handleAddItem(e, true)} className="column-click-area" />
             </div>
           </div>
           {editRect && editingItem && ReactDOM.createPortal(
@@ -3188,13 +3199,13 @@
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', padding: '2px 0' }}>
+          <div className="section-toggle section-toggle-content" onClick={(e) => { e.stopPropagation(); onToggle(); }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: labelColor }}>▶</span>
-              <span style={{ fontSize: '0.5625rem', color: labelColor, fontWeight: '500' }}>{label} ({count})</span>
+              <span className="section-toggle-arrow" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', color: labelColor }}>▶</span>
+              <span className="section-toggle-label" style={{ color: labelColor }}>{label} ({count})</span>
             </div>
             {isBacklog && onAddItem && (
-              <button onClick={(e) => { e.stopPropagation(); onAddItem(false); }} className="btn" style={{ fontWeight: '700', padding: '1px 5px', fontSize: '0.5625rem' }}><span style={{ position: 'relative', top: '-1px' }}>+</span></button>
+              <button onClick={(e) => { e.stopPropagation(); onAddItem(false); }} className="btn" style={{ fontWeight: '700', padding: '1px 5px', fontSize: '0.5625rem' }}><span className="btn-top-adjust">+</span></button>
             )}
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`} style={{ paddingTop: '4px' }}>
@@ -3225,18 +3236,8 @@
             {isBacklog && onAddItem && (
               <button
                 onClick={(e) => { e.stopPropagation(); onAddItem(true); }}
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  marginTop: '6px',
-                  marginBottom: '6px',
-                  background: 'transparent',
-                  border: '1px dashed var(--border-color)',
-                  borderRadius: '4px',
-                  color: 'var(--text-muted)',
-                  fontSize: '0.5625rem',
-                  cursor: 'pointer',
-                }}
+                className="btn-add-dashed"
+                style={{ marginTop: '6px', marginBottom: '6px' }}
               >
                 Agregar
               </button>
@@ -3452,8 +3453,8 @@
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('categoryId', category.id); setDragging(true); }}
             onDragEnd={() => setDragging(false)}
             onClick={onToggle} style={{ display: 'flex', alignItems: 'center', padding: '10px', minHeight: '36px', background: expanded ? `${category.color}12` : 'transparent' }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
-            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <div className="cat-swatch" style={{ background: category.color }} />
+            <span onDoubleClick={handleCategoryDoubleClick} className="cat-name" style={{ color: category.color }}>{category.name} ({ongoing.length})</span>
             <span style={{ color: 'var(--text-muted)', transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', fontSize: '0.625rem', padding: '4px' }}>▼</span>
           </div>
           <div className={`collapsible ${expanded ? 'expanded' : ''}`}>
@@ -3483,9 +3484,9 @@
                 onDragEnter={(e) => { e.currentTarget.style.cursor = 'not-allowed'; }}
                 onDragLeave={(e) => { e.currentTarget.style.cursor = 'inherit'; }}
               >
-                <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
-                  <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: 'var(--text-muted)' }}>▶</span>
-                  <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
+                <div className="section-toggle section-toggle-content" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ justifyContent: 'flex-start', gap: '4px' }}>
+                  <span className="section-toggle-arrow" style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', color: 'var(--text-muted)' }}>▶</span>
+                  <span className="section-toggle-label" style={{ color: 'var(--text-muted)' }}>Agendado ({scheduled.length})</span>
                 </div>
                 <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
                   {recurringItems.map(item => (
@@ -3655,15 +3656,15 @@
             onDragStart={(e) => { if (!isCategoryDraggable) { e.preventDefault(); return; } e.dataTransfer.setData('expandedCategoryId', category.id); setIsDraggingColumn(true); }}
             onDragEnd={() => setIsDraggingColumn(false)}
             style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', minHeight: '36px', background: `${category.color}12`, cursor: isCategoryDraggable ? 'grab' : 'default', opacity: isDraggingColumn ? 0.5 : 1 }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: category.color, marginRight: '10px' }} />
-            <span onDoubleClick={handleCategoryDoubleClick} style={{ fontWeight: '600', fontSize: '0.8125rem', flex: 1, color: category.color }}>{category.name} ({ongoing.length})</span>
+            <div className="cat-swatch" style={{ background: category.color }} />
+            <span onDoubleClick={handleCategoryDoubleClick} className="cat-name" style={{ color: category.color }}>{category.name} ({ongoing.length})</span>
           </div>
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px 8px' }}>
             <SidebarGroup label="Backlog" count={backlogItems.length} items={backlogItems} expanded={backlogExp} onToggle={() => onGroupToggle?.('backlog')} categories={categories} onComplete={onComplete} onEdit={onEdit} onDrop={(data, dropIdx, e) => handleGroupDrop(data, 'backlog', e, dropIdx)} showDropIndicator={isDraggingItem} isBacklog={true} justDroppedItemId={justDroppedItemId} />
             <div style={{ marginBottom: '4px', opacity: draggingUnscheduledItem ? 0.4 : 1, pointerEvents: draggingUnscheduledItem ? 'none' : 'auto', transition: 'opacity 0.15s' }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }}>
-              <div className="section-toggle" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0' }}>
-                <span style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.15s', fontSize: '0.5rem', color: 'var(--text-muted)' }}>▶</span>
-                <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: '500' }}>Agendado ({scheduled.length})</span>
+              <div className="section-toggle section-toggle-content" onClick={(e) => { e.stopPropagation(); onGroupToggle?.('scheduled'); }} style={{ justifyContent: 'flex-start', gap: '4px' }}>
+                <span className="section-toggle-arrow" style={{ transform: scheduledExp ? 'rotate(90deg)' : 'rotate(0)', color: 'var(--text-muted)' }}>▶</span>
+                <span className="section-toggle-label" style={{ color: 'var(--text-muted)' }}>Agendado ({scheduled.length})</span>
               </div>
               <div className={`collapsible ${scheduledExp ? 'expanded' : ''}`}>
                 {recurringItems.map(item => (
@@ -3832,14 +3833,8 @@
             }}
             onDragEnd={() => setIsDraggingColumn(false)}
             onClick={(e) => { e.stopPropagation(); handleAddItem(false); }}
-            style={{
-              padding: '10px 12px 2px 16px',
-              minHeight: '28px',
-              cursor: 'pointer',
-              opacity: isDraggingColumn ? 0.5 : 1,
-              display: 'flex',
-              alignItems: 'center',
-            }}>
+            className="column-header"
+            style={{ alignItems: 'center', opacity: isDraggingColumn ? 0.5 : 1 }}>
             <div style={{ fontSize: '0.875rem', color: category.color }}>
               <span style={{ fontWeight: '700' }}>{category.name}</span>
               <span style={{ fontWeight: '400', opacity: 0.7 }}> ({backlogItems.length})</span>
@@ -3847,7 +3842,7 @@
           </div>
 
           {/* Items list - flex column to allow click area to expand */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 8px 16px', display: 'flex', flexDirection: 'column' }}>
+          <div className="column-items">
             {/* Drop indicator at top */}
             <div className={`drop-indicator ${dropIndex === 0 ? 'visible' : ''}`} />
             {backlogItems.map((item, index) => {
@@ -3867,14 +3862,7 @@
               );
             })}
             {/* Click area to add at end - takes all remaining space */}
-            <div
-              onClick={() => handleAddItem(true)}
-              style={{
-                minHeight: '80px',
-                flex: 1,
-                cursor: 'pointer',
-              }}
-            />
+            <div onClick={() => handleAddItem(true)} className="column-click-area" />
           </div>
 
           {/* Edit popover for new items */}
@@ -4015,14 +4003,7 @@
           <div className={`bottom-sheet-overlay ${closing ? 'closing' : ''}`} onClick={handleRequestClose} />
           <div className={`bottom-sheet ${closing ? 'closing' : ''}`}>
             {/* Sticky header */}
-            <div style={{
-              position: 'sticky', top: 0, zIndex: 10,
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '0 16px 12px', marginBottom: '12px',
-              marginLeft: '-16px', marginRight: '-16px',
-              borderBottom: '1px solid var(--border-color)',
-              background: 'inherit'
-            }}>
+            <div className="bs-header">
               <button
                 onClick={handleRequestClose}
                 className="btn"
@@ -4046,11 +4027,8 @@
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Item..."
               autoFocus={isNewUntitledItem}
-              style={{
-                width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '0.875rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none'
-              }}
+              className="form-control form-group"
+              style={{ padding: '12px', fontSize: '0.875rem' }}
             />
 
             <textarea
@@ -4058,32 +4036,27 @@
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descripción..."
               rows={2}
-              style={{
-                width: '100%', padding: '12px', border: 'none', borderRadius: '8px',
-                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none', resize: 'none', fontFamily: 'inherit'
-              }}
+              className="form-control form-group form-textarea"
+              style={{ padding: '12px', fontSize: '0.75rem' }}
             />
 
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              style={{
-                width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)',
-                marginBottom: '10px', outline: 'none'
-              }}
+              className="form-control form-group"
+              style={{ padding: '10px', fontSize: '0.75rem' }}
             >
               {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
 
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Fecha</div>
+            <div className="form-group-lg">
+              <div className="form-label">Fecha</div>
               <button
                 onClick={() => setShowDatePicker(!showDatePicker)}
+                className="form-control"
                 style={{
-                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  background: 'var(--bg-input)', color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
+                  padding: '10px', borderRadius: '8px',
+                  color: scheduledDate ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontSize: '0.75rem', textAlign: 'left', cursor: 'pointer'
                 }}
               >
@@ -4097,19 +4070,16 @@
             </div>
 
             {hadRepeat && userClearedDate && (
-              <div style={{ marginBottom: '10px', padding: '8px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', fontSize: '0.625rem', color: '#EF4444' }}>
+              <div className="warning-box form-group-lg">
                 Al guardar se eliminará la recurrencia
               </div>
             )}
 
             {/* Only show repeat options if there's a date */}
             {scheduledDate && (
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Repetir</div>
-                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} style={{
-                  width: '100%', padding: '10px', border: 'none', borderRadius: '8px',
-                  fontSize: '0.75rem', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none'
-                }}>
+              <div className="form-group-lg">
+                <div className="form-label">Repetir</div>
+                <select value={repeatType} onChange={(e) => setRepeatType(e.target.value)} className="form-control" style={{ padding: '10px', borderRadius: '8px', fontSize: '0.75rem' }}>
                   <option value="none">No repetir</option>
                   <option value="days">Cada X días</option>
                   <option value="weeks">Cada X semanas</option>
@@ -4118,10 +4088,10 @@
                 {repeatType !== 'none' && repeatType !== 'weekdays' && (
                   <>
                     <input type="number" min="1" max="30" value={repeatEvery} onChange={(e) => setRepeatEvery(parseInt(e.target.value) || 1)}
-                      style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '0.75rem', textAlign: 'center', background: 'var(--bg-input)', color: 'var(--text-primary)', outline: 'none' }}
+                      className="form-control" style={{ marginTop: '6px', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', textAlign: 'center' }}
                     />
                     {repeatType === 'days' && (
-                      <select value={repeatMode} onChange={(e) => setRepeatMode(e.target.value)} style={{ width: '100%', marginTop: '6px', padding: '10px', border: 'none', borderRadius: '8px', fontSize: '0.625rem', background: 'var(--bg-input)', outline: 'none', color: 'var(--text-muted)' }}>
+                      <select value={repeatMode} onChange={(e) => setRepeatMode(e.target.value)} className="form-control" style={{ marginTop: '6px', padding: '10px', borderRadius: '8px', fontSize: '0.625rem', color: 'var(--text-muted)' }}>
                         <option value="fixed">Desde fecha fija</option>
                         <option value="completion">Desde última completación</option>
                       </select>
@@ -4146,17 +4116,8 @@
                   <button
                     type="button"
                     onClick={() => onToggleImportant?.(item.id)}
+                    className="bs-action-btn"
                     style={{
-                      flex: 1,
-                      padding: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
                       background: item.isImportant ? 'var(--accent-yellow)' : 'var(--bg-button)',
                       color: item.isImportant ? 'white' : 'var(--text-secondary)',
                     }}
@@ -4173,17 +4134,8 @@
                 <button
                   type="button"
                   onClick={() => { onComplete?.(item.id); handleSave(); }}
+                  className="bs-action-btn"
                   style={{
-                    flex: 1,
-                    padding: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
                     background: item.completed ? 'var(--accent-green)' : 'var(--bg-button)',
                     color: item.completed ? 'white' : 'var(--text-secondary)',
                   }}
@@ -5982,19 +5934,10 @@
       if (isMobile) {
         // MOBILE LAYOUT
         return (
-          <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', paddingTop: 'env(safe-area-inset-top)', overflow: 'hidden' }}>
+          <div className="app-mobile">
             {/* Floating header buttons - only visible in calendar mode */}
             {mobileViewMode === 'calendar' && (
-              <div style={{
-                position: 'fixed',
-                top: `calc(10px + env(safe-area-inset-top, 0px))`,
-                right: '20px',
-                zIndex: 100,
-                display: 'flex',
-                pointerEvents: 'none',
-                gap: '6px',
-                alignItems: 'center',
-              }}>
+              <div className="floating-header">
                 {!mobileIsToday && <button onClick={goToToday} onTouchStart={(e) => e.stopPropagation()} className="btn btn-primary" style={{ fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'none' }}>Hoy</button>}
                 <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} onTouchStart={(e) => e.stopPropagation()} className="btn" style={{ fontWeight: '600', fontSize: '0.75rem', pointerEvents: 'auto', touchAction: 'none' }}>{getShortMonthName(currentMobileDay)}</button>
               </div>
@@ -6129,37 +6072,15 @@
             <div className="mobile-footer">
               {/* FAB - positioned relative to footer */}
               <button
-                className="btn btn-primary"
+                className="btn btn-primary fab"
                 onClick={handleMobileAddClick}
-                style={{
-                  position: 'absolute',
-                  top: '-84px',
-                  right: '20px',
-                  fontSize: '0.9rem',
-                  padding: '18px 30px',
-                  borderRadius: '300px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  touchAction: 'manipulation',
-                  zIndex: 100,
-                }}
               >
                 Agregar
               </button>
               {/* Left half - Calendar */}
               <button
                 onClick={() => setMobileViewMode('calendar')}
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                  padding: '0 20px',
-                  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  height: '100%',
-                }}
+                className="footer-tab footer-tab-left"
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'calendar' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'calendar' ? 1 : 0.35, filter: mobileViewMode === 'calendar' ? 'none' : 'grayscale(100%)' }}>
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -6171,18 +6092,7 @@
               {/* Right half - Categories */}
               <button
                 onClick={() => setMobileViewMode('categories')}
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  padding: '0 20px',
-                  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  height: '100%',
-                }}
+                className="footer-tab footer-tab-right"
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={mobileViewMode === 'categories' ? 'var(--text-primary)' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: mobileViewMode === 'categories' ? 1 : 0.35, filter: mobileViewMode === 'categories' ? 'none' : 'grayscale(100%)' }}>
                   <rect x="3" y="3" width="7" height="7"/>
@@ -6237,11 +6147,11 @@
 
       // ===== DESKTOP LAYOUT - Two rows: Calendar top, Categories bottom =====
       return (
-        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
+        <div className="app-desktop">
           {/* Row 1: Calendar with header - 59% height */}
-          <div style={{ flex: '0 0 59%', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderBottom: '1px solid var(--border-color)' }}>
+          <div className="calendar-row">
             {/* Calendar header */}
-            <div style={{ padding: '8px 10px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px', height: '44px' }}>
+            <div className="header-bar">
               <button onClick={(e) => setCalendarRect(e.currentTarget.getBoundingClientRect())} className="btn" style={{ fontWeight: '600', fontSize: '0.5625rem', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-button)' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -6251,28 +6161,28 @@
                 </svg>
                 {getShortMonthName(viewBase)} {viewBase.getFullYear()}
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <button onClick={() => navigateDays(-12)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>««</span></button>
-                <button onClick={() => navigateDays(-1)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>«</span></button>
+              <div className="nav-group">
+                <button onClick={() => navigateDays(-12)} className="btn" style={{ background: 'var(--bg-button)' }}><span className="btn-top-adjust">««</span></button>
+                <button onClick={() => navigateDays(-1)} className="btn" style={{ background: 'var(--bg-button)' }}><span className="btn-top-adjust">«</span></button>
               </div>
               <span style={{ fontSize: '0.6875rem', fontWeight: '600', color: 'var(--text-primary)', minWidth: '70px', textAlign: 'center' }}>{rangeText}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <button onClick={() => navigateDays(1)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»</span></button>
-                <button onClick={() => navigateDays(12)} className="btn" style={{ background: 'var(--bg-button)' }}><span style={{ position: 'relative', top: '-1px' }}>»»</span></button>
+              <div className="nav-group">
+                <button onClick={() => navigateDays(1)} className="btn" style={{ background: 'var(--bg-button)' }}><span className="btn-top-adjust">»</span></button>
+                <button onClick={() => navigateDays(12)} className="btn" style={{ background: 'var(--bg-button)' }}><span className="btn-top-adjust">»»</span></button>
               </div>
               <button onClick={goToToday} className="btn" style={{ background: isTodayVisible ? 'var(--bg-button)' : 'var(--accent-blue)', color: isTodayVisible ? 'var(--text-secondary)' : '#FFF' }}>Hoy</button>
-              <div style={{ flex: 1 }} />
+              <div className="flex-spacer" />
               <button onClick={clearCategoryDone} className="btn" style={{ background: 'var(--bg-button)' }}>Borrar hechos</button>
               <button onClick={() => setCategoriesModalOpen(true)} className="btn" style={{ background: 'var(--bg-button)' }}>Editar categorías</button>
             </div>
-            <div ref={scrollRef} onDragOver={handleCalendarDragOver} style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', background: 'var(--bg-primary)' }}>
+            <div ref={scrollRef} onDragOver={handleCalendarDragOver} className="calendar-scroll">
               {days.map((day, i) => <DayColumn key={formatDate(day.date)} day={day} items={allItemsWithRecurring} categories={categories} dayEnergy={dayEnergy} onComplete={handleComplete} onEdit={handleEdit} onDelete={handleDelete} onToggleImportant={handleToggleImportant} onDrop={handleDrop} onAdd={handleSave} onSetEnergy={(d, e) => setDayEnergy(p => ({ ...p, [d]: e }))} isSticky={false} justDroppedItemId={justDroppedItemId} draggingItemType={draggingItemType} onDragTypeChange={setDraggingItemType} draggingRecurringRange={draggingRecurringRange} />)}
             </div>
           </div>
 
           {/* Row 2: Categories - horizontal scroll - 45% height */}
-          <div style={{ flex: '0 0 45%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-header)' }}>
-            <div style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden' }}>
+          <div className="categories-row">
+            <div className="categories-scroll">
               {categories.map(cat => (
                 <div key={cat.id}
                   onDragOver={(e) => { if (e.dataTransfer.types.includes('categoryid') && !cat.isFixed) { e.preventDefault(); setDragOverCat(cat.id); }}}
@@ -6290,18 +6200,10 @@
                     setNewCatRect(rect);
                   }
                 }}
-                style={{
-                  flex: '0 0 60px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: editPopover ? 'default' : 'pointer',
-                  opacity: editPopover ? 0.5 : 1,
-                  borderRight: '1px solid var(--border-color)',
-                  height: '100%',
-                }}
+                className="add-cat-cell"
+                style={{ cursor: editPopover ? 'default' : 'pointer', opacity: editPopover ? 0.5 : 1 }}
               >
-                <span style={{ fontSize: '1.25rem', fontWeight: '400', color: 'var(--text-muted)' }}>+</span>
+                <span className="add-cat-plus">+</span>
               </div>
             </div>
           </div>
