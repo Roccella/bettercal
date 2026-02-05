@@ -41,6 +41,7 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - **Zona Recurrentes**: items recurrentes + recurrentes completados (arriba)
 - **Zona Normal**: items normales + importantes + completados (abajo)
 - **Items completados se quedan en su posición** (no se mueven al final)
+- **Items descompletados también se quedan en su posición** (no se mueven)
 - **Drag & Drop con mute**:
   - Al arrastrar recurrente: zona normal se pone mute (opacity 0.3)
   - Al arrastrar normal/importante: zona recurrente se pone mute
@@ -188,6 +189,11 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 - Verifica si REAL_TODAY está en el array de días visibles
 - Usado para mostrar/ocultar botón "Hoy" condicionalmente
 
+### goToToday()
+- Navega al día de hoy
+- Resetea el scroll horizontal al inicio (desktop)
+- Hace scroll al top de la página
+
 ## Versión Mobile
 
 ### Layout Responsive
@@ -196,22 +202,26 @@ Better Cal es una aplicación de gestión de tareas estilo TeuxDeux, implementad
 
 ### Características Mobile
 - **Swipe navegación** con scroll-snap
-- **Header de día**: Incluye botones "Hoy" (si no es hoy) + "Feb" (mes) arriba a la derecha
-- **FAB flotante**: Botón "Agregar" como floating action button (abajo derecha)
-- **Footer**: Solo tabs (Calendario / Categorías) centrados
+- **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
+- **FAB flotante**: Botón "Agregar" (padding 17px 28px) más grande y más arriba (110px)
+- **Footer**: Dos zonas de tap grandes (mitad izquierda = calendario, mitad derecha = categorías)
+  - Icono calendario: arriba a la derecha de su mitad
+  - Icono categorías: arriba a la izquierda de su mitad
 - **BottomSheet**: Editor con botones Importante/Hecho (colores completos cuando activos)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
 - **Items**: fontSize 0.875rem, padding 8px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
 - **Toast**: Posición más arriba (120px + safe-area) para no tapar footer
 - **Categorías mobile**: Sin cards, sobre el fondo directamente, con padding top extra entre secciones
-- **Heading de día**: Muestra borde inferior al hacer scroll
+- **Heading de día**: Muestra borde inferior al hacer scroll, sin botones (están en header flotante)
 
 ### Interacciones Mobile
-- **Tocar item**: Abre BottomSheet (pero no si el calendario está abierto)
+- **Tocar item**: Abre BottomSheet (pero no si el calendario está abierto, en ese caso solo cierra calendario)
 - **Tocar heading categoría**: Crea item y abre BottomSheet
 - **Calendario popover**: Se cierra al tocar fuera sin hacer shimmer al siguiente item
 - **FAB Agregar**: Crea nuevo item y abre BottomSheet
+- **Long press (300ms+)**: Activa drag mode con shimmer visual
+- **Tap rápido**: No genera shimmer, solo abre el editor
 
 ### Safe Area (iPhone)
 - `viewport-fit=cover` + `env(safe-area-inset-*)` para notch y home indicator
