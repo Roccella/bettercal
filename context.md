@@ -23,6 +23,10 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 
 ## Estructura de la UI (Estilo TeuxDeux)
 
+### Título y Favicon
+- **Título dinámico**: "Tudux - Hoy" por defecto, cambia a "Tudux - Pasado" o "Tudux - Futuro" al navegar en desktop
+- **Favicon**: Ícono SVG de calendario 2D (inline data URI)
+
 ### Layout Principal - Dos Filas
 - **Fila 1 (59%)**: Calendario con scroll horizontal (32 columnas de 240px)
 - **Fila 2 (41%)**: Categorías con scroll horizontal (columnas de 200px)
@@ -103,6 +107,8 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Checkbox en hover**: Marca como completado
 - **Completar en categorías**: Item se queda en lugar visible (no desaparece)
 - **Hotkey Command+E**: Eliminar item (desktop)
+- **Undo**: Al deshacer un borrado, el item vuelve a su posición exacta en el array
+- **Doble-click en headings de categorías**: Protección contra ghost items (no crea item si ya hay uno pendiente)
 
 ## Modelo de Datos
 
@@ -188,12 +194,15 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 
 ### Popovers
 - `AddEditItemPopover` (desktop): Editor de items
+  - **Sin botón X de cierre** - se cierra clickeando fuera o con Escape
   - **Select de recurrencia solo visible si hay fecha**
 - `BottomSheet` (mobile): Editor fullscreen con botones Cancelar, Importante y Hecho
+  - Botón Cancelar: arriba a la izquierda Y abajo a la derecha (duplicado para fácil acceso)
   - Botón Importante: toggle sin cerrar el popover
   - Botón Hecho: guarda y cierra el popover
   - **Select de recurrencia solo visible si hay fecha**
   - **Auto-focus**: Solo para items nuevos, no para edición de existentes
+- `CategoriesModal`: Sin botón X de cierre, se cierra clickeando fuera o con Escape
 
 ## Funciones Clave
 
@@ -211,8 +220,13 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - Muestra toast con cantidad eliminada
 
 ### isTodayVisible (computed)
-- Verifica si REAL_TODAY está en el array de días visibles
-- Usado para mostrar/ocultar botón "Hoy" condicionalmente
+- Verifica si `viewBase` coincide con REAL_TODAY (es decir, si estamos en la vista por defecto)
+- Usado para estilizar botón "Hoy" (azul cuando no estamos en hoy, gris cuando sí)
+
+### getDaysArray(base, pastDays)
+- Genera array de días a mostrar: `pastDays` días antes de `base` + 31 días desde `base`
+- Desktop: `pastDays=1` (ayer + 31 = 32 columnas)
+- Mobile: `pastDays=14` (14 días atrás + 31 = 45 días para swipe)
 
 ### goToToday()
 - Navega al día de hoy
@@ -234,7 +248,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - Mobile: Vista de 1 día con swipe + footer con tabs
 
 ### Características Mobile
-- **Swipe navegación** con scroll-snap
+- **Swipe navegación** con scroll-snap (14 días hacia atrás + 31 hacia adelante)
 - **Header flotante**: Botones "Hoy" (si no es hoy) + mes flotan fijos arriba a la derecha, no se repiten en cada día
 - **FAB flotante**: Botón "Agregar" (fontSize 0.9rem, padding 18px 30px, borderRadius 300px) posicionado relativo al footer (top: -84px)
 - **Footer**: 84px de alto con position:relative, íconos centrados verticalmente (alignItems: center)
@@ -243,7 +257,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **Scroll bloqueado**: html/body con overflow:hidden, position:fixed (top/left/right/bottom:0) en mobile
   - Icono calendario: arriba a la derecha de su mitad
   - Icono categorías: arriba a la izquierda de su mitad
-- **BottomSheet**: Editor con botones Cancelar (fondo gris), Importante y Hecho (colores completos cuando activos)
+- **BottomSheet**: Editor con botones Cancelar (arriba izq + abajo der), Importante y Hecho (colores completos cuando activos), Borrar (abajo izq)
 - **Iconos SVG 2D**: Calendario (rect + líneas), Categorías (grid 2x2)
 - **Items**: fontSize 0.875rem, padding 6px 0, gap 8px, lineHeight 1.3
 - **Íconos en items**: Solo visibles si el estado está activo (recurrente/importante/completado)
@@ -264,10 +278,17 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 ### Safe Area (iPhone)
 - `viewport-fit=cover` + `env(safe-area-inset-*)` para notch y home indicator
 
+## Archivos del Proyecto
+- `static.html` - Aplicación principal (prototipo)
+- `context.md` - Documentación del modelo de datos y UI
+- `planning.md` - Plan de producción y decisiones técnicas
+- `test-cases-recurrentes.md` - Casos de prueba para recurrentes
+
 ## Sin Usar (Removido)
 - Light mode (solo dark)
 - Sistema de prioridad (Important/Pendiente select)
 - Botón "Marcar como hecho" en popovers desktop
+- Botones X de cierre en popovers desktop (se cierra con click fuera o Escape)
 - Sticky del día de hoy
 - Emoji 🔄 para recurrentes
 - Click en categoría para editar (ahora crea item)
