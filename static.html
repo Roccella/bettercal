@@ -377,7 +377,7 @@
       .mobile-only { display: flex; }
       .desktop-only { display: none !important; }
 
-      .mobile-footer { display: block; }
+      .mobile-footer { display: flex; }
 
       /* Toast wider and higher in mobile to not cover footer */
       .toast { width: calc(100vw - 40px); max-width: 400px; bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
@@ -3485,18 +3485,7 @@
           // Double check - if item is recurring, don't allow
           if (item?.repeat) return;
 
-          // If item has a date, show confirmation popover
-          if (item && item.scheduledDate) {
-            const rect = {
-              top: e.clientY,
-              bottom: e.clientY + 10,
-              left: e.clientX - 140,
-              right: e.clientX + 140,
-            };
-            setRemoveDatePopover({ item, rect, dropIdx: currentDropIndex, isRecurring: false });
-            return;
-          }
-
+          // Move directly without confirmation
           onSidebarGroupDrop?.(numId, 'backlog', category.id, currentDropIndex);
         }
       };
@@ -4541,6 +4530,7 @@
             // We show alert only if moving to normal items zone (where normal items exist)
             if (normalItemsCount > 0 && dropIndex > otherRecurringCount) {
               console.log('Moving recurring to normal zone - showing alert', { dropIndex, otherRecurringCount, normalItemsCount });
+              setDraggingItemType(null); // Reset mute state when showing alert
               setRemoveRecurrenceAlert({
                 item: originalItem,
                 date,
@@ -4552,6 +4542,7 @@
             }
 
             // Otherwise just reorder within recurring zone or append after all items
+            setDraggingItemType(null); // Reset mute state
             performDrop(numId, date, slot, dropIndex);
             return;
           }
@@ -4595,6 +4586,7 @@
           };
 
           setPendingRecurringDrop(pendingItem);
+          setDraggingItemType(null); // Reset mute state when showing popover
 
           console.log('Different day - showing popover');
           setRecurringEditPopover({
@@ -4635,6 +4627,7 @@
           }
         }
 
+        setDraggingItemType(null); // Reset mute state
         performDrop(numId, date, slot, dropIndex, dropOptions);
       };
 
@@ -5575,7 +5568,7 @@
             </button>
 
             {/* Mobile Footer - Two large tap zones */}
-            <div className="mobile-footer" style={{ display: 'flex', padding: 0 }}>
+            <div className="mobile-footer">
               {/* Left half - Calendar */}
               <button
                 onClick={() => setMobileViewMode('calendar')}
