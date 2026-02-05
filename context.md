@@ -64,7 +64,8 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **No se pueden mover a categorías** (drag & drop bloqueado)
 - **No se pueden modificar en días pasados** (cambios se ignoran silenciosamente)
 - **No se pueden mover al pasado** (días < hoy se mutean y no aceptan drop)
-- **Restricción de rango** (modelo Outlook): solo puede moverse entre instancia anterior y siguiente
+- **Restricción de rango** (modelo Outlook): solo puede moverse entre instancia anterior y siguiente (aplica tanto en drag & drop como en edición de fecha desde popover/bottom sheet)
+- **Edición de fecha**: Cambiar la fecha de una instancia recurrente desde el editor muestra las mismas opciones que el drag & drop (Solo este evento / Este y los siguientes / Todos)
 - **Overdue**: instancias pasadas sin completar se muestran en rojo (texto e ícono)
 - **Crear en día fuera del patrón weekdays**: se ajusta a la primera fecha válida del patrón
 
@@ -89,7 +90,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 
 ### Shimmers (Animaciones)
 - **Border radius**: 2px en todos los shimmers
-- **Drop shimmer**: 300ms L→R al soltar item
+- **Drop shimmer**: 300ms L→R al soltar item y al deshacer borrado (undo)
 - **Grab shimmer**: 300ms delay + 300ms R→L al hacer long press (mobile)
 - **Navigate shimmer**: 300ms R→L al navegar a fecha agendada
 

@@ -4623,11 +4623,74 @@
             existingItem.effort !== cleanData.effort
           );
 
+          // Get the visual date from desktop or mobile popover
+          const currentVisualDate = editPopover?.visualDate || bottomSheetItem?.visualDate || null;
+          const currentEditItem = editPopover?.item || bottomSheetItem?.item || null;
+
           // Don't allow modifying recurring items on past days
-          const visualDateObj = editPopover?.visualDate ? new Date(editPopover.visualDate + 'T00:00:00') : null;
+          const visualDateObj = currentVisualDate ? new Date(currentVisualDate + 'T00:00:00') : null;
           const isPastDay = visualDateObj && visualDateObj < REAL_TODAY;
           if (isRecurring && propsChanged && isPastDay) {
             // Silently ignore changes to recurring items on past days
+            setEditPopover(null);
+            return;
+          }
+
+          // Check if recurring item date changed (Outlook-style: show move options)
+          const dateChanged = isRecurring && currentVisualDate && cleanData.scheduledDate && cleanData.scheduledDate !== currentVisualDate;
+          if (dateChanged) {
+            const targetDate = cleanData.scheduledDate;
+            const visualDate = currentVisualDate;
+
+            // Validate range restriction (Outlook model: can't skip over adjacent instances)
+            const { minDate, maxDate } = getValidMoveRange(existingItem, visualDate);
+            if (minDate && targetDate < minDate) {
+              setToast({ message: 'No se puede mover antes de la instancia anterior' });
+              return;
+            }
+            if (maxDate && targetDate > maxDate) {
+              setToast({ message: 'No se puede mover después de la siguiente instancia' });
+              return;
+            }
+
+            // Get the exception date for this instance
+            const editItemId = currentEditItem?.id;
+            let exceptionDate = visualDate;
+            if (editItemId && typeof editItemId === 'string') {
+              if (currentEditItem?.originalScheduledDate) {
+                exceptionDate = currentEditItem.originalScheduledDate;
+              } else if (editItemId.includes('-')) {
+                const parts = editItemId.split('-');
+                if (parts.length >= 4) {
+                  exceptionDate = `${parts[1]}-${parts[2]}-${parts[3]}`;
+                }
+              }
+            }
+
+            // Also apply any property changes alongside the date change
+            if (propsChanged) {
+              // Apply property changes to all instances first
+              setItems(p => p.map(i => i.id === numId ? {
+                ...i,
+                title: cleanData.title,
+                description: cleanData.description,
+                effort: cleanData.effort,
+              } : i));
+            }
+
+            // Show recurring move popover for date change
+            const rect = editPopover?.rect || { top: window.innerHeight / 2, left: window.innerWidth / 2, bottom: window.innerHeight / 2, right: window.innerWidth / 2 };
+            setRecurringEditPopover({
+              item: existingItem,
+              exceptionDate,
+              visualDate,
+              originalSlot: existingItem.scheduledSlot || 'todo',
+              targetDate,
+              targetSlot: cleanData.scheduledSlot || existingItem.scheduledSlot || 'todo',
+              dropIndex: 0,
+              action: 'move',
+              rect,
+            });
             setEditPopover(null);
             return;
           }
@@ -4789,6 +4852,9 @@
             }
             return newItems;
           });
+          // Trigger drop shimmer on the restored item
+          setJustDroppedItemId(toast.item.id);
+          setTimeout(() => setJustDroppedItemId(null), 300);
         } else if (toast?.hiddenIds) {
           setItems(p => p.map(i => toast.hiddenIds.includes(i.id) ? { ...i, hiddenFromSidebar: false } : i));
         }
@@ -6007,6 +6073,20 @@
 
             {/* New Category Popover */}
             {newCatRect && <EditCategoryPopover category={{}} itemCount={0} onSave={handleEditCategory} onDelete={() => {}} onClose={() => setNewCatRect(null)} targetRect={newCatRect} />}
+
+            {/* Recurring Action Popover (for date changes on recurring items) */}
+            {recurringEditPopover && <RecurringActionPopover
+              item={recurringEditPopover.item}
+              originalDate={recurringEditPopover.originalDate}
+              visualDate={recurringEditPopover.visualDate}
+              targetDate={recurringEditPopover.targetDate}
+              targetSlot={recurringEditPopover.targetSlot}
+              action={recurringEditPopover.action}
+              targetRect={recurringEditPopover.rect}
+              pendingItemId={recurringEditPopover.pendingItemId}
+              onConfirm={handleRecurringAction}
+              onCancel={() => { setRecurringEditPopover(null); setPendingRecurringDrop(null); }}
+            />}
 
             {/* Toast */}
             {toast && <Toast message={toast.message} onUndo={handleUndoDelete} onClose={() => setToast(null)} />}
