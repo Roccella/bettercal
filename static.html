@@ -1835,24 +1835,46 @@
         }
       };
 
-      const handleDragStart = (index) => {
+      const [dropIndex, setDropIndex] = useState(-1);
+
+      const handleDragStart = (e, index) => {
         setDraggedIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
       };
 
       const handleDragOver = (e, index) => {
         e.preventDefault();
-        if (draggedIndex === null || draggedIndex === index) return;
-        setLocalCategories(prev => {
-          const updated = [...prev];
-          const [dragged] = updated.splice(draggedIndex, 1);
-          updated.splice(index, 0, dragged);
-          return updated;
-        });
-        setDraggedIndex(index);
+        if (draggedIndex === null) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const target = e.clientY < midY ? index : index + 1;
+        // Don't show indicator at no-op positions (right before or after dragged item)
+        if (target === draggedIndex || target === draggedIndex + 1) {
+          setDropIndex(-1);
+        } else {
+          setDropIndex(target);
+        }
       };
 
       const handleDragEnd = () => {
+        if (draggedIndex !== null && dropIndex >= 0) {
+          setLocalCategories(prev => {
+            const updated = [...prev];
+            const [dragged] = updated.splice(draggedIndex, 1);
+            const insertAt = dropIndex > draggedIndex ? dropIndex - 1 : dropIndex;
+            updated.splice(insertAt, 0, dragged);
+            return updated;
+          });
+        }
         setDraggedIndex(null);
+        setDropIndex(-1);
+      };
+
+      const handleDragLeave = (e) => {
+        // Only clear if leaving the list container, not moving between children
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setDropIndex(-1);
+        }
       };
 
       const handleSave = () => {
@@ -1879,17 +1901,18 @@
               {/* Close via clicking outside or Escape */}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0', marginBottom: '16px', marginTop: '12px' }} onDragLeave={handleDragLeave}>
               {localCategories.map((cat, index) => (
-                <div
-                  key={cat.id}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
-                  className="cat-modal-row"
-                  style={{ opacity: draggedIndex === index ? 0.5 : 1 }}
-                >
+                <React.Fragment key={cat.id}>
+                  <div className={`drop-indicator ${dropIndex === index ? 'visible' : ''}`} style={{ margin: '0' }} />
+                  <div
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className="cat-modal-row"
+                    style={{ opacity: draggedIndex === index ? 0.4 : 1, marginBottom: '8px' }}
+                  >
                   {/* Drag handle */}
                   <div style={{ color: 'var(--text-muted)', cursor: 'grab' }}>⋮⋮</div>
 
@@ -1936,7 +1959,9 @@
                     {getItemCount(cat.id)}
                   </span>
                 </div>
+                </React.Fragment>
               ))}
+              <div className={`drop-indicator ${dropIndex === localCategories.length ? 'visible' : ''}`} style={{ margin: '0' }} />
             </div>
 
             <div className="popover-actions">
