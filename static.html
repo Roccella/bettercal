@@ -5266,6 +5266,8 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: formatDate(currentMobileDay) });
+          // Scroll to top so input is visible when keyboard opens
+          window.scrollTo(0, 0);
         } else {
           // In categories view: create item in backlog (existing behavior)
           const newItem = {
@@ -5286,6 +5288,8 @@
           };
           setItems(p => [newItem, ...p]);
           setBottomSheetItem({ item: newItem, visualDate: null });
+          // Scroll to top so input is visible when keyboard opens
+          window.scrollTo(0, 0);
         }
       };
 
