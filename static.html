@@ -2160,13 +2160,19 @@
             {/* Para days/weeks: mostrar "Este y los siguientes" */}
             {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
               <button onClick={handleFollowingClick} className="btn btn-action">
-                Este y los siguientes
+                <div>Este y los siguientes</div>
+                <div className="btn-action-hint">
+                  Mover desde esta fecha en adelante
+                </div>
               </button>
             )}
             {/* Para days/weeks: mostrar "Todos los eventos" */}
             {!isDoneTarget && !isWeekdays && !showFollowingOptions && (
               <button onClick={() => onConfirm('all')} className="btn btn-action">
-                Todos los eventos
+                <div>Todos los eventos</div>
+                <div className="btn-action-hint">
+                  Mover toda la serie
+                </div>
               </button>
             )}
             {showFollowingOptions && (
@@ -2355,10 +2361,16 @@
           </div>
           <div className="popover-actions-col">
             <button onClick={onThis} className="btn btn-action">
-              Solo este evento
+              <div>Solo este evento</div>
+              <div className="btn-action-hint">
+                Guardar solo en esta instancia
+              </div>
             </button>
             <button onClick={onFollowing} className="btn btn-action">
-              Este y los siguientes
+              <div>Este y los siguientes</div>
+              <div className="btn-action-hint">
+                Guardar en esta y todas las futuras
+              </div>
             </button>
           </div>
         </Popover>

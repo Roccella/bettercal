@@ -87,6 +87,7 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 - **"Este y los siguientes"**: Pone `endDate` en la serie al día anterior a la fecha visual
 - **"Todos los eventos"**: Borra toda la serie (el item completo)
 - **Todas las opciones tienen undo** (deshacer en toast)
+- **Todos los botones de alertas recurrentes** (mover, borrar, guardar) tienen subtexto descriptivo (`btn-action-hint`)
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
