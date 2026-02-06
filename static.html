@@ -2276,6 +2276,41 @@
       );
     };
 
+    const RecurringDeletePopover = ({ item, onConfirm, onCancel, targetRect }) => {
+      const isWeekdays = item.repeat?.type === 'weekdays';
+
+      return (
+        <Popover onClose={onCancel} targetRect={targetRect}>
+          <div className="popover-info">
+            <div className="popover-title">Borrar evento recurrente</div>
+            <div className="popover-subtitle" style={{ marginBottom: '12px' }}>"{item.title}"</div>
+          </div>
+          <div className="popover-actions-col">
+            <button onClick={() => onConfirm('this')} className="btn btn-action">
+              <div>Solo este evento</div>
+              <div className="btn-action-hint">
+                Eliminar solo esta instancia
+              </div>
+            </button>
+            {!isWeekdays && (
+              <button onClick={() => onConfirm('following')} className="btn btn-action">
+                <div>Este y los siguientes</div>
+                <div className="btn-action-hint">
+                  Eliminar desde esta fecha en adelante
+                </div>
+              </button>
+            )}
+            <button onClick={() => onConfirm('all')} className="btn btn-action">
+              <div>Todos los eventos</div>
+              <div className="btn-action-hint">
+                Eliminar toda la serie
+              </div>
+            </button>
+          </div>
+        </Popover>
+      );
+    };
+
     const RemoveDatePopover = ({ itemTitle, onConfirm, onCancel, targetRect, isRecurring }) => {
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
@@ -4375,6 +4410,7 @@
       const [dragOverCat, setDragOverCat] = useState(null);
       const [viewBase, setViewBase] = useState(REAL_TODAY);
       const [recurringEditPopover, setRecurringEditPopover] = useState(null);
+      const [recurringDeletePopover, setRecurringDeletePopover] = useState(null); // For recurring delete confirmation
       const [recurringSavePopover, setRecurringSavePopover] = useState(null); // For edit property confirmation
       const [pendingRecurringDrop, setPendingRecurringDrop] = useState(null); // Temporary visual position during recurring move
       const [removeRecurrenceAlert, setRemoveRecurrenceAlert] = useState(null); // Alert when moving recurring to normal zone
@@ -4888,6 +4924,29 @@
 
       const handleDelete = (id) => {
         const numId = typeof id === 'string' ? parseInt(id.split('-')[0]) : id;
+        const item = items.find(i => i.id === numId);
+
+        // If item is recurring, show delete options popover
+        if (item?.repeat) {
+          const visualDate = editPopover?.visualDate || bottomSheetItem?.visualDate;
+          if (visualDate) {
+            // Determine exceptionDate: check if this instance was moved (movedTo)
+            let exceptionDate = visualDate;
+            if (item.exceptions) {
+              for (const [origDate, exc] of Object.entries(item.exceptions)) {
+                if (exc.movedTo && exc.movedTo.date === visualDate) {
+                  exceptionDate = origDate;
+                  break;
+                }
+              }
+            }
+            const rect = editPopover?.rect || { top: window.innerHeight / 2, left: window.innerWidth / 2, width: 0, height: 0 };
+            setRecurringDeletePopover({ item, exceptionDate, visualDate, rect });
+            return;
+          }
+        }
+
+        // Non-recurring: delete normally
         const deletedIndex = items.findIndex(i => i.id === numId);
         const deletedItem = deletedIndex >= 0 ? items[deletedIndex] : null;
         setItems(p => p.filter(i => i.id !== numId));
@@ -4932,6 +4991,10 @@
           });
         } else if (toast?.hiddenIds) {
           setItems(p => p.map(i => toast.hiddenIds.includes(i.id) ? { ...i, hiddenFromSidebar: false } : i));
+        } else if (toast?.recurringDeleteUndo) {
+          // Undo recurring delete: restore the item to its previous state
+          const { itemId, previousItem } = toast.recurringDeleteUndo;
+          setItems(p => p.map(i => i.id === itemId ? previousItem : i));
         }
         setToast(null);
       };
@@ -5670,6 +5733,83 @@
         setTimeout(() => setJustDroppedItemId(null), 300);
       };
 
+      // Handler principal para borrado de recurrentes
+      const handleRecurringDeleteAction = (choice) => {
+        if (!recurringDeletePopover) return;
+        const { item, exceptionDate, visualDate } = recurringDeletePopover;
+        // Save a snapshot of the item before modification (for undo)
+        const previousItem = { ...item, exceptions: item.exceptions ? { ...item.exceptions } : undefined, repeat: { ...item.repeat } };
+
+        switch (choice) {
+          case 'this': {
+            // "Solo este evento": add exception with deleted: true
+            setItems(p => p.map(i => {
+              if (i.id === item.id) {
+                const newExceptions = { ...(i.exceptions || {}) };
+                newExceptions[exceptionDate] = {
+                  ...(newExceptions[exceptionDate] || {}),
+                  deleted: true,
+                };
+                // Clean up movedTo since we're deleting
+                delete newExceptions[exceptionDate].movedTo;
+                delete newExceptions[exceptionDate].completed;
+                delete newExceptions[exceptionDate].completedDate;
+                return { ...i, exceptions: newExceptions };
+              }
+              return i;
+            }));
+            setToast({
+              message: `"${item.title}" eliminado (este evento)`,
+              recurringDeleteUndo: { itemId: item.id, previousItem },
+            });
+            break;
+          }
+          case 'following': {
+            // "Este y los siguientes": set endDate to day before visualDate
+            const endDateObj = new Date(visualDate + 'T00:00:00');
+            endDateObj.setDate(endDateObj.getDate() - 1);
+            const newEndDate = formatDate(endDateObj);
+
+            setItems(p => p.map(i => {
+              if (i.id === item.id) {
+                // Clean up exceptions on or after visualDate
+                const newExceptions = { ...(i.exceptions || {}) };
+                Object.keys(newExceptions).forEach(excDate => {
+                  if (excDate >= visualDate) {
+                    delete newExceptions[excDate];
+                  }
+                });
+                return {
+                  ...i,
+                  repeat: { ...i.repeat, endDate: newEndDate },
+                  exceptions: Object.keys(newExceptions).length > 0 ? newExceptions : undefined,
+                };
+              }
+              return i;
+            }));
+            setToast({
+              message: `"${item.title}" eliminado (este y siguientes)`,
+              recurringDeleteUndo: { itemId: item.id, previousItem },
+            });
+            break;
+          }
+          case 'all': {
+            // "Todos los eventos": delete the entire item
+            const deletedIndex = items.findIndex(i => i.id === item.id);
+            setItems(p => p.filter(i => i.id !== item.id));
+            if (item.title && item.title.trim() !== '') {
+              setToast({
+                message: `"${item.title}" eliminado`,
+                item: item,
+                index: deletedIndex,
+              });
+            }
+            break;
+          }
+        }
+        setRecurringDeletePopover(null);
+      };
+
       const navigateDays = (numDays) => {
         const newBase = new Date(viewBase);
         newBase.setDate(newBase.getDate() + numDays);
@@ -6168,6 +6308,14 @@
               onCancel={() => { setRecurringEditPopover(null); setPendingRecurringDrop(null); }}
             />}
 
+            {/* Recurring Delete Popover */}
+            {recurringDeletePopover && <RecurringDeletePopover
+              item={recurringDeletePopover.item}
+              targetRect={recurringDeletePopover.rect}
+              onConfirm={handleRecurringDeleteAction}
+              onCancel={() => setRecurringDeletePopover(null)}
+            />}
+
             {/* Toast */}
             {toast && <Toast message={toast.message} onUndo={handleUndoDelete} onClose={() => setToast(null)} />}
           </div>
@@ -6258,6 +6406,12 @@
             pendingItemId={recurringEditPopover.pendingItemId}
             onConfirm={handleRecurringAction}
             onCancel={() => { setRecurringEditPopover(null); setPendingRecurringDrop(null); }}
+          />}
+          {recurringDeletePopover && <RecurringDeletePopover
+            item={recurringDeletePopover.item}
+            targetRect={recurringDeletePopover.rect}
+            onConfirm={handleRecurringDeleteAction}
+            onCancel={() => setRecurringDeletePopover(null)}
           />}
           {recurringSavePopover && <RecurringSavePopover
             itemTitle={recurringSavePopover.cleanData.title}
