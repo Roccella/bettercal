@@ -2151,7 +2151,7 @@
             {/* Para weekdays: mostrar "Modificar repetición" que expande opciones */}
             {!isDoneTarget && isWeekdays && !showFollowingOptions && (
               <button onClick={handleFollowingClick} className="btn btn-action">
-                <div>Modificar repetición</div>
+                <div>Modificar repetición semanal</div>
                 <div className="btn-action-hint">
                   Cambiar días a partir de esta fecha
                 </div>
@@ -2277,8 +2277,6 @@
     };
 
     const RecurringDeletePopover = ({ item, onConfirm, onCancel, targetRect }) => {
-      const isWeekdays = item.repeat?.type === 'weekdays';
-
       return (
         <Popover onClose={onCancel} targetRect={targetRect}>
           <div className="popover-info">
@@ -2292,14 +2290,12 @@
                 Eliminar solo esta instancia
               </div>
             </button>
-            {!isWeekdays && (
-              <button onClick={() => onConfirm('following')} className="btn btn-action">
-                <div>Este y los siguientes</div>
-                <div className="btn-action-hint">
-                  Eliminar desde esta fecha en adelante
-                </div>
-              </button>
-            )}
+            <button onClick={() => onConfirm('following')} className="btn btn-action">
+              <div>Este y los siguientes</div>
+              <div className="btn-action-hint">
+                Eliminar desde esta fecha en adelante
+              </div>
+            </button>
             <button onClick={() => onConfirm('all')} className="btn btn-action">
               <div>Todos los eventos</div>
               <div className="btn-action-hint">

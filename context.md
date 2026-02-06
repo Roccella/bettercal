@@ -75,11 +75,18 @@ Tudux es una aplicación de gestión de tareas estilo TeuxDeux, implementada com
 
 ### Opciones al mover recurrentes (modelo Google Calendar)
 - **"Solo este evento"**: Crea excepción `movedTo` - el item sigue siendo parte de la serie
-- **Para weekdays**: 2 opciones: "Solo este evento" / "Modificar repetición"
+- **Para weekdays**: 2 opciones: "Solo este evento" / "Modificar repetición semanal"
 - **Para cada X días/semanas**: 3 opciones: "Solo este" / "Este y siguientes" / "Todos"
-- **"Modificar repetición"** (weekdays): Muestra selector de días, aplica desde la fecha destino (usa handleRecurringMoveFollowing)
+- **"Modificar repetición semanal"** (weekdays): Muestra selector de días, aplica desde la fecha destino (usa handleRecurringMoveFollowing)
 - **"Este y los siguientes"**: Termina serie original, crea nueva desde la fecha destino
 - **"Todos los eventos"**: Desplaza toda la serie (startDate, createdAt, excepciones)
+
+### Opciones al borrar recurrentes
+- **Siempre 3 opciones**: "Solo este evento" / "Este y los siguientes" / "Todos los eventos"
+- **"Solo este evento"**: Crea excepción `deleted: true` - la instancia desaparece pero la serie sigue
+- **"Este y los siguientes"**: Pone `endDate` en la serie al día anterior a la fecha visual
+- **"Todos los eventos"**: Borra toda la serie (el item completo)
+- **Todas las opciones tienen undo** (deshacer en toast)
 
 ### Items Importantes
 - **Texto amarillo** (color `--accent-yellow`)
